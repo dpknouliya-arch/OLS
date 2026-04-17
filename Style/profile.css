@@ -1,0 +1,463 @@
+fieldset {
+    gap: 20px;
+}
+
+fieldset input {
+    width: 100%;
+    border: 1px solid #DDDDDD;
+    padding: 12px 20px;
+    text-transform: capitalize;
+    color: var(--grey-color);
+    font-size: var(--XSmall-Size);
+    border-radius: 5px;
+}
+
+.boxes {
+    background: #FFFFFF;
+    border: 1px solid #DDDDDD;
+    padding: 30px;
+    border-radius: 5px;
+}
+
+#team-tab .boxes {
+    padding: 30px 30px 30px 0;
+
+}
+
+.orderMultiStep {
+    max-width: 900px;
+    display: flex;
+    align-items: center;
+    margin: auto;
+    background: #ECF0F9;
+    padding: 15px 40px;
+    justify-content: space-between;
+}
+
+.orderMultiStep .activeStep {
+    color: var(--blueColor);
+}
+
+.form-horizontal {
+    margin: 0 0 20px 0;
+}
+
+.form-horizontal .formTitle {
+    margin: 0 0 20px 0;
+    gap: 30px;
+    justify-content: space-between;
+}
+
+.orederItems a {
+    display: flex;
+    align-content: center;
+    gap: 11px;
+    font-size: var(--small-Size);
+    font-weight: 600;
+    color: var(--grey-color);
+}
+
+.orederItems .iconImg {
+    position: relative;
+    top: 2px;
+}
+
+.submitBUtton {
+    text-align: right;
+}
+
+.tab-pane {
+    padding: 20px;
+    background: #FFF;
+    margin-top: 30px;
+}
+
+.main-content-header .nav-item .nav-link.active {
+    background: #2F50A3 !important;
+    border: none;
+    color: #FFF;
+
+}
+
+.main-content-header .nav-item .nav-link {
+    display: flex;
+    align-content: center;
+    gap: 10px;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--grey-color);
+}
+
+#myTab {
+    display: flex;
+    width: 100%;
+    margin: auto;
+    margin-bottom: auto;
+    margin-bottom: auto;
+    text-align: center;
+    justify-content: space-between;
+    border-bottom: 0;
+    background: #ECF0F9;
+    border-radius: 5px;
+}
+
+
+.leftSide {
+    background: #FFFFFF;
+}
+
+.rightSide {
+    background: #F9F9F9;
+    padding: 30px;
+}
+
+.rightSide {
+    border: 1px solid #DDDDDD;
+}
+
+.rightSide .card,
+.leftSide .card {
+    background: #F9F9F9;
+}
+
+.rightSide li {
+    color: var(--grey-color);
+}
+
+.rightSide .themeBtn2 {
+    color: #21A366;
+    margin: 0 auto 0 0;
+    border: 1px solid #DDDDDD !important;
+    box-shadow: 0px 0px 4px 0px #0000002E;
+
+}
+
+.formBottom {
+    grid-template-columns: 200px 200px;
+}
+
+#addNewTeam .formBottom {
+    grid-template-columns: 1fr 1fr;
+}
+
+
+.RosterDetailsGuide .innerBox li {
+    color: var(--grey-color);
+    font-size: var(--XSmall-Size);
+}
+
+.teamTabsSection .tableLower {
+    padding: 20px 0;
+}
+
+#teamTab {
+    box-shadow: 0px 1px 4px 0px #0000001A;
+    border: 1px solid #DDDDDD;
+    position: sticky;
+    top: -32px;
+    z-index: 100;
+    padding: 10px;
+}
+
+#teamTab .nav-link.active {
+    box-shadow: 0px 1px 4px 0px #0000001A;
+    border: 1px solid #DDDDDD
+}
+
+#teamTab .nav-link {
+    border: 1px solid #e8e8e8;
+    margin: 0 2px;
+}
+
+.teamTabsSection {
+    display: none;
+}
+
+.teamTabsSection .tab-pane {
+    padding: 0;
+}
+
+
+
+.table-responsive th {
+    background: var(--blueColor);
+    color: #fff;
+    font-weight: 400;
+    font-size: 14px;
+    padding: 10px 4px !important;
+}
+
+.table-responsive td {
+    font-weight: 400;
+    font-size: 14px;
+}
+
+.upload-btn-wrapper button {
+    box-shadow: 0px 0px 4px 0px #0000002E;
+    border: 1px solid #DDDDDD;
+    width: 100%;
+
+}
+
+
+
+::placeholder {
+    color: var(--grey-color);
+
+}
+
+.innerMainContent {
+    padding: 40px 0;
+}
+
+
+
+body {
+    overflow-x: hidden;
+    background: #F6F8F9;
+    font-family: "Inter", sans-serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+}
+
+
+
+:root {
+    --black-bg: #000000;
+    --blueColor: #2F50A3;
+    --blue-bg: #2F50A3;
+    --black-color: #333333;
+    --white-bg: #FAFBFC;
+    --white-Color: #FAFBFC;
+    --grey-bg: #F6F8F9;
+    --grey-color: #777777;
+    --grey-color: #333;
+    --yellow-bg: #FFFF00;
+    --small-Size: 16px;
+    --XSmall-Size: 14px;
+    --medium-Size: 20px;
+    --large-Size: 22px;
+    --xl-size: 25px;
+}
+
+.XSmall {
+    font-size: var(--XSmall-Size);
+}
+
+.d-icon {
+    font-size: var(--medium-Size);
+    color: var(--grey-color);
+}
+
+.grey {
+    color: var(--grey-color);
+}
+
+.whiteBg {
+    background: #FFFFFF;
+
+}
+
+a {
+    color: var(--blueColor);
+    text-decoration: navajowhite;
+}
+
+.grid2 {
+    display: grid;
+    gap: 20px;
+    grid-template-columns: 1fr 1fr;
+}
+
+.grid2 .column2 {
+    grid-column: span 2;
+}
+
+.upload-btn-wrapper {
+    position: relative;
+    overflow: hidden;
+    display: inline-block;
+}
+
+.upload-btn-wrapper input[type=file] {
+    font-size: 100px;
+    position: absolute;
+    left: 0;
+    width: 100%;
+    top: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.bg-none {
+    background: none !important;
+}
+
+.border-none {
+    border: none !important;
+}
+
+.themebg {
+    background: var(--blue-bg);
+}
+
+.smallIcons {
+    width: 30px;
+}
+
+.sm-Btn {
+    text-decoration: underline;
+    color: var(--blue-bg)
+}
+
+.themeBtn {
+    background: var(--blue-bg);
+    color: #FFF;
+    padding: 10px 15px;
+    font-size: var(--XSmall-Size);
+    border-radius: 5px;
+    border: 2px solid var(--blueColor);
+    transition: .3s ease-in;
+}
+
+.themeBtn:hover {
+    background: #FFF;
+    color: var(--blueColor);
+    transform: translateY(3px) !important;
+}
+
+.defaultBtn {
+    padding: 10px;
+}
+
+.md-heading {
+    font-size: var(--medium-Size);
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.iconImg {
+    font-size: 25px;
+    font-weight: 600;
+}
+
+.main-content-header {
+    margin: 10px 0;
+    text-align: center;
+}
+
+.main-content-header .defaultHeader h2 {
+    font-size: 22px;
+    color: #2F50A3;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+label {
+    cursor: pointer;
+}
+
+label span {
+    display: inline-block;
+    position: relative;
+    background-color: transparent;
+    width: 20px;
+    cursor: pointer;
+    height: 20px;
+    transform-origin: center;
+    border: 2px solid var(--blueColor);
+    vertical-align: -6px;
+    margin-right: 10px;
+    margin-left: 10px;
+    transition: background-color 150ms 200ms, transform 350ms cubic-bezier(0.78, -1.22, 0.17, 1.89);
+}
+
+.fieldset input:focus-visible {
+    border-color: #2F50A3;
+    outline: #2F50A3;
+    box-shadow: 5px 5px 4px 0px #2F50A3C7 !important;
+}
+
+fieldset input {
+    width: 100%;
+    border: 1px solid #DDDDDD;
+    padding: 12px 20px;
+    text-transform: capitalize;
+    color: var(--grey-color);
+    font-size: var(--XSmall-Size);
+    border-radius: 5px;
+}
+
+label span:before {
+    content: "";
+    width: 0px;
+    height: 2px;
+    border-radius: 2px;
+    background: #fff;
+    position: absolute;
+    transform: rotate(45deg);
+    top: 8px;
+    left: 6px;
+    transition: width 50ms ease 50ms;
+    transform-origin: 0% 0%;
+}
+
+label span:after {
+    content: "";
+    width: 0;
+    height: 2px;
+    border-radius: 2px;
+    background: #fff;
+    position: absolute;
+    transform: rotate(305deg);
+    top: 12px;
+    left: 7px;
+    transition: width 50ms ease;
+    transform-origin: 0% 0%;
+}
+
+label:hover span:before {
+    width: 5px;
+    transition: width 100ms ease;
+}
+
+label:hover span:after {
+    width: 10px;
+    transition: width 150ms ease 100ms;
+}
+
+input[type="checkbox"] {
+    display: none;
+}
+
+input[type="checkbox"]:checked+label span {
+    background-color: var(--blue-bg);
+    transform: scale(1.25);
+}
+
+input[type="checkbox"]:checked+label span:after {
+    width: 10px;
+    background: #FFF;
+    transition: width 150ms ease 100ms;
+}
+
+input[type="checkbox"]:checked+label span:before {
+    width: 5px;
+    background: #FFF;
+    transition: width 150ms ease 100ms;
+}
+
+.styled-select select,
+textarea {
+
+
+    background: #FFFFFF;
+    cursor: pointer;
+    width: 100%;
+    border: 1px solid #DDDDDD;
+    padding: 12px 20px;
+    text-transform: capitalize;
+    color: var(--grey-color);
+    font-size: var(--XSmall-Size);
+    border-radius: 5px;
+}

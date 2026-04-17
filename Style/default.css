@@ -1,0 +1,1260 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
+
+
+body {
+
+    overflow-x: hidden;
+
+    background: #F6F8F9;
+
+    font-family: "Inter", sans-serif;
+
+    font-optical-sizing: auto;
+
+    font-style: normal;
+
+}
+
+
+
+* {
+
+    padding: 01;
+
+    margin: 0;
+
+    box-sizing: border-box;
+
+}
+
+
+
+:root {
+
+    --black-bg: #000000;
+
+    --blueColor: #2F50A3;
+
+    --blue-bg: #2F50A3;
+
+    --black-color: #333333;
+
+    --white-bg: #FAFBFC;
+
+    --white-Color: #FAFBFC;
+
+    --grey-bg: #F6F8F9;
+
+    --grey-color: #777777;
+
+    --grey-color: #333;
+
+    --yellow-bg: #FFFF00;
+
+    --small-Size: 1rem;
+
+    --XSmall-Size: 14px;
+
+    --medium-Size: 20px;
+
+    --large-Size: 22px;
+
+    --xl-size: 25px;
+
+    --small-size: 12px;
+
+    --XSmall-size: 14px;
+
+    --medium-size: 16px;
+
+    --large-size: 18px;
+
+    --xl-size: 20px;
+
+    --xxl-size: 22px;
+
+    --xxxl-size: 24px;
+
+}
+
+
+
+.XSmall {
+
+    font-size: var(--XSmall-Size);
+
+}
+
+
+
+.cursor {
+
+    cursor: pointer;
+
+}
+
+
+
+.mSize {
+
+    font-size: var(--medium-size);
+
+}
+
+
+
+.Small {
+
+    font-size: var(--Small-Size);
+
+}
+
+
+
+.d-icon {
+
+    font-size: var(--medium-Size);
+
+    color: var(--grey-color);
+
+}
+
+
+
+.grey {
+
+    color: var(--grey-color);
+
+}
+
+
+
+.whiteBg {
+
+    background: #FFFFFF;
+
+
+
+}
+
+
+
+a {
+
+    color: var(--blueColor);
+
+    text-decoration: navajowhite;
+
+}
+
+
+
+
+
+.grid2,
+
+.grid2,
+
+.grid4 {
+
+    display: grid;
+
+    gap: 1rem 1.5rem;
+
+}
+
+
+
+.grid2 {
+
+    grid-template-columns: 1fr 1fr;
+
+}
+
+
+
+.grid3 {
+
+    grid-template-columns: repeat(3, 1fr);
+
+}
+
+
+
+.grid4 {
+
+    grid-template-columns: repeat(4, 1fr);
+
+}
+
+
+
+.column2 {
+
+    grid-column: span 2;
+
+}
+
+
+
+.upload-btn-wrapper {
+
+    position: relative;
+
+    overflow: hidden;
+
+    display: inline-block;
+
+}
+
+
+
+.upload-btn-wrapper input[type=file] {
+
+    font-size: 100px;
+
+    position: absolute;
+
+    left: 0;
+
+    width: 100%;
+
+    top: 0;
+
+    opacity: 0;
+
+    cursor: pointer;
+
+}
+
+
+
+.bg-none {
+
+    background: none !important;
+
+}
+
+
+
+.border-none {
+
+    border: none !important;
+
+}
+
+
+
+.themeColor {
+
+    color: var(--blueColor);
+
+}
+
+
+
+.themebg {
+
+    background: var(--blue-bg);
+
+}
+
+
+
+.smallIcons {
+
+    width: 30px;
+
+}
+
+
+
+.sm-Btn {
+
+    text-decoration: underline;
+
+    color: var(--blue-bg)
+}
+
+
+
+.themeBtn {
+
+    background: var(--blue-bg);
+
+    color: #FFF;
+
+    padding: 8px 15px;
+
+    font-size: var(--XSmall-Size);
+
+    border-radius: 4px;
+
+    border: 2px solid var(--blueColor);
+
+    transition: .3s ease-in;
+
+
+
+}
+
+
+
+.iconBTn {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+}
+
+
+
+
+
+
+
+.iconBTn img {
+
+    width: 16px;
+
+}
+
+
+
+.purpleBtn {
+
+    background: #EAE7FF;
+
+    color: #8E7DFF;
+
+    padding: 4px 6px;
+
+}
+
+
+
+.purpleBtn:hover {
+
+    border: 1px solid #EAE7FF;
+
+}
+
+
+
+.redBtn {
+
+    background: #FFE1E2;
+
+    padding: 4px 6px;
+
+    color: #FF4B50;
+
+}
+
+
+
+.redBtn:hover {
+
+    border: 1px solid #FFE1E2;
+
+}
+
+
+
+.table-responsive input,
+
+.table-responsive select {
+
+    width: 100%;
+
+}
+
+
+
+.tbl_item_form select {
+
+    font-size: 12px !important;
+
+}
+
+
+
+.tableBTn {
+
+    color: var(--black-color);
+
+    border: 1px solid #DDDDDD;
+
+    padding: 4px 10px;
+
+    font-size: var(--XSmall-Size);
+
+    border-radius: 4px;
+
+}
+
+
+
+.themeBtn:hover {
+
+    transform: translateY(-3px) !important;
+
+    cursor: pointer;
+
+}
+
+
+
+.themeBtn2 {
+
+    background: #FFF;
+
+    color: var(--blue-bg);
+
+    border: 2px solid var(--blue-bg);
+
+    cursor: pointer;
+
+    padding: 10px 15px;
+
+    font-size: var(--XSmall-Size);
+
+    border-radius: 5px;
+
+}
+
+
+
+.themeBtn2grey {
+
+    background: #FFF;
+
+    color: var(--black-color);
+
+    box-shadow: 0px 0px 4px 0px #0000002E;
+
+    border: 1px solid #DDDDDD;
+
+    padding: 8px 15px;
+
+    font-size: var(--XSmall-Size);
+
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+
+}
+
+
+
+.defaultBtn {
+
+    padding: 10px;
+
+}
+
+
+
+.md-heading {
+
+    font-size: var(--medium-Size);
+
+    text-transform: uppercase;
+
+    font-weight: 600;
+
+}
+
+
+
+.iconImg {
+
+    font-size: 25px;
+
+    font-weight: 600;
+
+}
+
+
+
+.main-content-header {
+
+    margin: 10px 0;
+
+    /* text-align: center; */
+
+}
+
+
+
+.main-content-header .defaultHeader h2 {
+
+    font-size: 1.2rem;
+
+    color: #2F50A3;
+
+    font-weight: 600;
+
+    text-transform: uppercase;
+
+}
+
+
+
+label {
+
+    cursor: pointer;
+
+}
+
+
+
+label span {
+
+    display: inline-block;
+
+    position: relative;
+
+    background-color: transparent;
+
+    width: 20px;
+
+    cursor: pointer;
+
+    height: 20px;
+
+    transform-origin: center;
+
+    border: 2px solid var(--blueColor);
+
+    vertical-align: -6px;
+
+    margin-right: 10px;
+
+    margin-left: 10px;
+
+    transition: background-color 150ms 200ms, transform 350ms cubic-bezier(0.78, -1.22, 0.17, 1.89);
+
+}
+
+
+
+.fieldset input:focus-visible {
+
+    border-color: #2F50A3;
+
+    outline: #2F50A3;
+
+    box-shadow: 5px 5px 4px 0px #2F50A3C7 !important;
+
+}
+
+
+
+fieldset input {
+    width: 100%;
+    border: 1px solid #DDDDDD;
+    padding: 12px 20px;
+
+    color: var(--grey-color);
+    font-size: var(--XSmall-Size);
+    border-radius: 5px;
+}
+
+
+
+label span:before {
+
+    content: "";
+
+    width: 0px;
+
+    height: 2px;
+
+    border-radius: 2px;
+
+    background: #fff;
+
+    position: absolute;
+
+    transform: rotate(45deg);
+
+    top: 8px;
+
+    left: 6px;
+
+    transition: width 50ms ease 50ms;
+
+    transform-origin: 0% 0%;
+
+}
+
+
+
+label span:after {
+
+    content: "";
+
+    width: 0;
+
+    height: 2px;
+
+    border-radius: 2px;
+
+    background: #fff;
+
+    position: absolute;
+
+    transform: rotate(305deg);
+
+    top: 12px;
+
+    left: 7px;
+
+    transition: width 50ms ease;
+
+    transform-origin: 0% 0%;
+
+}
+
+
+
+label:hover span:before {
+
+    width: 5px;
+
+    transition: width 100ms ease;
+
+}
+
+
+
+label:hover span:after {
+
+    width: 10px;
+
+    transition: width 150ms ease 100ms;
+
+}
+
+
+
+input[type="checkbox"] {
+
+    display: none;
+
+}
+
+
+
+input[type="checkbox"]:checked+label span {
+
+    background-color: var(--blue-bg);
+
+    transform: scale(1.25);
+
+}
+
+
+
+input[type="checkbox"]:checked+label span:after {
+
+    width: 10px;
+
+    background: #FFF;
+
+    transition: width 150ms ease 100ms;
+
+}
+
+
+
+input[type="checkbox"]:checked+label span:before {
+
+    width: 5px;
+
+    background: #FFF;
+
+    transition: width 150ms ease 100ms;
+
+}
+
+.styled-select {
+    position: relative;
+}
+
+.styled-select select {
+
+    background: #FFFFFF;
+
+    cursor: pointer;
+
+    width: 100%;
+
+    border: 1px solid #DDDDDD;
+
+    padding: 12px 20px;
+
+    text-transform: capitalize;
+
+    color: var(--grey-color);
+
+    font-size: var(--XSmall-Size);
+
+    border-radius: 5px;
+
+}
+
+
+
+.orderBadge {
+
+    background: #444;
+
+    color: #FFF;
+
+    font-size: 14px;
+
+    padding: 5px 10px;
+
+    border-radius: 10px;
+
+}
+
+
+
+#addNewTeam .boxes {
+
+    padding: 10px;
+
+}
+
+
+
+.modal-title {
+
+    font-size: var(--small-Size) !important;
+
+}
+
+
+
+table,
+
+th,
+
+td {
+
+    border: 1px solid #C8C8C8;
+
+    border-bottom-width: 1px;
+
+    vertical-align: middle;
+
+    font-size: var(--XSmall-Size);
+
+}
+
+
+
+.greenBadge {
+
+    background: #33C481;
+
+}
+
+
+
+.rejectBadge {
+
+    background: red;
+
+}
+
+
+
+.defaultBadge {
+
+    padding: 3px 5px;
+
+    color: #FFF;
+
+    border-radius: 5px;
+
+    font-size: var(--XSmall-Size);
+
+}
+
+
+
+.nav-tabs .nav-link.active {
+
+    border-radius: 0;
+
+    border: none;
+
+}
+
+
+
+.modal-header {
+
+    background: #E0E9FF47;
+
+    padding: 1vw 1.4vw;
+
+    font-size: 14px !important;
+
+}
+
+
+
+.rightInnerDefault {
+
+    margin: 1vw;
+
+    background: #FFF;
+
+    padding: 1vw;
+
+
+
+
+
+}
+
+
+
+.assigned_user {
+
+    border: 1px solid #E0E9FF;
+
+    background: #F9F9F9;
+
+    padding: 1vw;
+
+    border-radius: 4px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    color: #666666;
+
+}
+
+
+
+.ManageAssigned_user {
+
+    margin-top: 20px;
+
+}
+
+
+
+.ManageAssigned_user .left img {
+
+    width: 35px;
+
+}
+
+
+
+.ManageAssigned_user img {
+
+    width: 50px;
+
+}
+
+
+
+.ManageAssigned_user .selectedUserBox img {
+
+    width: 18px;
+
+}
+
+
+
+.ManageAssigned_user .allUser img {
+
+    width: 18px;
+
+}
+
+
+
+.ManageAssigned_user .box {
+
+    border: 1px solid #E0E9FF;
+
+    background: #F9F9F9;
+
+    padding: 0.3vw 1vw;
+
+    border-radius: 4px;
+
+    display: flex;
+
+    align-content: center;
+
+    justify-content: center;
+
+    flex-direction: column;
+
+    gap: 5px;
+
+}
+
+
+
+.ManageAssigned_user .selectedUserBox {
+
+    background: #F4F6FA;
+
+    padding: 1vw;
+
+    margin-top: 20px;
+
+}
+
+
+
+.ManageAssigned_user .selectedUserBox .selectUserName {
+
+    background: #E0E9FF;
+
+    color: #2F50A3;
+
+    display: inline;
+
+    padding: 8px 10px;
+
+    border-radius: 8px;
+
+    font-size: 13px;
+
+    font-weight: 500;
+
+}
+
+
+
+.ManageAssigned_user .customGrid2 {
+
+    display: grid;
+
+    gap: 1vw;
+
+    grid-template-columns: 200px auto;
+
+}
+
+
+
+.ManageAssigned_user select {
+
+    border: 1px solid #DDDDDD;
+
+    background: #FFFFFF;
+
+    padding: 8px 10px;
+
+    border-radius: 4px;
+
+    margin-top: 5px;
+
+    width: 100%;
+
+
+
+}
+
+
+
+#newAddressModal .smallModal {
+
+    max-width: 30vw;
+
+}
+
+
+
+.userName {
+
+    border: 1px solid #DBE0EC;
+
+    background: #FFFFFF;
+
+    padding: 5px 10px;
+
+    border-radius: 4px;
+
+    font-size: 13px;
+
+    margin-bottom: 8px;
+
+    display: flex;
+
+    justify-content: space-between;
+
+}
+
+
+
+.allUser {
+
+    display: grid;
+
+    grid-template-columns: repeat(2, 1fr);
+
+    gap: 0 1rem;
+
+    padding: 1vw;
+
+    margin-top: 20px;
+
+    border: 1px solid #2F50A326;
+
+    background: #F9F9F9;
+
+
+
+}
+
+
+
+.assigned_user .userNumber {
+
+    font-size: 20px;
+
+    font-weight: 600;
+
+    color: #222;
+
+}
+
+
+
+.gridForm label {
+
+    display: block;
+
+    font-size: 13px;
+
+    font-weight: 500;
+
+    color: #444444;
+
+    margin-bottom: 8px;
+
+}
+
+
+
+.gridForm .form-group {
+
+    position: relative;
+
+}
+
+
+
+.gridForm .form-group .fa-exclamation-triangle {
+
+    position: absolute;
+
+    top: 35px;
+
+    right: 10px;
+
+    background: #FFE1E2;
+
+    padding: 8px;
+
+    color: #D5363B;
+
+    border-radius: 4px;
+
+}
+
+
+
+.gridForm input,
+
+.gridForm select {
+
+    border: 1px solid #DDDDDD;
+
+    border-radius: 4px;
+
+    padding: 5px 10px;
+
+    color: #777777;
+
+    text-transform: capitalize;
+
+    background: #FFFFFF;
+
+    font-size: 13px;
+
+    font-weight: 400;
+
+    width: 100%;
+
+    position: relative;
+
+}
+
+
+
+.customStyle {
+
+    border: 1px solid #33333357 !important;
+
+    padding: 5px !important;
+
+    text-align: center;
+
+    margin-top: 5px;
+
+    border-radius: 4px;
+
+}
+
+
+
+.orderStatusModal .grid3 {
+
+    display: grid;
+
+    grid-template-columns: auto 100px;
+
+}
+
+
+
+.orderStatusModal .grid2 {
+
+    display: grid;
+
+    border: 1px solid #E0E9FF;
+
+
+
+    grid-template-columns: repeat(2, 1fr);
+
+}
+
+
+
+.orderStatusModal td {
+
+    border: none;
+
+    white-space: collapse !important;
+
+}
+
+
+
+.orderStatusModal .link {
+
+    color: #2F50A3;
+
+    font-size: 16px;
+
+    font-weight: 500;
+
+}
+
+
+
+.area3 {
+
+    grid-area: 3;
+
+}
+
+
+
+table {
+
+    width: 100% !important;
+
+}
+
+
+
+#orderFormModal .modal-body {
+
+    height: 70vh !important;
+
+    overflow-y: scroll;
+
+    scrollbar-width: none;
+
+}
+
+
+
+#orderFormModal .smallModal {
+
+    max-width: 60vw;
+
+}
+
+
+
+.customBorder {
+
+    border: 1px solid #E0E9FF;
+
+}
+
+
+
+.borderTable td {
+
+    border-bottom: 1px solid #DDDDDD;
+
+}
+
+
+
+#orderFormModal .modal-footer #msg_input {
+
+    border: 1px solid #DDDDDD;
+
+}
+
+
+
+.tableHeadingTr {
+
+    display: flex !important;
+
+    align-content: center;
+
+    justify-content: center;
+
+    background: #ECF0F9;
+
+    padding: 10px;
+
+    text-transform: capitalize;
+
+    color: #2F50A3;
+
+    gap: 10px;
+
+    border-radius: 8px 8px 0 0;
+
+}

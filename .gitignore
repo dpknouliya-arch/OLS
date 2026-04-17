@@ -1,0 +1,66 @@
+# -----------------------------------------------
+# Sensitive / credentials
+# -----------------------------------------------
+db.php
+.env
+.env.*
+*.key
+*.pem
+*.crt
+*.p12
+
+# -----------------------------------------------
+# Uploaded / user-generated files
+# -----------------------------------------------
+src/upload/
+src/download/
+files/
+images/default/
+images/icons/
+
+# -----------------------------------------------
+# Large binary & archive files
+# -----------------------------------------------
+*.pdf
+*.xls
+*.xlsx
+*.zip
+*.tar.gz
+*.rar
+*.mp4
+*.mov
+*.avi
+
+# -----------------------------------------------
+# Third-party vendor libraries (install via Composer)
+# -----------------------------------------------
+vendor/
+phpmailer/
+mailer_src/
+
+# -----------------------------------------------
+# Frontend asset bundles (large, not source)
+# -----------------------------------------------
+assets/vendors/
+assets/tinymce/
+assets/tinymce2/
+assets/tinymce_latest_custom.zip
+ajax/assets/bootstrap-4.4.1/
+
+# -----------------------------------------------
+# Server / XAMPP generated files
+# -----------------------------------------------
+error_log
+*/error_log
+.ftpquota
+.well-known/
+
+# -----------------------------------------------
+# OS / IDE files
+# -----------------------------------------------
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo

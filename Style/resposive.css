@@ -1,0 +1,453 @@
+@media screen and (min-width:620px) {
+    .mobileShow {
+        display: none;
+    }
+}
+
+/* ===========================
+responsive from 1300px
+============================== */
+@media screen and (max-width:1300px) {
+    .mainLogin .userLogin {
+        grid-template-columns: 60vw auto;
+    }
+
+    .mainLogin .teamMemberLogin {
+        grid-template-columns: auto 60vw;
+    }
+
+    .manageOrder .grid3 {
+        gap: 2rem 1rem;
+    }
+
+    .manageOrder .singleORder {
+        padding: 6px;
+    }
+
+    .billingInfoPage .gridCustom2 {
+        padding: 2px;
+    }
+
+    .manageUSerPage #manage_su_main_panel {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .editORderPage fieldset {
+        gap: 25px;
+    }
+
+    .manageUSerPage .addNewUser {
+        grid-area: 1;
+        grid-column: span 3;
+    }
+
+
+
+    .rightInnerDefault .upperForm {
+        grid-template-columns: 55vw auto;
+    }
+
+    .mainLogin form {
+        width: 30vw;
+    }
+
+    .sidebar {
+        width: 22vw;
+    }
+
+    .customerUserPage .salesAdmin {
+        white-space: pre;
+    }
+
+    #newAddressModal .smallModal {
+        max-width: 45vw;
+    }
+}
+
+
+/* ===========================
+responsive from 1200px
+============================== */
+@media screen and (min-width:1200px) {
+    .sm-size {
+        font-size: var(--small-Size);
+    }
+
+    .subHeading {
+        font-size: var(--small-Size);
+    }
+
+
+}
+
+@media screen and (max-width:1200px) {
+    .addOrderPage #myTab {
+        max-width: 65vw;
+    }
+
+    .addOrderPage.boxes {
+        padding: 20px;
+    }
+
+    h6.subHeading.m-0 {
+        font-size: 14px;
+    }
+
+    .customerUserPage .salesAdminRow {
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .sidebar {
+        width: 25vw;
+    }
+
+    .smallModal {
+        max-width: 55vw;
+    }
+
+    .noneOnscreen {
+        display: none;
+    }
+}
+
+
+/* ===========================
+responsive from 1000px
+============================== */
+@media screen and (max-width:1000px) {
+    .addOrderPage #myTab {
+        max-width: 65vw;
+    }
+
+    .addOrderPage .boxes {
+        padding: 15px;
+    }
+
+    .addOrderPage .main-content-header .nav-item .nav-link {
+        gap: 10px;
+        padding: 10px;
+    }
+
+    .addOrderPage.boxes {
+        padding: 20px;
+    }
+
+    .addOrderPage#myTab {
+        max-width: 100%;
+    }
+
+    .addOrderPage .billingAndDelivery .grid2 {
+        grid-template-columns: 1fr;
+    }
+
+    .addOrderPage #myTab {
+        max-width: 100vw;
+    }
+}
+
+
+/* ===========================
+responsive from 1100px
+============================== */
+@media screen and (max-width:1100px) {
+    .mainLogin .userLogin {
+        grid-template-columns: 50vw auto;
+    }
+
+    .mainLogin .teamMemberLogin {
+        grid-template-columns: auto 50vw;
+    }
+
+    .mainLogin form {
+        width: 35vw;
+    }
+
+    .manageOrder .grid3 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .manageOrder .greenBadge {
+        right: 15px;
+        top: 25px;
+    }
+
+    .manageOrder .innerMainContent {
+        padding: 0 20px;
+    }
+}
+
+
+/* ===========================
+responsive from 820px
+============================== */
+@media screen and (max-width:820px) {
+    .mainLogin .userLogin {
+        grid-template-columns: 50vw auto;
+    }
+
+    .mainLogin .teamMemberLogin {
+        grid-template-columns: 50vw 50vw;
+    }
+
+    .mainLogin form {
+        width: 40vw;
+    }
+}
+
+
+/* ===========================
+responsive from 620px
+============================== */
+@media screen and (max-width:620px) {
+    .desktopShow {
+        display: none;
+    }
+
+    .mainLogin .userLogin {
+        grid-template-columns: 1fr;
+        height: 100vh;
+        -ms-layout-grid-mode: both;
+    }
+
+    .mainLogin .teamMemberLogin {
+        height: 100vh;
+        grid-template-columns: 1fr;
+    }
+
+    .mainLogin form {
+        width: 100%;
+    }
+
+    .main-content-footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        z-index: 1000;
+        background: #F6F8F9;
+    }
+
+    .header-links a {
+        padding: 2px;
+    }
+
+    .header {
+        left: 0;
+    }
+
+    .mainLogin .leftSide {
+        height: 35vh;
+    }
+
+    .header .rightAdminProfile img {
+        height: 40px;
+        margin-left: 5px;
+        padding: 5px;
+    }
+
+    .mainLogin .userLogin {
+        grid-template-columns: 1fr;
+
+    }
+
+    fieldset input {
+        padding: 8px 20px;
+    }
+
+    .addOrderPage #myTab {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        white-space: nowrap;
+        width: 100%;
+        overflow: scroll;
+        gap: 8px;
+        padding: 20px 10px;
+    }
+
+    .addOrderPage .innerMainContent,
+    .editORderPage .innerMainContent {
+        padding: 2vw;
+    }
+
+    .editORderPage #myTab {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        white-space: nowrap;
+        width: 100%;
+        overflow: scroll;
+        gap: 8px;
+        padding: 20px 10px;
+    }
+
+    .addOrderPage #myTab .nav-item {
+        display: inline-table;
+    }
+
+    .toggle-btn {
+        margin-right: 0;
+    }
+
+    .addOrderPage .nav-link,
+    .addOrderPage .nav-link {
+        border-radius: 5px !important;
+        border: 1px solid #BABEC2 !important;
+        font-size: var(--XSmall-Size) !important;
+    }
+
+    .main-content-header .nav-item .nav-link.active {
+        background: #FFF !important;
+    }
+
+    #orderFormModal .modal-body {
+        height: 55vh !important;
+        padding: 2vw !important;
+    }
+
+    #orderFormModal .smallModal {
+        max-width: 90vw;
+    }
+
+
+    :root {
+
+        --XSmall-Size: 0.8rem;
+    }
+
+    .sidebar {
+        width: 0;
+    }
+
+    .iconImg {
+        font-size: 1.4rem;
+    }
+
+    #myTab {
+        justify-content: center;
+    }
+
+    .d-flex.align-items-center.gap-3 {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .updateBillandShip .grid2 {
+        grid-template-columns: 1fr;
+    }
+
+    fieldset input {
+        padding: 10px 16px;
+    }
+
+    .addOrderPage .billingAndDelivery .grid2 {
+        gap: 5vw;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .addOrderPage .rightSide {
+        flex: 100%;
+    }
+
+    .addOrderPage .leftSide {
+        flex: 1;
+        display: contents;
+    }
+
+    .addOrderPage .leftSide .d-flex {
+        flex: 1;
+        display: block !important;
+    }
+
+    #order .grid2 {
+        grid-template-columns: 1fr;
+    }
+
+    .addOrderPage header {
+        padding: 0;
+
+    }
+
+    .addOrderPage .tab-pane {
+        padding: 10px;
+    }
+
+    .addOrderPage .boxes {
+        padding: 3vw;
+    }
+
+    .manageOrder .grid3 {
+        grid-template-columns: repeat(1, 1fr);
+    }
+
+    .billingInfoPage .themeBtn2 {
+        position: static;
+        margin: 10px auto;
+    }
+
+    .billingInfoPage .toast-header {
+        padding: 15px;
+    }
+
+    .manageUSerPage .grid4 {
+        grid-template-columns: repeat(1, 1fr);
+        gap: 1rem;
+        max-width: 95%;
+        margin: auto;
+    }
+
+    .billingInfoPage .gridCustom2 {
+        grid-template-columns: 1fr;
+    }
+
+    .manageUSerPage .singleUserBox {
+        border-radius: 8px;
+    }
+
+    .smallModal,
+    #newAddressModal .smallModal {
+        max-width: 95vw;
+    }
+
+    .modal-header {
+        padding: 4vw;
+    }
+
+    .manageUSerPage #manage_su_main_panel {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .manageUSerPage .userBoxes {
+        padding: 0;
+    }
+
+
+
+    .manageUSerPage .note {
+        padding: 4vw;
+    }
+
+    .manageOrder .innerMainContent,
+    .billingInfoPage .innerMainContent {
+        padding: 4vw !important;
+    }
+
+    .billingInfoPage .billingInfoTable .infoBody {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+
+    }
+
+    .rightInnerDefault .upperForm {
+        grid-template-columns: 1fr;
+    }
+
+    .rightInnerDefault .upperForm fieldset input {
+        width: 100% !important;
+    }
+
+    .SalesLogin {
+        grid-template-columns: 1fr;
+    }
+}

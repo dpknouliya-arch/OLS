@@ -1,0 +1,3381 @@
+.main-content {
+
+    transition: margin-left 0.3s;
+
+    padding: 20px 30px;
+
+
+
+    margin-top: 70px;
+
+    position: relative;
+
+}
+
+
+
+.main-content-footer {
+
+    position: fixed;
+
+    bottom: 0;
+
+    text-align: left;
+
+    padding: 10px;
+
+    padding-left: 10px;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    width: 100%;
+
+    background: #EBEEF6;
+
+    padding-left: 30px;
+
+    display: none;
+
+}
+
+
+
+.c-label {
+
+    padding-bottom: 5px;
+
+    font-size: 13px;
+
+    font-weight: 500;
+
+    color: #535555;
+
+}
+
+
+
+#dropdownMenuButton {
+
+    border: none;
+
+}
+
+
+
+.accordion {
+
+    background-color: #eee;
+
+    color: #444;
+
+    cursor: pointer;
+
+    padding: 18px;
+
+    width: 100%;
+
+    text-align: left;
+
+    border: none;
+
+    outline: none;
+
+    transition: 0.4s;
+
+}
+
+
+
+.panel {
+
+    padding: 0 18px;
+
+    background-color: white;
+
+    display: none;
+
+    overflow: hidden;
+
+}
+
+
+
+
+
+/* +================================================ 
+
+add order page 
+
+===================================================== */
+
+.addOrderPage fieldset {
+
+    gap: 30px;
+
+}
+
+
+
+.addOrderPage .boxes {
+
+    background: #FFFFFF;
+
+    border: 1px solid #DDDDDD;
+
+    padding: 1.5vw;
+
+    border-radius: 5px;
+
+}
+
+
+
+.addOrderPage #team-tab .boxes {
+
+    padding: 30px 30px 30px 0;
+
+
+
+}
+
+
+
+.addOrderPage .orderMultiStep {
+
+    max-width: 900px;
+
+    display: flex;
+
+    align-items: center;
+
+    margin: auto;
+
+    background: #ECF0F9;
+
+    padding: 15px 40px;
+
+    justify-content: space-between;
+
+}
+
+
+
+.addOrderPage .orderMultiStep .activeStep {
+
+    color: var(--blueColor);
+
+}
+
+
+
+.addOrderPage .form-horizontal {
+
+    margin: 0 0 20px 0;
+
+}
+
+
+
+.addOrderPage .form-horizontal .formTitle {
+
+    margin: 0 0 25px 0;
+
+    gap: 30px;
+
+    justify-content: space-between;
+
+}
+
+
+
+.addOrderPage .orederItems a {
+
+    display: flex;
+
+    align-content: center;
+
+    gap: 11px;
+
+    font-size: var(--small-Size);
+
+    font-weight: 600;
+
+    color: var(--grey-color);
+
+}
+
+
+
+.addOrderPage .orederItems .iconImg {
+
+    position: relative;
+
+    top: 2px;
+
+}
+
+
+
+.addOrderPage .submitBUtton {
+
+    text-align: right;
+
+}
+
+
+
+.addOrderPage .tab-pane {
+
+    padding: 20px;
+
+    background: #FFF;
+
+    margin-top: 25px;
+
+}
+
+
+
+.addOrderPage .innerMainContent {
+
+    padding: 0 1rem;
+
+}
+
+
+
+embed {
+
+    width: 50vw;
+
+    height: 50vh;
+
+}
+
+
+
+.modal-dialog {
+
+    max-width: 53vw;
+
+}
+
+
+
+.smallModal {
+
+    height: 100%;
+
+    max-width: 40vw;
+
+    margin: auto;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+}
+
+
+
+
+
+
+
+.main-content-header .nav-item .nav-link {
+
+    display: flex;
+
+    align-content: center;
+
+    gap: 10px;
+
+    font-size: var(--XSmall-Size);
+
+    font-weight: 500;
+
+    margin-bottom: -2px;
+
+    color: var(--grey-color);
+
+}
+
+
+
+.addOrderPage .main-content-header .nav-item .nav-link.active {
+
+    background: none !important;
+
+    border: none;
+
+    color: var(--blueColor);
+
+    border-radius: 4px;
+
+}
+
+
+
+.addOrderPage #myTab {
+
+    display: flex;
+
+    width: 100%;
+
+    margin: auto;
+
+    margin-bottom: auto;
+
+    margin-bottom: auto;
+
+    text-align: center;
+
+    justify-content: space-between;
+
+    border-bottom: 0;
+
+    background: #ECF0F9;
+
+    max-width: 50vw;
+
+    border-radius: 5px;
+
+}
+
+
+
+
+
+.addOrderPage .leftSide {
+
+    background: #FFFFFF;
+
+}
+
+
+
+.addOrderPage .rightSide .card {
+
+    background: #F9F9F9 !important;
+
+    padding: 30px;
+
+    border: 1px solid #DDDDDD !important;
+
+}
+
+
+
+
+
+.addOrderPage .rightSide .card,
+
+.addOrderPage .leftSide .card {
+
+    background: #F9F9F9;
+
+}
+
+
+
+.addOrderPage .rightSide li {
+
+    color: var(--grey-color);
+
+}
+
+
+
+.addOrderPage .rightSide .themeBtn2 {
+
+    color: #21A366;
+
+    margin: 0 auto 0 0;
+
+    border: 1px solid #DDDDDD !important;
+
+    box-shadow: 0px 0px 4px 0px #0000002E;
+
+
+
+}
+
+
+
+.addOrderPage .formBottom {
+
+    grid-template-columns: 200px 200px;
+
+}
+
+
+
+.addOrderPage #addNewTeam .formBottom {
+
+    grid-template-columns: 1fr 1fr;
+
+}
+
+
+
+.RosterDetailsGuide .innerBox {
+
+    background: #FFFFFF;
+
+    text-align: left;
+
+    padding: 30px;
+
+    border: 1px solid #DDDDDD;
+
+    border-radius: 5px;
+
+}
+
+
+
+.RosterDetailsGuide .innerBox li {
+
+    color: var(--grey-color);
+
+    font-size: var(--XSmall-Size);
+
+}
+
+
+
+.teamTabsSection .tableLower {
+
+    padding: 20px 0;
+
+}
+
+
+
+#teamTab {
+
+    box-shadow: 0px 1px 4px 0px #0000001A;
+
+    border: 1px solid #DDDDDD;
+
+    position: sticky;
+
+    top: -32px;
+
+    z-index: 100;
+
+    padding: 10px;
+
+}
+
+
+
+#teamTab .nav-link.active {
+
+    box-shadow: 0px 1px 4px 0px #0000001A;
+
+    border: 1px solid #DDDDDD;
+
+}
+
+
+
+#teamTab .nav-link {
+
+    border: 1px solid #e8e8e8;
+
+    margin: 0 2px;
+
+}
+
+
+
+.teamTabsSection {
+
+    display: none;
+
+}
+
+
+
+.teamTabsSection .tab-pane {
+
+    padding: 0;
+
+}
+
+
+
+.table-responsive th,
+
+td {
+
+    font-size: var(--XSmall-Size);
+
+    color: var(--);
+
+}
+
+
+
+.table-responsive th {
+
+    background: var(--blueColor);
+
+    color: #fff;
+
+    font-weight: 400;
+
+    font-size: 12px;
+
+    padding: 10px 4px !important;
+
+}
+
+
+
+.upload-btn-wrapper button {
+
+    box-shadow: 0px 0px 4px 0px #0000002E;
+
+    border: 1px solid #DDDDDD;
+
+    width: 100%;
+
+
+
+}
+
+
+
+.table-responsive td {
+
+    padding: 10px 4px !important;
+
+
+
+}
+
+
+
+#toggleGuide {
+
+    cursor: pointer;
+
+}
+
+
+
+.addOrderPage table,
+
+.addOrderPage th,
+
+.addOrderPage td {
+
+    border: 1px solid #C8C8C8
+}
+
+
+
+.addOrderPage .theader th {
+
+    background: #ECF0F9;
+
+    color: var(--blueColor);
+
+    padding: 15px;
+
+    font-size: var(--small-Size);
+
+}
+
+
+
+.addOrderPage .table-responsive {
+
+    overflow-x: auto;
+
+    -webkit-overflow-scrolling: touch;
+
+    border: 1px solid #e4dfdf;
+
+    border-radius: 5px;
+
+    white-space: nowrap;
+
+    margin-bottom: 30px;
+
+}
+
+
+
+.addOrderPage .table-responsive input,
+
+.addOrderPage .table-responsive select {
+
+    width: 100%;
+
+    font-size: 13px;
+
+    background: none;
+
+    border: none;
+
+    color: var(--grey-color);
+
+}
+
+
+
+.addOrderPage ::placeholder {
+
+    color: var(--grey-color);
+
+
+
+}
+
+
+
+.addOrderPage table select {
+
+    cursor: pointer;
+
+}
+
+
+
+.addOrderPage #PreviewPdfMdoal\  {
+
+    position: absolute;
+
+    right: 0;
+
+    bottom: 0;
+
+    background: var(--blueColor);
+
+    padding: 12px;
+
+    color: #FFF;
+
+    border-radius: 0 4px 5px 0;
+
+    font-size: 23px;
+
+}
+
+
+
+.addOrderPage #PreviewPdfMdoal embed {
+
+    width: 100%;
+
+    height: 80vh;
+
+}
+
+
+
+.addOrderPage #PreviewPdfMdoal .modal-dialog {
+
+    max-width: 800px;
+
+}
+
+
+
+.addOrderPage .row {
+
+    display: flex;
+
+    transition: all 0.5s ease;
+
+}
+
+
+
+.addOrderPage .leftSide {
+
+    flex: 0 0 66.67%;
+
+    transition: all 0.5s ease;
+
+}
+
+
+
+.addOrderPage .rightSide {
+
+    flex: 0 0 33.33%;
+
+    transition: all 0.5s ease;
+
+}
+
+
+
+.addOrderPage .rightSide.collapsed {
+
+    flex: 0 0 0;
+
+    visibility: hidden;
+
+    height: 25vh;
+
+    overflow: hidden;
+
+}
+
+
+
+.addOrderPage .leftSide.expanded {
+
+    flex: 1;
+
+}
+
+
+
+.addOrderPage .leftSide.expanded .grid2 {
+
+    grid-template-columns: 1fr 1fr 1fr
+}
+
+
+
+.addOrderPage .leftSide.expanded .grid2 .column2 {
+
+    grid-column: span 1;
+
+}
+
+
+
+.addOrderPage .leftSide.expanded .grid2 .formBottom {
+
+    grid-column: span 3;
+
+}
+
+
+
+.addOrderPage #toggleButton {
+
+    position: absolute;
+
+    top: 10px;
+
+    left: 10px;
+
+    cursor: pointer;
+
+    visibility: visible;
+
+
+
+}
+
+
+
+.addOrderPage #toggleButton img {
+
+    width: 22px;
+
+}
+
+
+
+.addOrderPage .rightSide.collapsed #toggleButton {
+
+    transform: rotate(180deg);
+
+}
+
+
+
+
+
+
+
+
+
+
+
+/* +================================================ 
+
+add order page 
+
+===================================================== */
+
+
+
+
+
+
+
+
+
+
+
+/* +================================================ 
+
+editORderPage order page 
+
+===================================================== */
+
+.addOrderPage .singleFrom label,
+
+.editORderPage .singleFrom label {
+
+    font-size: 12px;
+
+    background: #F9F9F9;
+
+    padding: 5px;
+
+    position: absolute;
+
+    top: -18px;
+
+    left: 10px;
+
+    border: 1px solid #EEEEEE;
+
+    border-radius: 4px;
+
+    width: auto !important;
+
+    z-index: 1;
+
+}
+
+
+
+.addOrderPage .form-group,
+
+.editORderPage .form-group {
+
+    position: relative;
+
+}
+
+
+
+.editORderPage {
+
+    padding: 1vw;
+
+    margin: 1vw;
+
+    width: 95%;
+
+}
+
+
+
+.editORderPage table td {
+
+    white-space: collapse !important;
+
+}
+
+
+
+
+
+
+
+.tbl_item_form td {
+
+    white-space: collapse !important;
+
+}
+
+
+
+div#table_showing {
+
+    margin-top: 20px;
+
+}
+
+
+
+.editORderPage .submitBUtton {
+
+    text-align: right !important;
+
+    margin-top: 20px;
+
+}
+
+
+
+.editORderPage #PreviewPdfMdoal\  {
+
+    padding: 9px;
+
+}
+
+
+
+.editORderPage .pageHeader {
+
+    padding-top: 0;
+
+}
+
+
+
+.editORderPage .column2 {
+
+    text-align: left;
+
+}
+
+
+
+.editORderPage fieldset {
+
+    gap: 35px;
+
+}
+
+
+
+.editORderPage .form-horizontal .formTitle,
+
+.addOrderPage .formTitle {
+
+    margin-bottom: 30px;
+
+}
+
+
+
+.editORderPage fieldset input {
+
+    font-size: 14px;
+
+    padding: 12px 20px 6px 20px;
+
+}
+
+
+
+
+
+.addOrderPage .nav-item .nav-link.active {
+
+    color: #2F50A3 !important;
+
+}
+
+
+
+.editORderPage textarea {
+
+    font-size: 14px !important;
+
+}
+
+textarea.form-control {
+    font-size: 14px;
+    color: #777777;
+}
+
+
+/* +================================================ 
+
+editORderPage order page 
+
+===================================================== */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* +================================================ 
+
+Login  page 
+
+===================================================== */
+
+.mainLogin .leftSide {
+
+    position: relative;
+
+    width: 100%;
+
+    height: 100vh;
+
+    overflow: hidden;
+
+    color: white;
+
+    top: -1px;
+
+}
+
+
+
+.mainLogin form {
+
+    width: 25vw;
+
+}
+
+
+
+.mainLogin .leftSide::after {
+
+    content: '';
+
+    position: absolute;
+
+    left: 0;
+
+    top: 0;
+
+    width: 100%;
+
+    height: 100%;
+
+    background: rgb(2, 0, 36);
+
+    background: linear-gradient(254deg, rgba(2, 0, 36, 0.30994404597776615) 0%, rgba(0, 0, 0, 0.12) 47%, rgba(24, 41, 45, 0.7301121132046569) 100%);
+
+}
+
+
+
+.mainLogin .formTitle {
+
+    margin-bottom: 40px;
+
+    margin-top: 10px;
+
+}
+
+
+
+.mainLogin .salesLoginOls {
+
+    background: #000000;
+
+    color: #FFF;
+
+    font-weight: 500;
+
+}
+
+
+
+.mainLogin .teamMemberLoginBtn {
+
+    background: #EA9A36;
+
+    background: #bfbfbf;
+
+    color: #000000 !important;
+
+    font-weight: 600;
+
+    color: #FFF;
+
+}
+
+
+
+.mainLogin .backgroundVideo {
+
+    position: absolute;
+
+    top: 50%;
+
+    left: 50%;
+
+    min-width: 150%;
+
+    min-height: 100%;
+
+    width: auto;
+
+    height: auto;
+
+    z-index: -1;
+
+    transform: translate(-50%, -50%);
+
+}
+
+
+
+.mainLogin .leftSide h1,
+
+.mainLogin .leftSide p {
+
+    position: relative;
+
+    z-index: 1;
+
+}
+
+
+
+.mainLogin label {
+
+    display: block;
+
+    margin-bottom: 10px;
+
+}
+
+
+
+.mainLogin .input-group {
+
+    flex-direction: column;
+
+}
+
+
+
+.mainLogin .input-group-text {
+
+    position: absolute;
+
+    right: 0;
+
+    top: 0;
+
+    border-radius: 0 3px 3px 0;
+
+    height: 100%;
+    cursor: pointer;
+
+}
+
+
+
+.mainLogin .form-control:focus {
+
+    border-color: #2F50A3;
+
+    box-shadow: 5px 5px 4px 0px #2F50A3C7;
+
+}
+
+
+
+.mainLogin .form-control {
+
+    padding: 8px 20px;
+
+    color: var(--grey-color);
+
+    font-size: var(--XSmall-Size);
+
+}
+
+
+
+.mainLogin .team_m_login {
+
+    font-size: var(--XSmall-Size);
+
+}
+
+
+
+.mainLogin .lockIcn {
+
+    background: var(--black-bg);
+
+    padding: 1.5vw;
+
+    color: #FFF;
+
+    font-size: 30px;
+
+    border-radius: 50%;
+
+}
+
+
+
+.mainLogin .teamMemberLogin .leftSide {
+
+    width: 100%;
+
+    right: 0;
+
+}
+
+
+
+.mainLogin .teamMemberLogin {
+
+    grid-template-columns: auto 60%;
+
+}
+
+
+
+.mainLogin .userLogin {
+
+    grid-template-columns: 60vw auto;
+
+}
+
+
+
+.mainLogin .themeBtn2grey,
+
+.mainLogin .themeBtn,
+
+.mainLogin .grid2 .column2 {
+
+    padding: 8px 15px;
+
+
+
+
+
+}
+
+
+
+/* +================================================ 
+
+Login page 
+
+===================================================== */
+
+
+
+/* +================================================ 
+
+Manage Order 
+
+===================================================== */
+
+.manageOrder .innerMainContent {
+
+    padding: 1vw !important;
+
+    margin: 1vw;
+
+    background: #FFF;
+
+}
+
+
+
+.manageOrder .table th {
+
+    background: #FFF;
+
+    color: var(--grey-color);
+
+}
+
+
+
+
+
+
+
+.manageOrder .singleORder {
+
+    box-shadow: 0px 0px 5.5px 2px #0000001A;
+
+    padding: 12px;
+
+    background: #FFF;
+
+    border-radius: 5px;
+
+    transition: .3s ease;
+
+    position: relative;
+
+    overflow: hidden;
+
+}
+
+
+
+.manageOrder .innerMainContent {
+
+    padding: 0 25px 25px;
+
+}
+
+
+
+.manageOrder .singleORder img {
+
+    background: #2F50A2;
+
+    padding: 3px 12px;
+
+    border-radius: 15px;
+
+    position: absolute;
+
+    right: 35px;
+
+    transition: .3s ease;
+
+    bottom: -30px;
+
+    width: 45px;
+
+
+
+}
+
+
+
+.manageOrder .singleORder:hover {
+
+    cursor: pointer;
+
+    transform: translateY(-5px);
+
+}
+
+
+
+.manageOrder .singleORder:hover.singleORder img {
+
+    bottom: 15px;
+
+
+
+}
+
+
+
+.manageOrder .table-responsive td,
+
+.manageOrder .table-responsive th {
+
+    border: none;
+
+    font-size: 14px;
+
+}
+
+
+
+.manageOrder .table-responsive td {
+
+    padding: 5px 4px !important;
+
+    border-bottom: 1px solid #EEEEEE;
+
+    text-align: left;
+
+}
+
+
+
+.manageOrder .table th {
+
+    background: #F9F9F9;
+
+    border: 1px solid #EEEEEE;
+
+    border-radius: 6px;
+
+    overflow: hidden;
+
+    text-align: left;
+
+    padding-left: 10px !important;
+
+}
+
+
+
+.manageOrder .grid3 {
+
+    gap: 2rem 1.5rem;
+
+    display: grid;
+
+}
+
+
+
+.manageOrder .greenBadge {
+
+
+
+    color: #FFF;
+
+    padding: 2px;
+
+    border-radius: 26px;
+
+    width: 55px !important;
+
+    text-align: center;
+
+    position: absolute;
+
+    right: 22px;
+
+    top: 32px;
+
+}
+
+
+
+/* +================================================ 
+
+Manage Order 
+
+===================================================== */
+
+
+
+
+
+
+
+/* +================================================ 
+
+billingInfoPage  Page 
+
+===================================================== */
+
+.billingInfoPage .toast {
+
+    overflow: hidden;
+
+    margin-bottom: 15px;
+
+    border: none;
+
+    border-radius: 10px;
+
+}
+
+
+
+.billingInfoPage .toast-header {
+
+    border: 1px solid #C8D5F9;
+
+    box-shadow: 0px 2px 8px 0px #0000001A;
+
+    background: #EBEEF6;
+
+    padding: 10px 100px 10px 10px;
+
+    border-radius: 10px;
+
+    overflow: hidden;
+
+    position: relative;
+
+    color: #333333;
+
+}
+
+
+
+.billingInfoPage .toast-header .btn-close {
+
+    cursor: pointer;
+
+    background: none;
+
+    position: absolute;
+
+    right: 25px;
+
+    top: 12px;
+
+    width: 20px;
+
+    height: 20px;
+
+}
+
+
+
+.billingInfoPage .themeBtn2 {
+
+    padding: 5px 15px;
+
+    width: 170px;
+
+    position: absolute;
+
+    right: 0;
+
+    font-size: 14px;
+
+    top: 22px;
+
+    justify-content: center;
+
+}
+
+
+
+.billingInfoPage .themeBtn2grey {
+
+    padding: 4px 5px;
+
+    margin-bottom: 10px;
+
+    font-size: 12px;
+
+    justify-content: center;
+
+
+
+}
+
+
+
+.billingInfoPage .defaultHeader {
+
+    background: #FFFFFF;
+
+}
+
+
+
+.billingInfoPage .innerMainContent {
+
+    background: #FFF;
+
+    margin: 1vw;
+
+    padding: 1vw;
+
+}
+
+
+
+.billingInfoPage .billingInfoTable {
+
+    padding: 1vw;
+
+}
+
+
+
+.billingInfoPage .billingInfoTable .infoHeader {
+
+    background: #EBEEF6;
+
+    border-radius: 8px;
+
+    margin-bottom: 20px;
+
+    position: sticky;
+
+    top: 68px;
+
+    z-index: 101;
+
+}
+
+
+
+.billingInfoPage .billingInfoTable .infoHeader .XSmall {
+
+    display: flex;
+
+    height: 50px;
+
+    align-items: center;
+
+    margin: auto;
+
+}
+
+
+
+.billingInfoPage .billingInfoTable .infoBody {
+
+    border: 1px solid #DDDDDD;
+
+    margin-top: 10px;
+
+    margin-bottom: 10px;
+
+    border-radius: 12px;
+
+    position: relative;
+
+}
+
+
+
+.billingInfoPage .infoBody {
+
+    transition: .3s ease;
+
+    background: #FFF;
+
+}
+
+
+
+.billingInfoPage .infoBody:hover {
+
+    box-shadow: 0px 2px 8px 0px #0000001A;
+
+    cursor: pointer;
+
+    transform: scale(0.99);
+
+    background: #F9F9F9;
+
+}
+
+
+
+.billingInfoPage .billingInfoTable .infoBody .gridCustom2 p {
+
+    font-size: 13px;
+    font-weight: 400;
+    color: #111111;
+
+}
+
+
+
+.billingInfoPage .billingInfoTable .infoBody .gridCustom2 h6 {
+
+    font-size: 14px;
+    color: #777777;
+    margin-bottom: 0;
+
+    font-weight: 500;
+
+}
+
+
+
+.billingInfoPage .billingInfoTable .infoBody p {
+
+    margin: 0;
+
+}
+
+
+
+.billingInfoPage .borderRight {
+
+    border-right: 1px solid #DDDDDD;
+
+}
+
+
+
+.billingInfoPage .infoBody .borderRight {
+
+    padding: 10px;
+
+}
+
+
+
+.billingInfoPage .borderLeft {
+
+    border-right: 1px solid #DDDDDD;
+
+}
+
+
+
+.billingInfoPage .gridCustom2 {
+
+    display: grid;
+
+    padding: 2px 5px;
+
+    align-items: center;
+
+    grid-template-columns: 6vw auto;
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.billingInfoPage .newAddressForm {
+
+    position: fixed;
+
+    top: 100px;
+
+    right: 8px;
+
+    background: #FFF;
+
+    width: 400px;
+
+    z-index: 101;
+
+    border-radius: 16px;
+
+    border: 1px solid #DDDDDD;
+
+}
+
+
+
+.billingInfoPage .newAddressForm .singleFrom {
+
+    padding: 15px 25px;
+
+}
+
+
+
+.billingInfoPage .newAddressForm label {
+
+    display: block;
+
+    text-align: left;
+
+    padding-bottom: 10px;
+
+    font-size: 13px;
+
+
+
+}
+
+
+
+.billingInfoPage .newAddressForm .formTitle {
+
+    border-bottom: 1px solid #DDDDDD;
+
+    padding: 20px;
+
+
+
+}
+
+[type="radio"]:checked,
+[type="radio"]:not(:checked) {
+    position: absolute;
+    left: -9999px;
+}
+
+[type="radio"]:checked+label,
+[type="radio"]:not(:checked)+label {
+    position: relative;
+    padding-left: 28px;
+    cursor: pointer;
+    line-height: 20px;
+    display: inline-block;
+    color: #666;
+}
+
+[type="radio"]:checked+label:before,
+[type="radio"]:not(:checked)+label:before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 18px;
+    height: 18px;
+    border: 1px solid #2F50A3;
+    border-radius: 100%;
+    background: #fff;
+}
+
+[type="radio"]:checked+label:after,
+[type="radio"]:not(:checked)+label:after {
+    content: '';
+    width: 12px;
+    height: 12px;
+    background: #2F50A3;
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    border-radius: 100%;
+    -webkit-transition: all 0.2s ease;
+    transition: all 0.2s ease;
+}
+
+[type="radio"]:not(:checked)+label:after {
+    opacity: 0;
+    -webkit-transform: scale(0);
+    transform: scale(0);
+}
+
+[type="radio"]:checked+label:after {
+    opacity: 1;
+    -webkit-transform: scale(1);
+    transform: scale(1);
+}
+
+
+.billingInfoPage .newAddressForm .grid2 {
+
+    gap: 1rem;
+
+}
+
+
+
+.billingInfoPage .newAddressForm input {
+
+    padding: 10px 20px;
+
+}
+
+
+
+.billingInfoPage .newAddressForm .formTitle img {
+
+    background: #F1F1F1;
+
+    padding: 5px;
+
+    position: absolute;
+
+    right: 25px;
+
+    top: 22px;
+
+    cursor: pointer;
+
+    width: 22px;
+
+}
+
+
+
+/* +================================================ 
+
+billingInfoPage Page
+
+===================================================== */
+
+
+
+
+
+.d-flex.align-items-center.gap-4 {
+
+    border: 1px solid #B4B4B4;
+
+    padding: 8px;
+
+    border-radius: 4px 4px 0 0;
+
+}
+
+
+
+
+
+/* +================================================ 
+
+manageUSerPage Page
+
+===================================================== */
+
+
+
+.manageUSerPage .innerMainContent {
+
+    background: #FFF;
+
+    padding: 1vw;
+
+    margin: 1vw;
+
+}
+
+
+
+.manageUSerPage .userBoxes {
+
+    padding: 20px;
+
+}
+
+
+
+.manageUSerPage .pageHeader {
+
+    padding-bottom: 0;
+
+}
+
+
+
+.manageUSerPage thead th {
+
+    background: #F4F6FA;
+
+    font-size: 14px;
+
+    font-weight: 500;
+
+    vertical-align: middle;
+
+    border: none;
+
+}
+
+
+
+.manageUSerPage .customIconBtn {
+
+    border: 1px solid #DDDDDD;
+
+    box-shadow: 0px 0px 6px 0px #0000001A;
+
+    padding: 0 15px;
+
+    border-radius: 8px;
+
+    display: grid;
+
+    grid-template-columns: 30px 20px;
+
+    width: 90px;
+
+}
+
+
+
+.manageUSerPage .Assign_user .iconBTn {
+
+    border: 1px solid #DDDDDD;
+
+    box-shadow: 0px 0px 6px 0px #0000001A;
+
+    padding: 0 15px;
+    font-size: 13px;
+    border-radius: 8px;
+
+}
+
+
+
+.manageUSerPage .customIconBtn .iconImg {
+
+    border-left: 1px solid #DDDDDD;
+
+    font-size: 25px;
+
+    font-weight: 600;
+
+    width: 40px;
+
+    text-align: center;
+
+}
+
+
+
+.manageUSerPage .customIconBtn .iconImg img {
+
+    width: 16px;
+
+}
+
+
+
+.manageUSerPage tbody td {
+
+    font-size: 14px;
+
+    font-weight: 400;
+
+    border: none;
+
+    border-bottom: 1px solid #DDDDDD;
+
+    vertical-align: middle;
+
+}
+
+
+
+
+
+.manageUSerPage .singleUserBox {
+
+    border-radius: 8px;
+
+    border: 1px solid #DDD;
+
+    background: #FFF;
+
+    padding: 15px;
+
+    box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.15);
+
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: center;
+
+    justify-content: space-between;
+
+
+    /* additional on 23 october  */
+
+    min-width: 215px;
+
+
+}
+
+
+
+.manageUSerPage .userdata {
+
+    border-radius: 12px;
+
+    border: 1px solid #DDD;
+
+    background: #F9F9F9;
+
+    padding: 12px 10px;
+
+    /* additional on 23 october  */
+    width: 100%;
+    position: relative;
+    /* overflow: hidden; */
+    overflow: auto;
+}
+
+
+
+.manageUSerPage .table {
+
+    border-radius: 12px;
+
+}
+
+
+
+.manageUSerPage .userContact {
+
+    padding: 20px 0 10px;
+
+    border-top: 2px dotted #DDDDDD;
+    display: flex;
+    margin-top: 20px;
+
+}
+
+.teamBootomButton .btn-success {
+    font-size: 14px;
+}
+
+
+.manageUSerPage .userContact a {
+
+    color: #333333;
+
+}
+
+
+
+.manageUSerPage .singleUserBox td,
+
+.manageUSerPage .singleUserBox th,
+
+.manageUSerPage .singleUserBox .tableBody {
+
+    padding: 5px 10px !important;
+
+    text-align: left;
+
+    font-weight: 500;
+
+    background: #F9F9F9 !important;
+
+    border: 2px solid #F9F9F9;
+
+    border: none !important;
+
+    vertical-align: middle;
+
+}
+
+
+
+.manageUSerPage .singleUserBox th {
+
+    color: #777777;
+
+
+
+}
+
+
+
+.manageUSerPage .singleUserBox td {
+
+    color: #222222;
+
+    font-weight: 400;
+
+}
+
+
+
+.manageUSerPage .userContact .goBackBtn {
+
+    border-radius: 8px;
+
+    padding: 5px 10px;
+
+    font-size: 14px;
+
+    border: 1px solid #DDD;
+
+    background: #FFF;
+
+    box-shadow: 0px 0px 2px 0px rgba(0, 0, 0, 0.10);
+
+}
+
+
+
+.manageUSerPage .newUserForm label {
+
+    display: block;
+
+    text-align: left;
+
+    font-size: 14px;
+
+    margin-bottom: 10px;
+
+}
+
+
+
+.manageUSerPage .newUserForm .grid2 {
+
+    gap: 1rem;
+
+}
+
+
+
+.manageUSerPage .newUserForm .formTitle .border {
+
+    padding: 5px 10px;
+
+    font-size: 13px;
+
+    border-radius: 8px;
+
+    border: 1px solid #DDD;
+
+}
+
+
+
+.manageUSerPage .newUserForm input {
+
+
+
+    padding: 8px 10px;
+
+
+
+}
+
+
+
+.manageUSerPage .grid4 {
+
+    gap: 1rem;
+
+}
+
+
+
+.manageUSerPage .note {
+
+    background: #ECECEC;
+
+    padding: 1vw;
+
+    border-radius: 4px;
+
+}
+
+
+
+.manageUSerPage .note li {
+
+    font-size: 14px;
+
+    color: #333333;
+
+}
+
+
+
+.manageUSerPage #manage_su_main_panel {
+
+    margin-top: 20px;
+
+}
+
+
+
+.manageUSerPage .userProfile img {
+
+    width: 52px;
+
+    height: 52px;
+
+}
+
+
+
+.manageUSerPage .userProfile select {
+
+    border: 1px solid #D7D5D5;
+
+    padding: 5px 20px;
+
+    border-radius: 4px;
+
+    font-size: 14px;
+
+    width: 100%;
+
+}
+
+
+
+.afterEditInput input {
+
+    border: 1px solid #DDD;
+
+    padding: 5px 10px;
+
+    width: 100% !important;
+
+    border-radius: 4px;
+
+    font-size: 13px;
+
+}
+
+
+
+/* +================================================ 
+
+manageUSerPage Page
+
+===================================================== */
+
+
+
+
+
+
+
+/* +================================================ 
+
+finalApprovalPage Page
+
+===================================================== */
+
+.finalApprovalPage .innerMainContent {
+
+    padding: 1vw;
+
+    margin: 1vw;
+
+    background: #FFF;
+
+}
+
+
+
+.finalApprovalPage table td {
+
+    vertical-align: middle;
+
+    padding: 8px 15px !important;
+
+}
+
+
+
+.finalApprovalPage .tableBTn {
+
+    box-shadow: 0px 0px 6px 0px #0000001A;
+
+    border-radius: 8px;
+
+}
+
+
+
+.approve_ajax {
+
+    border: 1px solid #8E7DFF !important;
+
+    color: #8E7DFF !important;
+
+}
+
+
+
+.reject_modal {
+
+    border: 1px solid #FF4B50 !important;
+
+    color: #FF4B50 !important;
+
+}
+
+
+
+.chatBtn {
+
+    border: 1px solid #198754 !important;
+
+    color: #198754 !important;
+
+    padding: 8px 10px !important;
+
+}
+
+
+
+/* +================================================ 
+
+finalApprovalPage Page
+
+===================================================== */
+
+
+
+
+
+
+
+
+
+
+
+/* +================================================ 
+
+salesDashBoard Page
+
+===================================================== */
+
+.salesDashBoard.innerMainContent {
+
+    padding: 1vw;
+
+}
+
+
+
+.salesDashBoard .border-none {
+
+    border: none !important;
+
+    background: #FFF;
+
+    padding: 1.5vw;
+
+    border-radius: 8px;
+
+}
+
+
+
+.salesDashBoard .boxes {
+
+    border-radius: 8px;
+
+    padding: 0;
+
+}
+
+
+
+.salesDashBoard .boxes .grid2 {
+
+    border-radius: 15px;
+
+    background-repeat: no-repeat;
+
+    background-position: center;
+
+    position: relative;
+
+    border: 2px solid #060B0D;
+
+    overflow: hidden;
+
+}
+
+
+
+.salesDashBoard .boxes img {
+
+    width: 100%;
+
+}
+
+
+
+.salesDashBoard .boxes .contentSide h1 {
+
+    font-size: 20px;
+
+}
+
+
+
+.salesDashBoard .boxes .contentSide h4 {
+
+    font-size: 30px;
+
+    font-weight: 800;
+
+}
+
+
+
+.salesDashBoard .boxes .grid2::after {
+
+    content: '';
+
+    position: absolute;
+
+    left: 0;
+
+    top: 0;
+
+    width: 55vw;
+
+    height: 100%;
+
+    background: linear-gradient(90deg, #000000 0%, #080F12 76.61%, rgba(11, 20, 24, 0) 100%);
+
+    padding: 5vw;
+
+}
+
+
+
+.salesDashBoard .contentSide {
+
+    position: relative;
+
+    z-index: 100;
+
+    color: #FFF;
+
+    padding: 2vw;
+
+}
+
+
+
+
+
+
+
+.salesDashBoard .adminOverview .items {
+
+    border: 1px solid #DDDDDD;
+
+    border-radius: 8px;
+
+    transition: .3s ease;
+
+}
+
+
+
+.salesDashBoard .adminOverview .items:hover {
+
+    transform: translateY(-10px);
+
+}
+
+
+
+.salesDashBoard .adminOverview .history {
+
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: center;
+
+
+
+}
+
+
+
+.salesDashBoard .adminOverview .items h5 {
+
+    font-size: 18px;
+
+}
+
+
+
+.salesDashBoard .adminOverview .items h1 {
+
+    font-size: 32px;
+
+}
+
+
+
+.salesDashBoard .adminOverview .items .iconImg {
+
+    width: 80px;
+
+}
+
+
+
+
+
+
+
+.salesDashBoard .adminOverview .grid3 {
+
+    display: grid;
+
+    gap: 20px;
+
+    color: #FFFFFF;
+
+    grid-template-columns: repeat(3, 1fr);
+
+}
+
+
+
+.salesDashBoard .totalCus {
+
+    background: linear-gradient(90deg, #7EA3FF 0%, #648CEF 100%);
+
+}
+
+
+
+.salesDashBoard .ActiveCus {
+
+    background: linear-gradient(90deg, #34B87A 0%, #25A86A 100%);
+
+
+
+}
+
+
+
+.salesDashBoard .inActiveCus {
+
+    background: linear-gradient(90deg, #EFCF51 0%, #E7C125 100%);
+
+
+
+}
+
+
+
+.salesDashBoard .innerMainContent .card {
+
+    padding: 2vw;
+
+}
+
+
+
+
+
+
+
+.salesDashBoard .dottedBorder {
+
+    border: 1px dotted #777777;
+
+    margin: 45px 10px;
+
+}
+
+
+
+.salesDashBoard .adminOverview .items .bgImg {
+
+    height: 100%;
+
+    position: absolute;
+
+    right: 0;
+
+    width: 10vw;
+
+    top: 0;
+
+    overflow: hidden;
+
+    border-radius: 8px;
+
+}
+
+
+
+.salesDashBoard .adminOverview .items .bgImg img {
+
+
+
+    width: 100%;
+
+    height: 100%;
+
+}
+
+
+
+.salesDashBoard .leftSide {
+
+    position: relative;
+
+    padding: 2vw 0;
+
+    z-index: 1;
+
+}
+
+
+
+
+
+/* +================================================ 
+
+salesDashBoard Page
+
+===================================================== */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* +================================================ 
+
+customerUserPage Page Customers_user.php
+
+===================================================== */
+
+.customerUserPage {
+
+    padding: 1vw;
+
+}
+
+
+
+.customerUserPage .card {
+
+    padding: 1.5vw;
+
+}
+
+
+
+.customerUserPage table th {
+
+    background: #F4F6FA;
+
+    font-weight: 500;
+
+    font-size: 14px;
+
+}
+
+
+
+.customerUserPage .loginBTn {
+
+    border: 1px solid #DDDDDD;
+
+    box-shadow: 0px 0px 6px 0px #0000001A;
+
+    font-size: 12px;
+
+}
+
+
+
+.customerUserPage .editBTn {
+
+    background: #EAE7FF;
+
+    color: #8E7DFF;
+
+    padding: 0.1vw 0.4vw;
+
+}
+
+
+
+.customerUserPage .editBTn:hover {
+
+    color: #8E7DFF;
+
+    border: 1px solid #EAE7FF;
+
+}
+
+
+
+.customerUserPage .salesAdminBtn {
+
+    background: #E0E9FF;
+
+    color: #2F50A3;
+
+    padding: 2px 10px;
+
+    font-size: 12px;
+
+    font-weight: 500;
+
+}
+
+
+
+.customerUserPage .salesAdminBtn:hover {
+
+    color: #2F50A3;
+
+    border: 1px solid #E0E9FF;
+
+}
+
+
+
+.customerUserPage .deleteBtn {
+
+    background: #FFE1E2;
+
+    color: #FF4B50;
+
+    padding: 0.1vw 0.4vw;
+
+}
+
+
+
+.customerUserPage .deleteBtn:hover {
+
+    color: #FF4B50;
+
+    border: 1px solid #FFE1E2;
+
+}
+
+
+
+.customerUserPage .salesAdmin {
+
+    background: #E0E9FF;
+
+    display: inline;
+
+    padding: 4px 10px;
+
+    border-radius: 4px;
+
+    margin-right: 5px;
+
+    color: #2F50A3;
+
+    font-weight: 500;
+
+}
+
+
+
+.customerUserPage .salesAdminRow {
+
+    display: flex;
+
+    justify-content: center;
+
+}
+
+
+
+.customerUserPage .pageHeader {
+
+    padding: 0 0 20px 0;
+
+}
+
+
+
+.customerUserPage .head .iconBTn {
+
+    background: #111111;
+
+    color: #FFF;
+
+    font-size: 13px;
+
+    border: 2px solid #111;
+
+    border-radius: 4px;
+
+    padding: 2px 10px !important;
+
+}
+
+
+
+.customerUserPage .head form .iconBTn {
+
+    position: absolute;
+
+    right: -1px;
+
+    border-radius: 0 5px 5px 0;
+
+    padding: 1px 10px !important;
+
+}
+
+
+
+.customerUserPage .head form .iconBTn img {
+
+    width: 13px;
+
+}
+
+
+
+.customerUserPage .head form input::placeholder,
+
+.customerUserPage .head form input {
+
+    padding: 1px 10px;
+
+    font-size: 14px;
+
+}
+
+
+
+/* +================================================ 
+
+customerUserPage Page Customers_user.php
+
+===================================================== */
+
+
+
+
+
+
+
+
+
+/* +================================================ 
+
+teamMemberOrderFormPage Page Customers_user.php
+
+===================================================== */
+
+.teamMemberOrderFormPage .singleORder {
+
+    box-shadow: 0px 0px 5.5px 2px #0000001A;
+
+    padding: 12px;
+
+    background: #FFF;
+
+    border-radius: 5px;
+
+    transition: .3s ease;
+
+    position: relative;
+
+    overflow: hidden;
+
+}
+
+
+
+.teamMemberOrderFormPage .singleORder:hover {
+
+    cursor: pointer;
+
+    transform: translateY(-5px);
+
+}
+
+
+
+
+
+
+
+.teamMemberOrderFormPage .grid4 {
+
+    gap: 2rem 1.5rem;
+
+    display: grid;
+
+    grid-template-columns: repeat(4, 1fr);
+
+}
+
+
+
+.teamMemberOrderFormPage .table th {
+
+    background: #F9F9F9;
+
+    border: 1px solid #EEEEEE !important;
+
+    border-radius: 6px;
+
+    overflow: hidden;
+
+    text-align: left;
+
+    padding-left: 10px !important;
+
+}
+
+
+
+
+
+
+
+.teamMemberOrderFormPage .table-responsive td {
+
+    padding: 5px 4px !important;
+
+    border-bottom: 1px solid #EEEEEE !important;
+
+    text-align: left;
+
+}
+
+
+
+.teamMemberOrderFormPage .singleORder:hover.singleORder img {
+
+    bottom: 15px;
+
+}
+
+
+
+.teamMemberOrderFormPage .singleORder img {
+
+    background: #2F50A2;
+
+    padding: 3px 12px;
+
+    border-radius: 27px;
+
+    position: absolute;
+
+    right: 35px;
+
+    transition: .3s ease;
+
+    bottom: -30px;
+
+    width: 45px;
+
+}
+
+
+
+.teamMemberOrderFormPage .table-responsive td,
+
+.teamMemberOrderFormPage .table-responsive th {
+
+    border: none;
+
+    border-bottom-width: medium;
+
+    border-bottom-style: none;
+
+    border-bottom-color: currentcolor;
+
+    font-size: 14px;
+
+}
+
+
+
+.teamMemberOrderFormPage .greenBadge {
+
+    color: #FFF;
+
+    padding: 2px;
+
+    border-radius: 26px;
+
+    width: 55px !important;
+
+    text-align: center;
+
+    position: absolute;
+
+    right: 22px;
+
+    top: 32px;
+
+}
+
+
+
+.teamMemberOrderFormPage .greenBadge {
+
+    background: #33C481;
+
+}
+
+
+
+.teamMemberOrderFormPage {
+
+    padding: 0.6vw 1.5vw;
+
+    background: #FFF;
+
+    height: 100%;
+
+    text-align: center;
+
+}
+
+
+
+
+
+/* +================================================ 
+
+teamMemberOrderFormPage Page Customers_user.php
+
+===================================================== */
+
+
+
+
+
+
+
+
+
+/* +================================================ 
+
+teamMemberManageORder Page edit_order_sub.php
+
+===================================================== */
+
+.teamMemberManageORder {
+
+    padding: 1vw;
+
+}
+
+
+
+.teamMemberManageORder .card {
+
+    padding: 1vw;
+
+    border: none;
+
+}
+
+
+
+.teamMemberManageORder .refNum {
+
+    background: #34B87A1A;
+
+    border: 1.2px solid #34B87A;
+
+    border-radius: 4px;
+
+    color: #34B87A;
+
+    padding: 0.4vw 1vw;
+
+    display: inline-block;
+
+    margin: 0;
+
+    font-size: 14px;
+
+}
+
+
+
+.teamMemberManageORder input,
+
+.teamMemberManageORder select {
+
+    width: 100%;
+
+    border: none;
+
+    background: #FFF;
+
+    text-align: center;
+
+    color: #444;
+
+    font-size: 13px;
+
+    font-weight: 500;
+
+}
+
+
+
+.teamMemberManageORder .table-responsive th,
+
+.teamMemberManageORder .table-responsive td {
+
+    text-align: center !important;
+
+    border: 1px solid #ECECEC !important;
+
+}
+
+
+
+.teamMemberManageORder .iconBTn img {
+
+    width: 18px;
+
+    cursor: pointer;
+
+}
+
+
+
+.teamMemberManageORder .iconBTn {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+}
+
+
+
+.teamMemberManageORder .tbl_item_form {
+
+    margin-top: 20px;
+
+}
+
+
+
+.teamMemberManageORder table th:nth-child(1) {
+
+    width: 2vw;
+
+}
+
+
+
+
+
+
+
+.teamMemberManageORder table th:nth-child(5),
+
+.teamMemberManageORder table th:nth-child(7) {
+
+    width: 3vw;
+
+}
+
+
+
+.teamMemberManageORder table th:nth-child(3),
+
+.teamMemberManageORder table th:nth-child(4),
+
+.teamMemberManageORder table th:nth-child(10),
+
+.teamMemberManageORder table th:nth-child(15) {
+
+    width: 8vw;
+
+}
+
+
+
+.teamMemberManageORder .tfoot .themeBtn {
+
+    background: var(--blue-bg);
+
+    color: #FFF;
+
+    width: auto;
+
+
+
+}
+
+
+
+/* +================================================ 
+
+teamMemberManageORder Page edit_order_sub.php
+
+===================================================== */
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* +================================================ 
+
+design_approvalPage Page design_approvalPage.php
+
+===================================================== */
+
+
+
+.design_approvalPage .innerMainContent {
+
+    padding: 1vw;
+
+    margin: 1vw;
+
+    background: #FFF;
+
+}
+
+
+
+/* +================================================ 
+
+design_approvalPage Page design_approvalPage.php
+
+===================================================== */
+
+
+
+
+
+
+
+
+
+/* +================================================ 
+
+newOrderPage   design_approvalPage.php
+
+===================================================== */
+
+.newOrderPage .innerMainContent {
+
+    padding: 1vw;
+
+    margin: 1vw;
+
+    background: #FFF;
+
+}
+
+
+
+/* +================================================ 
+
+newOrderPage   design_approvalPage.php
+
+===================================================== */
