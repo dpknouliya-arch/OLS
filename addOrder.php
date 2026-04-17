@@ -812,80 +812,11 @@ addNewTeam Member Modal
 <!-- Toggles  -->
 
 <script>
-    function chooseUploadProcess(ele = false) {
-        console.log(ele);
-        var input = '';
-        if (ele) {
-            let form = $(ele).closest('form'); // or .closest('.modal')
-            input = form.find('#input_on_team_name').val();
-        } else {
-            input = $('#input_on_team_name').val();
-        }
-        console.log(input)
-        // if ($('#input_on_team_name').val() == "") {
-        //     alert("Please fill the Team Name.");
-        //     return false;
-        // } 
 
-        if (input == "") {
-            alert("Please fill the Team Name.");
-            return false;
-        }
-        $('.teamTabsSection').show(300);
+  function GetTotalCount(){
 
-        const teamId = $('#teamTab li').length;
-        $('#teamTab .nav-link').removeClass('active');
+  }    
 
-        $('#table_showing .tab-pane').removeClass('active');
-
-
-
-        const teamTab = `
-
-                    <li class="nav-item" role="presentation">
-
-                        <a class="nav-link  active" id="fill-tab-${teamId}" data-bs-toggle="tab" href="#fill-tabpanel-${teamId}" role="tab" aria-controls="fill-tabpanel-${teamId}" aria-selected="true"> Team ${teamId} </a>
-
-                    </li>`;
-
-        $('#teamTab').append(teamTab);
-
-        var prod_id = $('#prod_id').val();
-        var form_id = $('#form_id_inc').val();
-        // var on_team_name = window.btoa($('#input_on_team_name').val());
-        var on_team_name = window.btoa(input);
-
-        var on_year = window.btoa($('#input_on_year').val());
-
-        //var draft_id = $('#edit_draft_id').val();
-        $.ajax({
-            type: "POST",
-            dataType: "html",
-            url: "ajax/manage_order/new_card_upload.php",
-            data: {
-                "prod_id": prod_id,
-                "form_id": form_id,
-                "on_team_name": on_team_name,
-                "on_year": on_year
-            },
-            success: function(resp) {
-                $('#table_showing').append(resp);
-
-                $('#input_on_team_name').val("");
-                $('#input_on_year').val("");
-                form_id = parseInt(form_id);
-                form_id++;
-                $('#form_id_inc').val(form_id);
-                $('#form_id_inc').val(form_id);
-                tmp_num_form = parseInt($('#tmp_num_form').val());
-                tmp_num_form++;
-                $('#tmp_num_form').val(tmp_num_form);
-
-                $('#addNewTeam').modal('hide');
-            }
-        });
-
-    }
 
     $(document).ready(function() {
         $('#toggleGuide').click(function() {
@@ -911,6 +842,8 @@ addNewTeam Member Modal
     
     $(document).on('click', '.orderFormUpload', function () {
         let isValid = CheckOrderFormValidation(); 
+
+
         if(!isValid){
              console.log("validation failed"); 
              return false; 
@@ -939,6 +872,25 @@ addNewTeam Member Modal
             formData.append('on_team_name' ,on_team_name) ; 
             formData.append('teamno' , teamId) ; 
             formData.append('on_year' , on_year) ; 
+
+
+
+            $('#teamTab .nav-link').removeClass('active');
+
+            $('#table_showing .tab-pane').removeClass('active');
+
+
+
+            const teamTab = `
+                    <li class="nav-item" role="presentation">
+
+                        <a class="nav-link  active" id="fill-tab-${teamId}" data-bs-toggle="tab" href="#fill-tabpanel-${teamId}" role="tab" aria-controls="fill-tabpanel-${teamId}" aria-selected="true"> Team ${teamId} </a>
+
+                    </li>`;
+
+
+
+            $('#teamTab').append(teamTab);
 
 
 
@@ -990,23 +942,12 @@ addNewTeam Member Modal
             $('.teamTabsSection').show(300); // Adjust duration as needed
             var prod_id = $('#prod_id_new').val();
             var form_id = $('#form_id_inc').val();
-            var on_team_name = window.btoa($('#input_on_team_name_new').val());
+
+            var on_team_name = base64EncodeUnicode($('#input_on_team_name_new').val());
             var on_year = window.btoa($('#input_on_year_new').val());
 
             $('.teamTabsSection').show(300); // Show the section
-            //const teamId = `team${nextTeamNumber}`;
-
-            // const teamTab = `
-
-            //     <li class="nav-item" role="presentation">
-
-            //         <a class="nav-link" id="${teamId}-tab" data-bs-toggle="tab" href="#${teamId}" role="tab" aria-controls="${teamId}" aria-selected="false">
-
-            //             Team ${nextTeamNumber}
-
-            //         </a>
-
-            //     </li>`;
+         
 
             const teamId = $('#teamTab li').length;
             $('#teamTab .nav-link').removeClass('active');
@@ -1433,22 +1374,23 @@ addNewTeam Member Modal
 </script>
 
 <script>
-    function removeTable(element) {
-
-        // Find the closest table-responsive div and remove it
-
-        // const tableDiv = element.closest('.table-responsive'); 
-        const tableDiv = element.closest('.table')
 
 
+   function removeTable(el) {
 
-        if (tableDiv) {
+    // Get current tab-pane
+    var $tabPane = $(el).closest('.tab-pane');
 
-            tableDiv.remove();
+    var tabPaneId = $tabPane.attr('id'); // e.g. fill-tabpanel-1
 
-        }
+    // Remove the tab-pane
+    $tabPane.remove();
 
-    }
+    // Remove corresponding tab button
+    $('button[data-bs-target="#' + tabPaneId + '"], a[href="#' + tabPaneId + '"]').remove();
+
+    // Activate first available tab
+}
 
     function addItemRow(form_id, prod_id) {
 
@@ -2214,7 +2156,7 @@ addNewTeam Member Modal
 
 
        if(is_new){
-                 isValid &= validateField('#input_on_team_name_new', VALIDATION_PATTERNS.textNumber, 'Invalid team name');
+                 isValid &= validateField('#input_on_team_name_new', 'Invalid team name');
                 isValid &= ValidateOnlyEmpty('#input_on_year_new', 'Select Year');
                 isValid &= ValidateOnlyEmpty('#prod_id_new', 'Select Order Form');
        }else{
