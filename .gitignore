@@ -54,7 +54,7 @@ error_log
 */error_log
 .ftpquota
 .well-known/
-.htaccess
+
 # -----------------------------------------------
 # OS / IDE files
 # -----------------------------------------------
@@ -64,3 +64,4 @@ Thumbs.db
 .idea/
 *.swp
 *.swo
+.htaccess
