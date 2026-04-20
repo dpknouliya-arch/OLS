@@ -3,50 +3,42 @@ include('check-session.php');
 include('db.php');
 include 'encryption_helper.php';
 $obj_user = json_decode(base64_decode($_SESSION["JOGOLS"]));
-$user_id = $obj_user->user_id;
+$user_id  = $obj_user->user_id;
 
 if (isset($_GET['order_id'])) {
     $order_id = customDecode($_GET['order_id']);
 
-    // Fetch order data
-    $sql = "SELECT * FROM design_order WHERE order_id = ?";
+    $sql  = "SELECT * FROM design_order WHERE order_id = ?";
     $stmt = $conn4->prepare($sql);
     $stmt->bind_param("i", $order_id);
     $stmt->execute();
     $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
-        $order = $result->fetch_assoc();
-
-        // Extract values
+        $order    = $result->fetch_assoc();
         $designId = $order['design_id'];
         $sock_design = $order['sock_design'];
-        $added_date = $order['added_date'];
+        $added_date  = $order['added_date'];
 
-        // 🧩 Decode JSON fields
         $zones = json_decode($order['colorDecals'], true);
         $logos = json_decode($order['imagedecals'], true);
         $texts = json_decode($order['textdecals'], true);
 
-        // 🧵 Fabric fields
         $fab_ary = [
-            'Base' => $order['fabric_base'],
-            'Neck' => $order['fabric_neck'],
-            'Mesh' => $order['fabric_mesh'],
-            'Shoulder' => $order['fabric_shoulder']
+            'Base'     => $order['fabric_base'],
+            'Neck'     => $order['fabric_neck'],
+            'Mesh'     => $order['fabric_mesh'],
+            'Shoulder' => $order['fabric_shoulder'],
         ];
 
-        // You may also fetch style/stripe names if needed:
         $jersey_coller = $order['fabric_neck'];
-        $jsname = '';
-        $stripes_name = '';
+        $jsname        = '';
+        $stripes_name  = '';
 
-        // 🧩 Optional: Fetch preview images if saved separately
         $frontImage = $order['front_image'] ?? '';
-        $backImage = $order['back_image'] ?? '';
-        $leftImage = $order['left_image'] ?? '';
+        $backImage  = $order['back_image']  ?? '';
+        $leftImage  = $order['left_image']  ?? '';
         $rightImage = $order['right_image'] ?? '';
-
     } else {
         echo "<p>No design found for this Order ID.</p>";
         exit;
@@ -56,648 +48,518 @@ if (isset($_GET['order_id'])) {
     exit;
 }
 
-$order_team_data = [];
+$order_team_data   = [];
+$order_design_data = [];
+
 $order_id = customDecode($_GET['order_id']);
 if (isset($order_id)) {
-    $sql_team = "SELECT * FROM order_team WHERE order_id = ?";
+    $sql_team  = "SELECT * FROM order_team WHERE order_id = ?";
     $stmt_team = $conn4->prepare($sql_team);
     $stmt_team->bind_param("i", $order_id);
     $stmt_team->execute();
     $result_team = $stmt_team->get_result();
-
     while ($row = $result_team->fetch_assoc()) {
         $order_team_data[] = $row;
     }
 }
+
+if (isset($designId)) {
+    $sql_designs  = "SELECT * FROM designs WHERE id = ?";
+    $stmt_designs = $conn4->prepare($sql_designs);
+    $stmt_designs->bind_param("i", $designId);
+    $stmt_designs->execute();
+    $result_designs = $stmt_designs->get_result();
+    while ($row = $result_designs->fetch_assoc()) {
+        $order_design_data[] = $row;
+    }
+}
+
+$design_name  = !empty($order_design_data[0]['name'])       ? $order_design_data[0]['name']       : '—';
+$jersey_type  = !empty($order_design_data[0]['modal_type']) ? $order_design_data[0]['modal_type'] : '—';
+$design_image = !empty($order_design_data[0]['image'])      ? $order_design_data[0]['image']      : '';
+
+$order_date_fmt = !empty($added_date) ? date('d-m-Y H:i:s', strtotime($added_date)) : '—';
+$order_id_enc   = customEncode($order_id);
+
+function getPantonName($conn4, $zone, $designId, $type = 'pantonName') {
+    $sql  = "SELECT panton_name, name FROM colors WHERE name = ?";
+    $stmt = $conn4->prepare($sql);
+    $stmt->bind_param("s", $zone);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if ($row = $result->fetch_assoc()) {
+        return $type === 'pantonName' ? $row['panton_name'] : $row['name'];
+    }
+
+    $sql  = "SELECT color_group FROM design_zones WHERE design_id = ? AND zone_name = ? OR sub_zone_name = ? LIMIT 1";
+    $stmt = $conn4->prepare($sql);
+    $stmt->bind_param("iss", $designId, $zone, $zone);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if (!($row = $result->fetch_assoc())) { return $zone; }
+
+    $colorGroup = $row['color_group'];
+    $map = ['primary' => 'primary_color', 'secondary' => 'secondary_color', 'tertiary' => 'tertiary_color'];
+    if (!isset($map[$colorGroup])) { return $colorGroup; }
+
+    $sql  = "SELECT {$map[$colorGroup]} AS color FROM designs WHERE id = ? LIMIT 1";
+    $stmt = $conn4->prepare($sql);
+    $stmt->bind_param("i", $designId);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if (!($row = $result->fetch_assoc())) { return $colorGroup; }
+    $colorName = $row['color'];
+
+    $sql  = "SELECT panton_name, name FROM colors WHERE name = ?";
+    $stmt = $conn4->prepare($sql);
+    $stmt->bind_param("s", $colorName);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if ($row = $result->fetch_assoc()) {
+        return $type === 'pantonName' ? $row['panton_name'] : $row['name'];
+    }
+    return $colorName;
+}
 ?>
 
-<section class="generatePO">
-    <div class="container">
-        <div class="row" >
-            <div style="text-align: right;">
-                <span id="printBtn" style="margin-right: 20px;cursor: pointer;" class="blueBtn">
-                    <i class="fa fa-print" aria-hidden="true"></i>
-                </span>
-            </div>
-            <div class="col-md-8 m-auto" id="pritn_details">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="Style/ols_3d_order.css">
 
-                <!-- PDF 1 -->
-                <div class="innerDiv">
-                    <div class="step1 stepsItems">
-                        <div class="upperHead">
-                            <figure class="logo my-auto">
-                                <img src="images/logo1.png" alt="">
-                            </figure>
-                        </div>
-                        <div>
-                            
-                        </div>
-                        <div class="stepNavigate">
-                            <h6>Style <span class="styleName">The Premier Hockey Jersey</span></h6>
-                        </div>
-                        <div class="modelAngleView grid4">
-                            <figure>
-                                <img src="<?= htmlspecialchars($frontImage) ?>" >
-                            </figure>
-                            <figure>
-                                <img src="<?= htmlspecialchars($backImage) ?>">
-                            </figure>
-                            <figure>
-                                <img src="<?= htmlspecialchars($leftImage) ?>"  alt="">
-                            </figure>
-                            <figure>
-                                <img src="<?= htmlspecialchars($rightImage) ?>" alt="">
-                            </figure>
-                        </div>
-                        <div class="tableArea fabricDetails">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th scope="col">Fabric Details</th>
-                                        <th scope="col">Collar</th>
-                                        <th scope="col">Style</th>
-                                        <th scope="col">Stripes</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>
-                                            <?php
-                                            foreach ($fab_ary as $key => $value) {
-                                                ?>
-                                                <h6> <span><?php echo $key; ?></span> <?php echo $value; ?></h6>
-                                                <?php
-                                            }
-                                            ?>                                               
-                                        </td>
-                                        <td>
-                                            <h6><?php echo $jersey_coller;?></h6>
-                                        </td>
-                                        <td>
-                                            <h6> <?php echo $jsname;?></h6>
-                                        </td>
-                                        <td>
-                                            <h6><?= $stripes_name; ?></h6>                                                
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="tableArea ColorDetails">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th scope="col" colspan="2">Color Details</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr class="grid2">
-                                        <?php
-                                        if (!empty($zones)) {
-                                            foreach ($zones as $key => $zone) {
-                                                if (is_array($zone)) {
-                                                    foreach ($zone as $subKey => $subValue) {
-                                                        ?>
-                                                        <td>
-                                                            <h6 class="tableDataStyle2">
-                                                                <span><?= htmlspecialchars($subKey) ?></span>
-                                                                <div class="colorArea">
-                                                                    <?php
-                                                                        $colorName = getPantonName($conn4, $subValue, $designId , 'colorName');
-                                                                    ?>
-                                                                    <span class="ColorApply activeColor" 
-                                                                        style="background-color: <?= $colorName ?>; box-shadow: rgba(0,0,0,0.35) 0px 5px 15px; border: 1px solid #55555536;"></span>
-                                                                    <?= getPantonName($conn4, $subValue, $designId , 'pantonName') ?: "No matching panton name found." ?>
-                                                                </div>
-                                                            </h6>
-                                                        </td>
-                                                        <?php
-                                                    }
-                                                } else {
-                                                    ?>
-                                                    <td>
-                                                        <h6 class="tableDataStyle2">
-                                                            <span><?= htmlspecialchars($key) ?></span>
-                                                            <div class="colorArea">
-                                                                <?php
-                                                                    $colorName = getPantonName($conn4, $zone, $designId , 'colorName');
-                                                                ?>
-                                                                <span class="ColorApply activeColor" 
-                                                                    style="background-color: <?= $colorName ?>; box-shadow: rgba(0,0,0,0.35) 0px 5px 15px; border: 1px solid #55555536;"></span>
-                                                                <?= getPantonName($conn4, $zone, $designId , 'pantonName') ?: "No matching panton name found." ?>
-                                                            </div>
-                                                        </h6>
-                                                    </td>
-                                                    <?php
-                                                }
-                                            }
-                                        }
-                                        ?>                                            
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
+<!-- Hidden fields for downstream use -->
+<?php foreach ($order_design_data as $value): ?>
+<input type="hidden" name="coller_id"  value="<?= htmlspecialchars($value['coller_id'])  ?>">
+<input type="hidden" name="style_id"   value="<?= htmlspecialchars($value['style_id'])   ?>">
+<input type="hidden" name="stripes_id" value="<?= htmlspecialchars($value['stripes_id']) ?>">
+<?php endforeach; ?>
+<input type="hidden" name="order_id"  value="<?= $order_id ?>">
+<input type="hidden" name="design_id" value="<?= $designId ?>">
 
-                <!-- PDF 2 -->
-                <div class="innerDiv ">
-                    <div class="step2 stepsItems">
-                        <div class="upperHead">
-                            <figure class="logo my-auto">
-                                <img src="images/logo1.png" alt="">
-                            </figure>
-                        </div>
-                        <div class="stepNavigate">
-                            <h6>Style <span class="styleName">The Premier Hockey Jersey</span></h6>
-                        </div>
-                        <div class="tableArea numberDetails">
-                            <h5 class="tableFor">Number Details</h5>
-                            <table class="table">
-                                <thead>
-                                    <tr class="thead2">
-                                        <th scope="col">Placement</th>
-                                        <th scope="col">Size</th>
-                                        <th scope="col">Font</th>
-                                        <th scope="col">Fill</th>
-                                        <th scope="col">Outline</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php if (!empty($texts)) {
-                                        foreach ($texts as $key => $text) {
-                                            // Skip if no displayType
-                                            if (!isset($text['displayType']) || trim($text['displayType']) === '') continue;
+<style>
+@keyframes spin { to { transform: rotate(360deg); } }
+.ols3d-preloader {
+  position: absolute; inset: 0; background: rgba(248,249,252,.92);
+  display: flex; align-items: center; justify-content: center; z-index: 10; border-radius: 0;
+}
+.ols3d-preloader-spinner {
+  width: 44px; height: 44px; border: 4px solid #E8EDF5;
+  border-top-color: #1B3FB0; border-radius: 50%;
+  animation: spin .9s linear infinite;
+}
+</style>
 
-                                            // Safe extraction with fallbacks
-                                            $displayName  = $text['displayName'] ?? 'Unknown';
-                                            $Text         = $text['Text'] ?? '';
-                                            $FontFamily   = $text['FontFamily'] ?? 'Default Font';
-                                            $FontColor    = $text['FontColor'] ?? '#000000';
-                                            $OutlineColor = $text['OutlineColor'] ?? '#FFFFFF';
-                                            $height       = isset($text['height']) ? floatval($text['height']) * 39.3701 : 0;
-                                            $width        = isset($text['width']) ? floatval($text['width']) * 39.3701 : 0;
+<div class="ols3d-module">
 
-                                            ?>
-                                            <tr>
-                                                <td><h6 class="fw6"><?= htmlspecialchars($displayName) ?>: <?= htmlspecialchars($Text) ?></h6></td>
-                                                <td><?= number_format($height, 2) ?>"H X <?= number_format($width, 2) ?>"W</td>
-                                                <td><?= htmlspecialchars($FontFamily) ?></td>
-                                                <td>
-                                                    <div class="colorArea flexRow">
-                                                        <span class="ColorApply activeColor" style="background-color: <?= htmlspecialchars($FontColor) ?>;"></span>
-                                                        <?= htmlspecialchars(getPantonName($conn4, $FontColor, $designId , 'pantonName')) ?>
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <div class="colorArea flexRow">
-                                                        <span class="ColorApply activeColor" style="background-color: <?= htmlspecialchars($OutlineColor) ?>;"></span>
-                                                        <?= htmlspecialchars(getPantonName($conn4, $OutlineColor, $designId , 'pantonName')) ?>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                            <?php
-                                        }
-                                    }
-
-                                    ?>                                       
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="tableArea nameDetails">
-                            <h5 class="tableFor">Name Details</h5>
-                            <table class="table">
-                                <thead>
-                                    <tr class="thead2">
-                                        <th scope="col">Placement</th>
-                                        <th scope="col">Size</th>
-                                        <th scope="col">Font</th>
-                                        <th scope="col">Fill</th>
-                                        <th scope="col">Outline</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php if (!empty($texts)) {
-                                        foreach ($texts as $key => $text) {
-                                            if (!isset($text['displayType']) || $text['displayType'] === 'text') continue;
-
-                                            $displayName  = $text['displayName'] ?? 'Unknown';
-                                            $Text         = $text['Text'] ?? '';
-                                            $FontFamily   = $text['FontFamily'] ?? 'Default Font';
-                                            $FontColor    = $text['FontColor'] ?? '#000000';
-                                            $OutlineColor = $text['OutlineColor'] ?? '#FFFFFF';
-                                            $height       = isset($text['height']) ? floatval($text['height']) * 39.3701 : 0;
-                                            $width        = isset($text['width']) ? floatval($text['width']) * 39.3701 : 0;
-                                            ?>
-                                            <tr>
-                                                <td><h6 class="fw6"><?= $displayName ?>: <?= $Text?></h6></td>
-                                                <td><?= number_format($height, 2) ?>"H X <?= number_format($width, 2) ?>"W</td>
-                                                <td><?= $FontFamily ?></td>
-                                                <td>
-                                                    <div class="colorArea flexRow">
-                                                        <span class="ColorApply activeColor" style="background-color: <?= $FontColor ?>;"></span>
-                                                        <?= getPantonName($conn4, $FontColor, $designId , 'pantonName') ?>
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <div class="colorArea flexRow">
-                                                        <span class="ColorApply activeColor" style="background-color: <?= $OutlineColor ?>;"></span>
-                                                        <?= getPantonName($conn4, $OutlineColor, $designId , 'pantonName') ?>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                            <?php
-                                        }
-                                    }
-
-                                    ?>
-                                                                        
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="grid2">
-                            <?php if (!empty($logos)) {
-                                foreach ($logos as $key => $logo) {
-                                    // $height = $logo['height'] * 39.3701;
-                                    // $width = $logo['width'] * 39.3701;
-                                    $height       = isset($logo['height']) ? floatval($logo['height']) * 39.3701 : 0;
-                                    $width        = isset($logo['width']) ? floatval($logo['width']) * 39.3701 : 0;
-                                    ?>
-                                    <div class="tableArea shoulderYokeLogo LogoPlacement">
-                                        <h5 class="tableFor"><?= htmlspecialchars($logo['displayName']) ?></h5>
-                                        <table class="table">
-                                            <tbody>
-                                                <tr>
-                                                    <td>
-                                                        <figure><img src="<?= htmlspecialchars($logo['imageSrc']) ?>" alt="" width="150px"></figure>
-                                                        <h6><span>Placement</span> <?= htmlspecialchars($logo['displayName']) ?></h6>
-                                                        <h6><span>Size</span> <?= number_format($height, 2) ?>"H X <?= number_format($width, 2) ?>"W</h6>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    <?php
-                                }
-                            }
-
-                            ?>                                
-                        </div>
-                    </div>
-                </div>                    
-                <div class="tableArea shoulderYokeLogo LogoPlacement">
-                    <h5 class="tableFor">socks</h5>
-                    <table class="table">
-                        <tbody>
-                            <tr>
-                                <td>                                                            
-                                    <figure><img src="https://jogsports.com/jogdigital/<?php echo $sock_design;?>" width="200"></figure>  
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <!-- PDF 3 -->
-                <div class="innerDiv ">
-                    <div class="step3 stepsItems">
-                        <div class="upperHead">
-                            <figure class="logo my-auto">
-                                <img src="images/logo1.png" alt="">
-                            </figure>
-                        </div>
-                        <div class="stepNavigate">
-                            <h6>Style <span class="styleName">The Premier Hockey Jersey</span></h6>
-                        </div>
-                        <div class="tableArea numberDetails">
-                            <h5 class="tableFor">Roster Details</h5>
-                            <table class="table">
-                                <thead>
-                                    <tr class="thead2">
-                                        <th scope="col">Player Name</th>
-                                        <th scope="col">Size</th>
-                                        <th scope="col">Jersey No.</th>
-                                        <th scope="col">Color</th>
-                                        <th scope="col">QTY</th>
-                                        <th scope="col">C or A</th>
-                                        <th scope="col">Flag</th>
-                                        <th scope="col">Name For Packing</th>
-                                        <th scope="col">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php if (!empty($order_team_data)): ?>
-                                        <?php foreach ($order_team_data as $row): ?>
-                                            <tr>
-                                                <td><?= htmlspecialchars($row['name']) ?></td>
-                                                <td>
-                                                    <select class="w-100 border-none bg-none">
-                                                        <option <?= ($row['sizes'] == 'XS') ? 'selected' : '' ?>>XS</option>
-                                                        <option <?= ($row['sizes'] == 'S') ? 'selected' : '' ?>>S</option>
-                                                        <option <?= ($row['sizes'] == 'M') ? 'selected' : '' ?>>M</option>
-                                                        <option <?= ($row['sizes'] == 'L') ? 'selected' : '' ?>>L</option>
-                                                        <option <?= ($row['sizes'] == 'XL') ? 'selected' : '' ?>>XL</option>
-                                                        <option <?= ($row['sizes'] == '2XL') ? 'selected' : '' ?>>2XL</option>
-                                                        <option <?= ($row['sizes'] == '3XL') ? 'selected' : '' ?>>3XL</option>
-                                                        <option <?= ($row['sizes'] == '4XL') ? 'selected' : '' ?>>4XL</option>
-                                                        <option <?= ($row['sizes'] == '5XL') ? 'selected' : '' ?>>5XL</option>
-                                                    </select>
-                                                </td>
-                                                <td class="text-center"><?= htmlspecialchars($row['jerseyNos']) ?></td>
-                                                <td class="text-center"><?= htmlspecialchars($row['colors']) ?></td>
-                                                <td class="text-center"><?= htmlspecialchars($row['qtys']) ?></td>
-                                                <td class="text-center"><?= htmlspecialchars($row['corAs']) ?></td>
-                                                <td class="text-center"><?= ($row['flags'] == 'yes') ? '✔' : '-' ?></td>
-                                                <td class="text-center"><?= ($row['namepackings'] == 'yes') ? '✔' : '-' ?></td>
-                                                <td class="text-center">
-                                                    <button type="button" class="deleteRowButton" data-id="<?= $row['team_id'] ?>">
-                                                        <img src="images/icons/delete.png" alt="" class="iconImg"> Delete
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        <?php endforeach; ?>
-                                    <?php else: ?>
-                                        <tr><td colspan="9" class="text-center">No team members found for this order.</td></tr>
-                                    <?php endif; ?>                                 
-                                </tbody>
-                                <tfoot>                                    
-                                </tfoot>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+  <!-- Title Row -->
+  <div class="ols3d-title-row">
+    <a href="?vp=<?= base64_encode('3d_orders') ?>" class="ols3d-back-btn" title="Back to Orders">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/>
+      </svg>
+    </a>
+    <div>
+      <h1>Order Details</h1>
+      <p class="ols3d-breadcrumb">
+        <a href="?vp=<?= base64_encode('3d_orders') ?>">Orders</a>
+        <span class="sep">›</span>
+        <span class="current">#<?= $order['order_id'] ?></span>
+      </p>
     </div>
-</section>
+  </div>
 
-<section class="ReviewDetailsMain d-none">
-    <div class="container">
-        <div class="row">
-            <div class="col-md-7 leftSide">
-                <div class="card border-none bg-none">
-                    <h6 ITEMS class="divTitle">
-                        YOUR ITEMS
-                    </h6>
-                    <div class="items d-flex ">
-                        <figure class="m-0"><img src="images/AllProducts/product1.png" alt="" class="designImg">
-                        </figure>
-                        <div class="itemsDetails">
-                            <h5 class="itemName ">Premier Jerseys</h5>
-                            <p class="itemDesc sp">Classic Cut and Sew Jersey with twill appliques</p>
-                            <a href="#" data-toggle="modal" data-target="#roasterDetailsPopup">Roster details</a>
-                            <a href="#">Preview 3d Jersey</a>
-                            <div class="threeDots">
-                                <figure>
-                                    <img src="images/icons/threeDot.png" alt="" class="toggleButton">
-                                </figure>
-                                <button class="deleteButton" style="display: none;">Delete</button>
-                            </div>
-
-                        </div>
-                    </div>
-                    <a href="#" class="blueBtn">Submit
-                    </a>
-                </div>
-            </div>
-            
-            <div class="col-md-5 rightSide">
-                <div class="card border-none bg-none">
-                    <h6 ITEMS class="divTitle">
-                        SUMMARY <img src="images/icons/shirt.png" alt="" class="iconImg">
-                    </h6>
-                    <div class="card border-none">
-                        <table class="table  table-striped table-bordered table-hover">
-                            <tbody>
-                                <tr>
-                                    <th colspan="2" style="padding-left: 20px;">GARMENT INFO</th>
-                                </tr>
-                                <tr>
-                                    <td scope="row" style="width: 50%;">Sport</td>
-                                    <td>Hockey</td>
-                                </tr>
-                                <tr>
-                                    <td scope="row" style="width: 50%;">Product Type</td>
-                                    <td>Premier Jersey</td>
-                                </tr>
-                                <tr>
-                                    <td scope="row" style="width: 50%;">Fabric</td>
-                                    <td>Polyester</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <table class="table  table-striped table-bordered table-hover">
-                            <tbody>
-                                <tr>
-                                    <th colspan="2" style="padding-left: 20px;">COLOR</th>
-                                </tr>
-                                <tr>
-                                    <td scope="row" style="width: 50%;">Primary</td>
-                                    <td>
-                                        <div class="d-flex gap-2">
-                                            <div class="color"
-                                                style="background: #1BBEC6;  width: 20px;    height: 20px;">
-                                            </div>
-                                            <div> ( BRIGHT CYAN )</div>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td scope="row" style="width: 50%;">Secondary</td>
-                                    <td>
-                                        <div class="d-flex gap-2">
-                                            <div class="color"
-                                                style="background: #A21D27;  width: 20px;    height: 20px;">
-                                            </div>
-                                            <div>
-                                                ( CRIMSON RED )
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td scope="row" style="width: 50%;">Tertiary</td>
-                                    <td>
-                                        <div class="d-flex gap-2">
-                                            <div class="color"
-                                                style="background: #060606;  width: 20px;    height: 20px;">
-                                            </div>
-                                            <div>
-                                                ( RICH BLACK )
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-
-                            </tbody>
-                        </table>
-                        <table class="table  table-striped table-bordered table-hover">
-                            <tbody>
-                                <tr>
-                                    <th colspan="3" style="padding-left: 20px;">LOGO PLACEMENT</th>
-                                </tr>
-                                <tr>
-                                    <td scope="row">Front Chest</td>
-                                    <td><input type="text" id="name" name="name" required></td>
-                                    <td>
-                                        <div class="d-flex gap-2">
-                                            <div class="color"
-                                                style="background: #1A1617;  width: 20px;    height: 20px;">
-                                            </div>
-                                            <div> ( CHARCOAL BLACK )</div>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td scope="row">Back Center</td>
-                                    <td><input type="text" id="name" name="name" required></td>
-                                    <td>
-                                        <div class="d-flex gap-2">
-                                            <div class="color"
-                                                style="background: #EA4423;  width: 20px;    height: 20px;">
-                                            </div>
-                                            <div> ( BRIGHT CYAN )</div>
-                                        </div>
-                                    </td>
-                                </tr>
-
-
-                            </tbody>
-                        </table>
-                        <table class="table  table-striped table-bordered table-hover">
-                            <tbody>
-                                <tr>
-                                    <th colspan="3" style="padding-left: 20px;">ROSTER DECORATION</th>
-                                </tr>
-                                <tr>
-                                    <td scope="row">Shoulders</td>
-                                    <td><input type="text" id="name" name="name" required></td>
-                                    <td>
-                                        <div class="d-flex gap-2">
-                                            <div class="color"
-                                                style="background: #1A1617;  width: 20px;    height: 20px;">
-                                            </div>
-                                            <div> ( CHARCOAL BLACK )</div>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td scope="row">Back Center</td>
-                                    <td><input type="text" id="name" name="name" required></td>
-                                    <td>
-                                        <div class="d-flex gap-2">
-                                            <div class="color"
-                                                style="background: #EA4423;  width: 20px;    height: 20px;">
-                                            </div>
-                                            <div> ( BRIGHT CYAN )</div>
-                                        </div>
-                                    </td>
-                                </tr>
-
-
-                            </tbody>
-                        </table>
-
-                    </div>
-                    <div class="quantitySize">
-                        <h6 ITEMS class="divTitle">
-                            QUANTITY & SIZE REVIEW
-                        </h6>
-                        <table class="table table-bordered table-hover">
-                            <thead class="thead-dark">
-                                <tr>
-                                    <th scope="col" class="text-center">Size</th>
-                                    <th scope="col" class="text-center">M</th>
-                                    <th scope="col" class="text-center">L</th>
-                                    <th scope="col" class="text-center">XL</th>
-                                    <th scope="col" class="text-center">XXL</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <th scope="row" class="text-center">QTY</th>
-                                    <td scope="row" class="text-center">10</td>
-                                    <td scope="row" class="text-center">5</td>
-                                    <td scope="row" class="text-center">2</td>
-                                    <td scope="row" class="text-center">3</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row" colspan="4" style="padding-left: 45px;">Total</th>
-
-                                    <td scope="row" class="text-center">20</td>
-                                </tr>
-
-
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
+  <!-- Step Progress Bar -->
+  <div class="ols3d-step-bar">
+    <div class="ols3d-step-bar-id">
+      <span>Order ID:</span>
+      <strong>#<?= $order['order_id'] ?></strong>
     </div>
-</section>
+    <div class="ols3d-steps">
+      <div class="ols3d-step">
+        <div class="ols3d-step-num active">1</div>
+        <span class="ols3d-step-label active">Order Details</span>
+      </div>
+      <div class="ols3d-step-connector"></div>
+      <div class="ols3d-step">
+        <div class="ols3d-step-num">2</div>
+        <span class="ols3d-step-label">Add Roster</span>
+      </div>
+      <div class="ols3d-step-connector"></div>
+      <div class="ols3d-step">
+        <div class="ols3d-step-num">3</div>
+        <span class="ols3d-step-label">Checkout</span>
+      </div>
+    </div>
+    <div class="ols3d-step-bar-note">
+      Last Modified: <strong><?= $order_date_fmt ?></strong>
+    </div>
+  </div>
 
-<?php    
-    function getPantonName($conn4, $zone, $designId, $type='pantonName') {
-        // Step 1: Try direct match in colors table
-        $sql = "SELECT panton_name,name FROM colors WHERE name = ?";
-        $stmt = $conn4->prepare($sql);
-        $stmt->bind_param("s", $zone);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        if ($row = $result->fetch_assoc()) {
-            if ($type === 'pantonName'){                
-                return $row['panton_name'];
-            } else {
-                    return $row['name']; // direct color name match
+
+  <!-- Style / Jersey info bar -->
+  <div class="ols3d-info-bar">
+    <span class="ols3d-info-label">Style:</span>
+    <span class="ols3d-info-value"><?= htmlspecialchars($design_name) ?></span>
+    <div class="ols3d-info-divider"></div>
+    <span class="ols3d-info-label">Jersey Type:</span>
+    <span class="ols3d-info-value"><?= htmlspecialchars($jersey_type) ?></span>
+    <div class="ols3d-info-divider"></div>
+    <span class="ols3d-badge ols3d-badge-new">New</span>
+  </div>
+
+  <!-- ── Two-column preview panels ─────────────────────────── -->
+  <div class="ols3d-panels">
+
+    <!-- 3D Preview -->
+    <div class="ols3d-panel">
+      <div class="ols3d-panel-header">
+        <span class="ols3d-panel-title">3D Preview</span>
+        <span class="ols3d-panel-tag">Interactive</span>
+      </div>
+      <div class="ols3d-preview-area">
+        <div class="ols3d-preloader" id="preloader">
+          <div class="ols3d-preloader-spinner"></div>
+        </div>
+        <div id="threejs-container-user"></div>
+      </div>
+      <div class="ols3d-preview-footer">
+        <button class="ols3d-view-tab active" onclick="setView('front',this)">Front</button>
+        <button class="ols3d-view-tab" onclick="setView('back',this)">Back</button>
+        <button class="ols3d-view-tab" onclick="setView('left',this)">Left</button>
+        <button class="ols3d-view-tab" onclick="setView('right',this)">Right</button>
+      </div>
+    </div>
+
+    <!-- Customer Art Approval -->
+    <div class="ols3d-panel">
+      <div class="ols3d-panel-header">
+        <span class="ols3d-panel-title">Customer Art Approval</span>
+        <span class="ols3d-badge ols3d-badge-preapproval">Pre-approval</span>
+      </div>
+      <div class="ols3d-panel-body">
+        <div class="ols3d-art-dark">
+          <?php if (!empty($frontImage)): ?>
+          <div class="ols3d-art-view">
+            <img src="<?= htmlspecialchars($frontImage) ?>" alt="Front">
+            <figcaption>Front</figcaption>
+          </div>
+          <?php endif; ?>
+          <?php if (!empty($backImage)): ?>
+          <div class="ols3d-art-view">
+            <img src="<?= htmlspecialchars($backImage) ?>" alt="Back">
+            <figcaption>Back</figcaption>
+          </div>
+          <?php endif; ?>
+          <?php if (!empty($leftImage)): ?>
+          <div class="ols3d-art-view">
+            <img src="<?= htmlspecialchars($leftImage) ?>" alt="Left">
+            <figcaption>Left</figcaption>
+          </div>
+          <?php endif; ?>
+          <?php if (!empty($rightImage)): ?>
+          <div class="ols3d-art-view">
+            <img src="<?= htmlspecialchars($rightImage) ?>" alt="Right">
+            <figcaption>Right</figcaption>
+          </div>
+          <?php endif; ?>
+          <?php if (empty($frontImage) && empty($backImage)): ?>
+            <p style="color:#555;font-size:12px;">No preview images available.</p>
+          <?php endif; ?>
+        </div>
+        <div class="ols3d-art-actions">
+          <button class="ols3d-btn-approve">✓ Approve</button>
+          <button class="ols3d-btn-changes">Request Changes</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /.ols3d-panels -->
+
+  <!-- ── Specifications ────────────────────────────────────── -->
+  <div class="ols3d-specs-card">
+    <div class="ols3d-specs-card-title">Specifications</div>
+    <div class="ols3d-specs-card-body">
+
+      <!-- Fabric & Collar Details -->
+      <div class="ols3d-spec-section">
+        <div class="ols3d-spec-header" onclick="toggleSpec(this)">
+          <span class="ols3d-spec-header-title">Fabric &amp; Collar Details</span>
+          <svg class="ols3d-spec-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/>
+          </svg>
+        </div>
+        <div class="ols3d-spec-body">
+          <div class="ols3d-fabric-grid">
+            <div class="ols3d-fabric-col">
+              <div class="ols3d-fabric-col-title">Fabric Details</div>
+              <?php foreach ($fab_ary as $fkey => $fval): ?>
+              <div class="ols3d-kv">
+                <span class="ols3d-kv-key"><?= htmlspecialchars($fkey) ?></span>
+                <span class="ols3d-kv-val"><?= htmlspecialchars($fval ?: '—') ?></span>
+              </div>
+              <?php endforeach; ?>
+            </div>
+            <div class="ols3d-fabric-col">
+              <div class="ols3d-fabric-col-title">Collar</div>
+              <div class="ols3d-kv">
+                <span class="ols3d-kv-key">Style</span>
+                <span class="ols3d-kv-val"><?= htmlspecialchars($jersey_coller ?: '—') ?></span>
+              </div>
+            </div>
+            <div class="ols3d-fabric-col">
+              <div class="ols3d-fabric-col-title">Stripes</div>
+              <div class="ols3d-kv">
+                <span class="ols3d-kv-key">Style</span>
+                <span class="ols3d-kv-val"><?= htmlspecialchars($jsname ?: '—') ?></span>
+              </div>
+              <div class="ols3d-kv">
+                <span class="ols3d-kv-key">Pattern</span>
+                <span class="ols3d-kv-val"><?= htmlspecialchars($stripes_name ?: '—') ?></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Color Details -->
+      <div class="ols3d-spec-section">
+        <div class="ols3d-spec-header" onclick="toggleSpec(this)">
+          <span class="ols3d-spec-header-title">Color Details</span>
+          <svg class="ols3d-spec-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/>
+          </svg>
+        </div>
+        <div class="ols3d-spec-body">
+          <?php if (!empty($zones)): ?>
+          <div class="ols3d-colors-grid">
+            <?php
+            foreach ($zones as $zkey => $zval) {
+                if (is_array($zval)) {
+                    foreach ($zval as $subKey => $subValue) {
+                        $colorName  = getPantonName($conn4, $subValue, $designId, 'colorName');
+                        $pantonName = getPantonName($conn4, $subValue, $designId, 'pantonName');
+            ?>
+            <div class="ols3d-color-row">
+              <span class="ols3d-color-row-key"><?= htmlspecialchars($subKey) ?></span>
+              <div class="ols3d-color-swatch-wrap">
+                <span class="ols3d-color-swatch" style="background-color:<?= htmlspecialchars($colorName) ?>"></span>
+                <span class="ols3d-color-name"><?= htmlspecialchars($pantonName ?: $colorName) ?></span>
+              </div>
+            </div>
+            <?php
+                    }
+                } else {
+                    $colorName  = getPantonName($conn4, $zval, $designId, 'colorName');
+                    $pantonName = getPantonName($conn4, $zval, $designId, 'pantonName');
+            ?>
+            <div class="ols3d-color-row">
+              <span class="ols3d-color-row-key"><?= htmlspecialchars($zkey) ?></span>
+              <div class="ols3d-color-swatch-wrap">
+                <span class="ols3d-color-swatch" style="background-color:<?= htmlspecialchars($colorName) ?>"></span>
+                <span class="ols3d-color-name"><?= htmlspecialchars($pantonName ?: $colorName) ?></span>
+              </div>
+            </div>
+            <?php
+                }
             }
-        }
+            ?>
+          </div>
+          <?php else: ?>
+          <div style="padding:16px 20px;font-size:13px;color:#9DAABF;">No color data available.</div>
+          <?php endif; ?>
+        </div>
+      </div>
 
-        // Step 2: If not found, check design_zones for color_group
-        $sql = "SELECT color_group FROM design_zones WHERE design_id = ? AND zone_name = ? OR sub_zone_name = ? LIMIT 1";
-        $stmt = $conn4->prepare($sql);
-        $stmt->bind_param("iss", $designId, $zone, $zone);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        if (!($row = $result->fetch_assoc())) {
-            return $zone; // no zone match
-        }
+      <!-- Number Details -->
+      <div class="ols3d-spec-section">
+        <div class="ols3d-spec-header" onclick="toggleSpec(this)">
+          <span class="ols3d-spec-header-title">Number Details</span>
+          <svg class="ols3d-spec-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/>
+          </svg>
+        </div>
+        <div class="ols3d-spec-body">
+          <table class="ols3d-spec-table">
+            <thead>
+              <tr>
+                <th>Placement</th><th>Size</th><th>Font</th><th>Fill</th><th>Outline</th>
+              </tr>
+            </thead>
+            <tbody>
+              <?php
+              $has_numbers = false;
+              if (!empty($texts)) {
+                  foreach ($texts as $text) {
+                      if (!isset($text['displayType']) || trim($text['displayType']) === '') continue;
+                      $has_numbers  = true;
+                      $displayName  = $text['displayName']  ?? 'Unknown';
+                      $Text         = $text['Text']         ?? '';
+                      $FontFamily   = $text['FontFamily']   ?? 'Default Font';
+                      $FontColor    = $text['FontColor']    ?? '#000000';
+                      $OutlineColor = $text['OutlineColor'] ?? '#FFFFFF';
+                      $height       = isset($text['height']) ? number_format(floatval($text['height']) * 39.3701, 2) : '0.00';
+                      $width        = isset($text['width'])  ? number_format(floatval($text['width'])  * 39.3701, 2) : '0.00';
+                      $fillPanton   = getPantonName($conn4, $FontColor,    $designId, 'pantonName');
+                      $outPanton    = getPantonName($conn4, $OutlineColor, $designId, 'pantonName');
+              ?>
+              <tr>
+                <td class="fw"><?= htmlspecialchars($displayName) ?>: <?= htmlspecialchars($Text) ?></td>
+                <td class="mono"><?= $height ?>"H × <?= $width ?>"W</td>
+                <td><?= htmlspecialchars($FontFamily) ?></td>
+                <td>
+                  <div class="ols3d-color-inline">
+                    <span class="ols3d-color-dot" style="background:<?= htmlspecialchars($FontColor) ?>"></span>
+                    <span class="ols3d-tag-blue"><?= htmlspecialchars($fillPanton ?: $FontColor) ?></span>
+                  </div>
+                </td>
+                <td>
+                  <div class="ols3d-color-inline">
+                    <span class="ols3d-color-dot" style="background:<?= htmlspecialchars($OutlineColor) ?>"></span>
+                    <span class="ols3d-tag-grey"><?= htmlspecialchars($outPanton ?: $OutlineColor) ?></span>
+                  </div>
+                </td>
+              </tr>
+              <?php
+                  }
+              }
+              if (!$has_numbers): ?>
+              <tr><td colspan="5" style="color:#9DAABF;text-align:center;padding:16px;">No number details available.</td></tr>
+              <?php endif; ?>
+            </tbody>
+          </table>
+        </div>
+      </div>
 
-        $colorGroup = $row['color_group'];
-        $map = [
-            'primary'   => 'primary_color',
-            'secondary' => 'secondary_color',
-            'tertiary'  => 'tertiary_color'
-        ];
+      <!-- Name Details -->
+      <div class="ols3d-spec-section">
+        <div class="ols3d-spec-header" onclick="toggleSpec(this)">
+          <span class="ols3d-spec-header-title">Name Details</span>
+          <svg class="ols3d-spec-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/>
+          </svg>
+        </div>
+        <div class="ols3d-spec-body">
+          <table class="ols3d-spec-table">
+            <thead>
+              <tr>
+                <th>Placement</th><th>Size</th><th>Font</th><th>Fill</th><th>Outline</th>
+              </tr>
+            </thead>
+            <tbody>
+              <?php
+              $has_names = false;
+              if (!empty($texts)) {
+                  foreach ($texts as $text) {
+                      if (!isset($text['displayType']) || $text['displayType'] === 'text') continue;
+                      $has_names    = true;
+                      $displayName  = $text['displayName']  ?? 'Unknown';
+                      $Text         = $text['Text']         ?? '';
+                      $FontFamily   = $text['FontFamily']   ?? 'Default Font';
+                      $FontColor    = $text['FontColor']    ?? '#000000';
+                      $OutlineColor = $text['OutlineColor'] ?? '#FFFFFF';
+                      $height       = isset($text['height']) ? number_format(floatval($text['height']) * 39.3701, 2) : '0.00';
+                      $width        = isset($text['width'])  ? number_format(floatval($text['width'])  * 39.3701, 2) : '0.00';
+                      $fillPanton   = getPantonName($conn4, $FontColor,    $designId, 'pantonName');
+                      $outPanton    = getPantonName($conn4, $OutlineColor, $designId, 'pantonName');
+              ?>
+              <tr>
+                <td class="fw"><?= htmlspecialchars($displayName) ?>: <?= htmlspecialchars($Text) ?></td>
+                <td class="mono"><?= $height ?>"H × <?= $width ?>"W</td>
+                <td><?= htmlspecialchars($FontFamily) ?></td>
+                <td>
+                  <div class="ols3d-color-inline">
+                    <span class="ols3d-color-dot" style="background:<?= htmlspecialchars($FontColor) ?>"></span>
+                    <span class="ols3d-tag-blue"><?= htmlspecialchars($fillPanton ?: $FontColor) ?></span>
+                  </div>
+                </td>
+                <td>
+                  <div class="ols3d-color-inline">
+                    <span class="ols3d-color-dot" style="background:<?= htmlspecialchars($OutlineColor) ?>"></span>
+                    <span class="ols3d-tag-grey"><?= htmlspecialchars($outPanton ?: $OutlineColor) ?></span>
+                  </div>
+                </td>
+              </tr>
+              <?php
+                  }
+              }
+              if (!$has_names): ?>
+              <tr><td colspan="5" style="color:#9DAABF;text-align:center;padding:16px;">No name details available.</td></tr>
+              <?php endif; ?>
+            </tbody>
+          </table>
+        </div>
+      </div>
 
-        if (!isset($map[$colorGroup])) {
-            return $colorGroup;
-        }
+      <!-- Logo / Crest Details -->
+      <?php if (!empty($logos)): ?>
+      <div class="ols3d-spec-section">
+        <div class="ols3d-spec-header" onclick="toggleSpec(this)">
+          <span class="ols3d-spec-header-title">Logo / Crest Details</span>
+          <svg class="ols3d-spec-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/>
+          </svg>
+        </div>
+        <div class="ols3d-spec-body">
+          <div class="ols3d-logo-grid">
+            <?php foreach ($logos as $logo): ?>
+            <?php
+                $lh = isset($logo['height']) ? number_format(floatval($logo['height']) * 39.3701, 2) : '0.00';
+                $lw = isset($logo['width'])  ? number_format(floatval($logo['width'])  * 39.3701, 2) : '0.00';
+            ?>
+            <div class="ols3d-logo-item">
+              <?php if (!empty($logo['imageSrc'])): ?>
+              <img src="<?= htmlspecialchars($logo['imageSrc']) ?>" alt="Logo">
+              <?php endif; ?>
+              <div class="logo-label"><?= htmlspecialchars($logo['displayName'] ?? 'Logo') ?></div>
+              <p>Placement: <?= htmlspecialchars($logo['displayName'] ?? '—') ?></p>
+              <p>Size: <?= $lh ?>"H × <?= $lw ?>"W</p>
+            </div>
+            <?php endforeach; ?>
+          </div>
+        </div>
+      </div>
+      <?php endif; ?>
 
-        // Step 3: Get the actual color value from designs
-        $sql = "SELECT {$map[$colorGroup]} AS color FROM designs WHERE id = ? LIMIT 1";
-        $stmt = $conn4->prepare($sql);
-        $stmt->bind_param("i", $designId);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        if (!($row = $result->fetch_assoc())) {
-            return $colorGroup;
-        }
-        $colorName = $row['color'];
+    </div><!-- /.ols3d-specs-card-body -->
+  </div><!-- /.ols3d-specs-card -->
 
-        // Step 4: Lookup again in colors to get panton_name
-        $sql = "SELECT panton_name,name FROM colors WHERE name = ?";
-        $stmt = $conn4->prepare($sql);
-        $stmt->bind_param("s", $colorName);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        if ($row = $result->fetch_assoc()) {
-            if ($type === 'pantonName'){       
-            return $row['panton_name'];
-            } else {
-                    return $row['name'];
-            }
-        }
+  <!-- Action Buttons -->
+  <div class="ols3d-actions">
+    <a href="?vp=<?= base64_encode('3d_order_roster') ?>&order_id=<?= $order_id_enc ?>"
+       class="ols3d-btn-primary">
+      Continue to Add Roster →
+    </a>
+    <a href="?vp=<?= base64_encode('3d_orders') ?>" class="ols3d-btn-secondary">
+      Save Draft
+    </a>
+  </div>
 
-        return $colorName; // no match at all
-    }                
-?>
+</div><!-- /.ols3d-module -->
+
+<!-- Three.js and related scripts -->
+<script src="https://cdn.jsdelivr.net/npm/opentype.js@1.3.4/dist/opentype.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/loaders/GLTFLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/geometries/DecalGeometry.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/renderers/SVGRenderer.js"></script>
+<script src="https://unpkg.com/three@0.160.0/examples/js/utils/BufferGeometryUtils.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" crossorigin="anonymous"></script>
+<script type="module" src="js/3dmodel.js?ver=1.0"></script>
+
+<script>
+function toggleSpec(header) {
+  var body = header.nextElementSibling;
+  if (!body) return;
+  var collapsed = header.classList.toggle('collapsed');
+  body.classList.toggle('hidden', collapsed);
+}
+
+function setView(view, btn) {
+  document.querySelectorAll('.ols3d-view-tab').forEach(function (b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+  // viewpoint control hook – extend with three.js camera logic as needed
+}
+</script>
