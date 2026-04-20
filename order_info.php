@@ -3,72 +3,33 @@ include('check-session.php');
 include('db.php');
 include 'encryption_helper.php';
 $obj_user = json_decode(base64_decode($_SESSION["JOGOLS"]));
-$user_id = $obj_user->user_id;
+$user_id  = $obj_user->user_id;
 
 if (isset($_GET['order_id'])) {
     $order_id = customDecode($_GET['order_id']);
-
-    // Fetch order data
-    $sql = "SELECT * FROM design_order WHERE order_id = ?";
+    $sql  = "SELECT * FROM design_order WHERE order_id = ?";
     $stmt = $conn4->prepare($sql);
     $stmt->bind_param("i", $order_id);
     $stmt->execute();
     $result = $stmt->get_result();
-
     if ($result->num_rows > 0) {
-        $order = $result->fetch_assoc();
-
-        // Extract values
-        $designId = $order['design_id'];
+        $order       = $result->fetch_assoc();
+        $designId    = $order['design_id'];
         $sock_design = $order['sock_design'];
-        $added_date = $order['added_date'];
-
-        // 🧩 Decode JSON fields
-        $zones = json_decode($order['colorDecals'], true);
-        $logos = json_decode($order['imagedecals'], true);
-        $texts = json_decode($order['textdecals'], true);
-
-        // 🧵 Fabric fields
-        $fab_ary = [
-            'Base' => $order['fabric_base'],
-            'Neck' => $order['fabric_neck'],
-            'Mesh' => $order['fabric_mesh'],
-            'Shoulder' => $order['fabric_shoulder']
-        ];
-
-        // You may also fetch style/stripe names if needed:
-        $jersey_coller = $order['fabric_neck'];
-        $jsname = '';
-        $stripes_name = '';
-
-        // 🧩 Optional: Fetch preview images if saved separately
-        $frontImage = $order['front_image'] ?? '';
-        $backImage = $order['back_image'] ?? '';
-        $leftImage = $order['left_image'] ?? '';
-        $rightImage = $order['right_image'] ?? '';
-
-    } else {
-        echo "<p>No design found for this Order ID.</p>";
-        exit;
-    }
-} else {
-    echo "<p>Invalid order ID.</p>";
-    exit;
-}
+        $added_date  = $order['added_date'];
+    } else { echo "<p>No design found.</p>"; exit; }
+} else { echo "<p>Invalid order ID.</p>"; exit; }
 
 $order_team_data = [];
-$order_id = customDecode($_GET['order_id']);
-if (isset($order_id)) {
-    $sql_team = "SELECT * FROM order_team WHERE order_id = ?";
-    $stmt_team = $conn4->prepare($sql_team);
-    $stmt_team->bind_param("i", $order_id);
-    $stmt_team->execute();
-    $result_team = $stmt_team->get_result();
+$order_design_data = [];
 
-    while ($row = $result_team->fetch_assoc()) {
-        $order_team_data[] = $row;
-    }    
-}
+$order_id = customDecode($_GET['order_id']);
+$sql_team = "SELECT * FROM order_team WHERE order_id = ?";
+$stmt_team = $conn4->prepare($sql_team);
+$stmt_team->bind_param("i", $order_id);
+$stmt_team->execute();
+$result_team = $stmt_team->get_result();
+while ($row = $result_team->fetch_assoc()) { $order_team_data[] = $row; }
 
 if (isset($designId)) {
     $sql_designs = "SELECT * FROM designs WHERE id = ?";
@@ -76,304 +37,453 @@ if (isset($designId)) {
     $stmt_designs->bind_param("i", $designId);
     $stmt_designs->execute();
     $result_designs = $stmt_designs->get_result();
-
-    while ($row = $result_designs->fetch_assoc()) {
-        $order_design_data[] = $row;
-    }    
+    while ($row = $result_designs->fetch_assoc()) { $order_design_data[] = $row; }
 }
 
-$sql_select = "SELECT * FROM tbl_address WHERE user_id='" . $user_id . "' AND enable=1 AND (is_billing_addr=1 OR is_deliver_addr=1) AND contact_name<>'' AND address<>'' AND city<>'' AND contact_name<>'' AND country<>'' AND zip_code<>'' AND tel<>'' AND email<>'' ORDER BY is_billing_addr ASC;";
+$a_data = [0 => null, 1 => null];
+$sql_select = "SELECT * FROM tbl_address WHERE user_id='" . (int)$user_id . "' AND enable=1 AND (is_billing_addr=1 OR is_deliver_addr=1) ORDER BY is_billing_addr DESC, is_deliver_addr DESC";
 $rs_select = $conn->query($sql_select);
-$num_row = $rs_select->num_rows;
-
-$a_data = array();
-
-if ($num_row == 1) {
-    $a_data[0] = $rs_select->fetch_assoc();
-    $a_data[1] = $a_data[0];
-} else {
+if ($rs_select) {
     while ($row_select = $rs_select->fetch_assoc()) {
-        if ($row_select["is_billing_addr"] == "1") {
-            $a_data[0] = $row_select;
-        } else if ($row_select["is_deliver_addr"] == "1") {
-            $a_data[1] = $row_select;
-        }
+        if ($row_select['is_billing_addr'] == '1' && $a_data[0] === null) { $a_data[0] = $row_select; }
+        if ($row_select['is_deliver_addr'] == '1' && $a_data[1] === null) { $a_data[1] = $row_select; }
     }
 }
-?>
 
-<?php
-foreach ($order_design_data as $key => $value) {  
-?>
+$design_name  = !empty($order_design_data[0]['name'])       ? $order_design_data[0]['name']       : '—';
+$jersey_type  = !empty($order_design_data[0]['modal_type']) ? $order_design_data[0]['modal_type'] : '—';
+$design_price = !empty($order_design_data[0]['price'])      ? $order_design_data[0]['price']      : '0.00';
+$design_image = !empty($order_design_data[0]['image'])      ? $order_design_data[0]['image']      : '';
+$order_id_enc = customEncode($order_id);
+$total_qty    = count($order_team_data);
+$order_date_fmt = !empty($added_date) ? date('d/m/Y', strtotime($added_date)) : date('d/m/Y');
 
-    <input type="hidden" name="coller_id" value="<?= $value['coller_id']; ?>">
-
-    <input type="hidden" name="style_id" value="<?= $value['style_id']; ?>">
-
-    <input type="hidden" name="stripes_id" value="<?= $value['stripes_id']; ?>">
-
-    
-<?php
-}   
-?>
-<input type="hidden" name="order_id" value="<?= $order_id; ?>">
-<input type="hidden" name="design_id" value="<?= $designId; ?>">
-
-<section class="generatePO">
-    <div class="container">
-        <div class="row" >
-            <div class="  pageHeader">
-                <h2>Checkout</h2>             
-            </div>
-            <div >            
-                <ul class="nav justify-content-center" id="myTab" role="tablist">                
-                    <li class="nav-item" role="presentation">
-                        1. Order Details                        
-                    </li>
-                    <li class="nav-item" role="presentation">                        
-                        2. Checkout                        
-                    </li>
-                </ul>
-            </div>            
-            <div class="col-md-6" id="pritn_details">
-                <div class="boxes">
-                    <div class="formTitle d-flex align-items-center flex-row">
-                        <div class="orderBadge">
-                            Order Date :<?php echo date("m/d/Y"); ?>
-                            <input type="hidden" name="order_date" id="order_date" value="<?php echo date("Y-m-d"); ?>">
-                        </div>
-                    </div>
-                    <fieldset class="singleFrom">
-                        <div class="form-group  ">
-                            <label for="">Project Name</label>
-                            <input type="text" name="project_name" id="project_name" style="width: 100%;" value="">
-                        </div>
-                        <div class="form-group  ">
-                            <label for="">Customer PO</label>
-                            <input type="text" name="customer_po" id="customer_po" style="width: 100%;" value="">
-                        </div>
-
-                        <div class="form-group  ">
-                            <label for="">Game / Event date</label>
-                            <input type="date" name="game_event_date" id="game_event_date" style="width: 100%;" value="">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="">Request due date</label>
-
-                            <input type="date" name="req_due_date" id="req_due_date" style="width: 100%;" value="">
-                        </div>
-                        <div class="form-group">
-                            <label for="">Payment Option</label>
-                            <div class="styled-select">
-                                <select style="width: 100%; font-size: 14px;" name="payment_opt" id="payment_opt">
-                                    <option value="Net 30">Net 30</option>
-                                    <option value="Net 15">Net 15</option>
-                                    <option value="Net 7">Net 7</option>
-                                    <option value="Due on receipt">Due on receipt</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="">Sales rep</label>
-                            <div class="styled-select">
-                                <select style="width: 100%; font-size: 14px;" name="sales_rep" id="sales_rep">
-                                    <?php
-                                    $sql_new = "SELECT * FROM employee WHERE employee_position_id='5'";
-                                    $emps = $conn3->query($sql_new);
-                                    $num_rows = $emps->num_rows;
-                                    if ($num_rows > 0) {
-                                        while ($row_selection = $emps->fetch_assoc()) {
-                                    ?>
-                                            <option value="<?= $row_selection['employee_id'] ?>" <?php if ($a_data[0]["sales_rep_id"] == $row_selection['employee_id']) {
-                                                                                                        echo "selected";
-                                                                                                    } ?>>
-                                                <?= $row_selection['employee_name'] ?>
-                                            </option>
-                                    <?php
-                                        }
-                                    }
-                                    ?>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="form-group position-relative ">
-                            <label for="">Reorder? Type the EX
-                                here</label>
-                            <input type="text" name="reorder_num" id="reorder_num" style="width: 100%;" value="">                            
-                        </div>
-
-
-                    </fieldset>
-                </div>
-            </div>
-            <div class="col-md-6 m-auto"> 
-                <div class="card">
-                    <div class="row">
-                        <div class="col-md-3 align-items-center m-3">   
-                            <div style="background:#dfdfdf; width:150px">
-                                <img src="http://localhost:9090/jog_3d/admin/uploads/designs/images/<?php echo $order_design_data[0]['image']; ?>" alt="" class="w-100" >                            
-                            </div>                          
-                        </div>
-                        <div class="col-md-5 align-items-right" >
-                            style: <?= $order_design_data[0]['name']; ?><br>
-                            price: $<?= $order_design_data[0]['price']; ?>
-                            Jersey Type: <?= $order_design_data[0]['modal_type']; ?>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="boxes card  mt-2 p-3">
-                    <h5>Billing Information <a href="?vp=<?= base64_encode("billinginfo") ?>" class="sm-Btn">Edit</a></h5>
-                    <p> Company : <span><?php echo $a_data[0]["addr_name"]; ?></span> </p>    
-                    <p> Address : <span><?php echo $a_data[0]["address"]; ?></span> </p>    
-                    <p> Email : <span><?php echo $a_data[0]["email"]; ?></span> </p>    
-                    <p> Tel : <span><?php echo $a_data[0]["tel"]; ?></span> </p>    
-                    <p> TAX ID : <span><?php echo $a_data[0]["tax_id"]; ?></span> </p>    
-                </div> 
-                <div class="boxes card mt-2 p-3 ">
-                    <h5>Delivery Information <a href="?vp=<?= base64_encode("billinginfo") ?>" class="sm-Btn">Edit</a></h5>
-                    <p> Company : <span><?php echo $a_data[1]["addr_name"]; ?></span> </p>    
-                    <p> Address : <span><?php echo $a_data[1]["address"]; ?></span> </p>    
-                    <p> Email : <span><?php echo $a_data[1]["email"]; ?></span> </p>    
-                    <p> Tel : <span><?php echo $a_data[1]["tel"]; ?></span> </p>    
-                    <p> TAX ID : <span><?php echo $a_data[1]["tax_id"]; ?></span> </p>    
-                </div>                                             
-            </div>            
-        </div>
-        <div class="row">
-            <div class="col-4">
-                <button class="btn btn-primary m-auto mt-3 w-20" id="printBtn">create order</button>
-            </div>
-        </div>        
-    </div>
-</section>
-
-
-    <script src="https://cdn.jsdelivr.net/npm/opentype.js@1.3.4/dist/opentype.min.js"></script>
-
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-
-    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
-
-    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/loaders/GLTFLoader.js"></script>
-
-    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.js"></script>
-
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/geometries/DecalGeometry.js"></script>
-
-    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/renderers/SVGRenderer.js"></script>
-
-    <script src="https://unpkg.com/three@0.160.0/examples/js/utils/BufferGeometryUtils.js"></script>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-
-
-
-    <!-- Jquery -->
-
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
-
-        integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
-
-        crossorigin="anonymous"></script>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
-
-        integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
-
-        crossorigin="anonymous"></script>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.activity-indicator/1.0.0/jquery.activity-indicator.min.js"
-
-        integrity="sha512-vIgIa++fkxuAQ95xP3yHzA33Z+iwePLCFeeMcIOqmHhTEAvfBoFap1nswEwU/xE/o4oW0putZ6dbY7JS1emkdQ=="
-
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script type="module" src="js/3dmodel.js?ver=1.0"></script>
-<script>
-    showBillingInfo();
-     function showBillingInfo() {
-
-        $('#billing_addr_content').html('<i class="fa fa-cog fa-spin fa-1x fa-fw"></i> Loding...');
-
-        $.ajax({
-            type: "POST",
-            dataType: "html",
-            url: "ajax/billing/show_billing_info.php",
-            success: function(resp) {
-
-                $('#billing_addr_content').html(resp);
-
-            }
-        });
-
+$unique_sizes = [];
+foreach ($order_team_data as $td) {
+    if (!empty($td['jersey_size']) && !in_array($td['jersey_size'], $unique_sizes)) {
+        $unique_sizes[] = $td['jersey_size'];
     }
-</script>
-<?php    
-    function getPantonName($conn4, $zone, $designId, $type='pantonName') {
-        // Step 1: Try direct match in colors table
-        $sql = "SELECT panton_name,name FROM colors WHERE name = ?";
-        $stmt = $conn4->prepare($sql);
-        $stmt->bind_param("s", $zone);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        if ($row = $result->fetch_assoc()) {
-            if ($type === 'pantonName'){                
-                return $row['panton_name'];
-            } else {
-                    return $row['name']; // direct color name match
-            }
-        }
+}
+$sizes_str = !empty($unique_sizes) ? implode(', ', $unique_sizes) : '—';
 
-        // Step 2: If not found, check design_zones for color_group
-        $sql = "SELECT color_group FROM design_zones WHERE design_id = ? AND zone_name = ? OR sub_zone_name = ? LIMIT 1";
-        $stmt = $conn4->prepare($sql);
-        $stmt->bind_param("iss", $designId, $zone, $zone);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        if (!($row = $result->fetch_assoc())) {
-            return $zone; // no zone match
-        }
+$TOKEN_KEY = 'jogsports_secure_key_' . session_id();
+function encAddrId($id, $key) {
+    $iv  = openssl_random_pseudo_bytes(16);
+    $enc = openssl_encrypt((string)$id, 'AES-128-CBC', $key, 0, $iv);
+    return base64_encode($enc . '::' . base64_encode($iv));
+}
+$billing_addr_enc  = !empty($a_data[0]['addr_id']) ? encAddrId($a_data[0]['addr_id'], $TOKEN_KEY) : '';
+$delivery_addr_enc = !empty($a_data[1]['addr_id']) ? encAddrId($a_data[1]['addr_id'], $TOKEN_KEY) : '';
 
-        $colorGroup = $row['color_group'];
-        $map = [
-            'primary'   => 'primary_color',
-            'secondary' => 'secondary_color',
-            'tertiary'  => 'tertiary_color'
-        ];
-
-        if (!isset($map[$colorGroup])) {
-            return $colorGroup;
-        }
-
-        // Step 3: Get the actual color value from designs
-        $sql = "SELECT {$map[$colorGroup]} AS color FROM designs WHERE id = ? LIMIT 1";
-        $stmt = $conn4->prepare($sql);
-        $stmt->bind_param("i", $designId);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        if (!($row = $result->fetch_assoc())) {
-            return $colorGroup;
-        }
-        $colorName = $row['color'];
-
-        // Step 4: Lookup again in colors to get panton_name
-        $sql = "SELECT panton_name,name FROM colors WHERE name = ?";
-        $stmt = $conn4->prepare($sql);
-        $stmt->bind_param("s", $colorName);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        if ($row = $result->fetch_assoc()) {
-            if ($type === 'pantonName'){       
-            return $row['panton_name'];
-            } else {
-                    return $row['name'];
-            }
-        }
-
-        return $colorName; // no match at all
-    }                
+// Pre-encode existing address data for JS
+$billing_js  = json_encode([
+    'company'  => $a_data[0]['addr_name']    ?? '',
+    'contact'  => $a_data[0]['contact_name'] ?? '',
+    'address'  => $a_data[0]['address']      ?? '',
+    'city'     => $a_data[0]['city']         ?? '',
+    'state'    => $a_data[0]['state']        ?? '',
+    'postal'   => $a_data[0]['zip_code']     ?? ($a_data[0]['zipcode'] ?? ''),
+    'country'  => $a_data[0]['country']      ?? '',
+    'phone'    => $a_data[0]['tel']          ?? '',
+    'email'    => $a_data[0]['email']        ?? '',
+    'tax'      => $a_data[0]['tax_id']       ?? ($a_data[0]['tax_no'] ?? ''),
+    'enc_id'   => $billing_addr_enc,
+]);
+$delivery_js = json_encode([
+    'company'  => $a_data[1]['addr_name']    ?? '',
+    'contact'  => $a_data[1]['contact_name'] ?? '',
+    'address'  => $a_data[1]['address']      ?? '',
+    'city'     => $a_data[1]['city']         ?? '',
+    'state'    => $a_data[1]['state']        ?? '',
+    'postal'   => $a_data[1]['zip_code']     ?? ($a_data[1]['zipcode'] ?? ''),
+    'country'  => $a_data[1]['country']      ?? '',
+    'phone'    => $a_data[1]['tel']          ?? '',
+    'email'    => $a_data[1]['email']        ?? '',
+    'tax'      => $a_data[1]['tax_id']       ?? ($a_data[1]['tax_no'] ?? ''),
+    'enc_id'   => $delivery_addr_enc,
+]);
 ?>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="Style/ols_3d_order.css">
+
+<?php foreach ($order_design_data as $value): ?>
+<input type="hidden" name="coller_id"  value="<?= htmlspecialchars($value['coller_id'])  ?>">
+<input type="hidden" name="style_id"   value="<?= htmlspecialchars($value['style_id'])   ?>">
+<input type="hidden" name="stripes_id" value="<?= htmlspecialchars($value['stripes_id']) ?>">
+<?php endforeach; ?>
+<input type="hidden" name="order_id"   id="order_id"  value="<?= $order_id ?>">
+<input type="hidden" name="design_id"  value="<?= $designId ?>">
+<input type="hidden" name="order_date" id="order_date" value="<?= date('Y-m-d') ?>">
+
+<div class="ols3d-module">
+
+  <!-- Title Row -->
+  <div class="ols3d-title-row">
+    <a href="?vp=<?= base64_encode('3d_order_roster') ?>&order_id=<?= $order_id_enc ?>" class="ols3d-back-btn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/>
+      </svg>
+    </a>
+    <div>
+      <h1>Checkout</h1>
+      <p class="ols3d-breadcrumb">
+        <a href="?vp=<?= base64_encode('3d_orders') ?>">Orders</a>
+        <span class="sep">›</span>
+        <a href="?vp=<?= base64_encode('3d_order_details') ?>&order_id=<?= $order_id_enc ?>">#<?= $order['order_id'] ?></a>
+        <span class="sep">›</span>
+        <a href="?vp=<?= base64_encode('3d_order_roster') ?>&order_id=<?= $order_id_enc ?>">Add Roster</a>
+        <span class="sep">›</span>
+        <span class="current">Checkout</span>
+      </p>
+    </div>
+  </div>
+
+  <!-- Step Progress Bar -->
+  <div class="ols3d-step-bar">
+    <div class="ols3d-step-bar-date">Order Date: <?= $order_date_fmt ?></div>
+    <div class="ols3d-steps">
+      <div class="ols3d-step">
+        <div class="ols3d-step-num done">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+        </div>
+        <span class="ols3d-step-label">Order Details</span>
+      </div>
+      <div class="ols3d-step-connector done"></div>
+      <div class="ols3d-step">
+        <div class="ols3d-step-num done">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+        </div>
+        <span class="ols3d-step-label">Add Roster</span>
+      </div>
+      <div class="ols3d-step-connector done"></div>
+      <div class="ols3d-step">
+        <div class="ols3d-step-num active">3</div>
+        <span class="ols3d-step-label active">Checkout</span>
+      </div>
+    </div>
+    <div></div>
+  </div>
+
+  <p class="ols3d-hint">Please fill the details accordingly.</p>
+
+  <!-- Main checkout grid -->
+  <div class="ols3d-checkout-grid">
+
+    <!-- LEFT: Order Form -->
+    <div class="ols3d-form-card">
+
+      <div class="ols3d-field">
+        <label for="customer_po">Customer PO</label>
+        <input type="text" id="customer_po" name="customer_po" placeholder="Customer PO number">
+      </div>
+
+      <div class="ols3d-field">
+        <label for="req_due_date">Request Due Date</label>
+        <input type="date" id="req_due_date" name="req_due_date">
+      </div>
+
+      <div class="ols3d-field">
+        <label for="sales_rep">Sales Representative</label>
+        <select id="sales_rep" name="sales_rep">
+          <option value="">Select</option>
+          <?php
+          $sql_emp = "SELECT * FROM employee WHERE employee_position_id='5'";
+          $emps    = $conn3->query($sql_emp);
+          if ($emps && $emps->num_rows > 0) {
+              while ($emp = $emps->fetch_assoc()) {
+                  echo '<option value="' . htmlspecialchars($emp['employee_id']) . '">'
+                      . htmlspecialchars($emp['employee_name']) . '</option>';
+              }
+          }
+          ?>
+        </select>
+      </div>
+
+      <div class="ols3d-field">
+        <label for="project_name">Project Name</label>
+        <input type="text" id="project_name" name="project_name" placeholder="Enter project name">
+      </div>
+
+      <div class="ols3d-field">
+        <label for="game_event_date">Game / Event Date</label>
+        <input type="date" id="game_event_date" name="game_event_date">
+      </div>
+
+      <div class="ols3d-field">
+        <label for="payment_opt">Payment Options</label>
+        <select id="payment_opt" name="payment_opt">
+          <option value="">Select</option>
+          <option value="Credit Card">Credit Card</option>
+          <option value="Net 30">Invoice / Net 30</option>
+          <option value="Net 15">Net 15</option>
+          <option value="Net 7">Net 7</option>
+          <option value="Due on receipt">Due on receipt</option>
+          <option value="Bank Transfer">Bank Transfer</option>
+        </select>
+      </div>
+
+      <div class="ols3d-field">
+        <label for="reorder_num">Reorder? Type the EX here</label>
+        <input type="text" id="reorder_num" name="reorder_num" placeholder="Re Order">
+      </div>
+
+      <div style="margin-top:8px;">
+        <button id="printBtn" class="ols3d-btn-primary" type="button">
+          Submit Order
+        </button>
+      </div>
+
+    </div><!-- /.ols3d-form-card -->
+
+    <!-- RIGHT: Summary Stack -->
+    <div class="ols3d-summary-stack">
+
+      <!-- Order details card -->
+      <div class="ols3d-summary-card">
+        <div class="ols3d-summary-card-head">Order ID : #<?= $order['order_id'] ?></div>
+        <div class="ols3d-design-thumb">
+          <div class="ols3d-design-thumb-img">
+            <?php if (!empty($design_image)): ?>
+            <img src="https://jogsports.com/jogdigital/admin/uploads/designs/images/<?= htmlspecialchars($design_image) ?>" alt="<?= htmlspecialchars($design_name) ?>">
+            <?php else: ?>
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#CBD3E8" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <?php endif; ?>
+          </div>
+          <div class="ols3d-design-meta">
+            <div>Style: <strong><?= htmlspecialchars($design_name) ?></strong></div>
+            <div>Type: <strong><?= htmlspecialchars($jersey_type) ?></strong></div>
+            <?php if (!empty($sock_design)): ?>
+            <div>Socks: <strong style="background:#F0F2F7;padding:1px 8px;border-radius:5px;font-size:11px;">Added</strong></div>
+            <?php endif; ?>
+          </div>
+        </div>
+      </div>
+
+      <!-- Roster summary card -->
+      <div class="ols3d-summary-card">
+        <div class="ols3d-summary-card-head">Roster Summary</div>
+        <div class="ols3d-summary-card-body">
+          <div class="ols3d-summary-row">
+            <span class="ols3d-summary-key">Total QTY</span>
+            <span class="ols3d-summary-val"><?= $total_qty ?></span>
+          </div>
+          <div class="ols3d-summary-row">
+            <span class="ols3d-summary-key">Sizes</span>
+            <span class="ols3d-summary-val"><?= htmlspecialchars($sizes_str) ?></span>
+          </div>
+          <div class="ols3d-summary-row">
+            <span class="ols3d-summary-key">Status</span>
+            <span class="ols3d-summary-val"><span class="ols3d-badge ols3d-badge-new">New</span></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Billing Information card -->
+      <div class="ols3d-addr-card" id="billingCard">
+        <div class="ols3d-addr-card-head">
+          <span class="ols3d-addr-card-title">Billing Information</span>
+          <div class="ols3d-addr-card-actions">
+            <button type="button" class="ols3d-addr-btn <?= empty($a_data[0]) ? 'ols3d-addr-btn-add' : 'ols3d-addr-btn-edit' ?>"
+                    id="billingToggleBtn"
+                    onclick="toggleAddrCard('billing')">
+              <?= empty($a_data[0]) ? '+ Add' : 'Edit' ?>
+            </button>
+          </div>
+        </div>
+        <?php if (!empty($a_data[0])): ?>
+        <div class="ols3d-addr-card-body" id="billingDisplay">
+          <?php $rows = [['Company',$a_data[0]['addr_name']??''],['Contact',$a_data[0]['contact_name']??''],['Address',$a_data[0]['address']??''],['City',$a_data[0]['city']??''],['Email',$a_data[0]['email']??''],['Phone',$a_data[0]['tel']??''],['TAX ID',$a_data[0]['tax_id']??($a_data[0]['tax_no']??'')]]; foreach($rows as [$k,$v]): if(trim($v)==='') continue; ?>
+          <div class="ols3d-billing-row"><span><?= $k ?></span><span><?= htmlspecialchars($v) ?></span></div>
+          <?php endforeach; ?>
+        </div>
+        <?php else: ?>
+        <div class="ols3d-addr-card-body" id="billingDisplay" style="display:none;"></div>
+        <?php endif; ?>
+        <!-- Inline billing form -->
+        <div id="billingForm" style="display:none;">
+          <div class="ols3d-inline-form">
+            <div class="ols3d-inline-form-grid">
+              <div class="ols3d-inline-form-field"><label>Company Name <span style="color:#EF4444">*</span></label><input type="text" id="b_company" placeholder="Company name"></div>
+              <div class="ols3d-inline-form-field"><label>Contact Name <span style="color:#EF4444">*</span></label><input type="text" id="b_contact" placeholder="Contact person"></div>
+              <div class="ols3d-inline-form-field full"><label>Address <span style="color:#EF4444">*</span></label><input type="text" id="b_address" placeholder="Street address"></div>
+              <div class="ols3d-inline-form-field"><label>City <span style="color:#EF4444">*</span></label><input type="text" id="b_city" placeholder="City"></div>
+              <div class="ols3d-inline-form-field"><label>State / Province</label><input type="text" id="b_state" placeholder="State or Province"></div>
+              <div class="ols3d-inline-form-field"><label>Postal Code <span style="color:#EF4444">*</span></label><input type="text" id="b_postal" placeholder="ZIP code"></div>
+              <div class="ols3d-inline-form-field"><label>Country <span style="color:#EF4444">*</span></label><input type="text" id="b_country" placeholder="Country"></div>
+              <div class="ols3d-inline-form-field"><label>Phone <span style="color:#EF4444">*</span></label><input type="text" id="b_phone" placeholder="Phone number"></div>
+              <div class="ols3d-inline-form-field"><label>Email <span style="color:#EF4444">*</span></label><input type="email" id="b_email" placeholder="Email address"></div>
+              <div class="ols3d-inline-form-field"><label>TAX / GST Number</label><input type="text" id="b_tax" placeholder="Tax ID (optional)"></div>
+            </div>
+            <div class="ols3d-inline-form-actions">
+              <button type="button" class="ols3d-inline-btn-cancel" onclick="toggleAddrCard('billing')">Cancel</button>
+              <button type="button" class="ols3d-inline-btn-save" id="billingSaveBtn" onclick="saveAddrInline('billing')">Save Address</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Delivery Information card -->
+      <div class="ols3d-addr-card" id="deliveryCard">
+        <div class="ols3d-addr-card-head">
+          <span class="ols3d-addr-card-title">Delivering to</span>
+          <div class="ols3d-addr-card-actions">
+            <button type="button" class="ols3d-addr-btn <?= empty($a_data[1]) ? 'ols3d-addr-btn-add' : 'ols3d-addr-btn-edit' ?>"
+                    id="deliveryToggleBtn"
+                    onclick="toggleAddrCard('delivery')">
+              <?= empty($a_data[1]) ? '+ Add' : 'Edit' ?>
+            </button>
+          </div>
+        </div>
+        <?php if (!empty($a_data[1])): ?>
+        <div class="ols3d-addr-card-body" id="deliveryDisplay">
+          <?php $rows = [['Company',$a_data[1]['addr_name']??''],['Contact',$a_data[1]['contact_name']??''],['Address',$a_data[1]['address']??''],['City',$a_data[1]['city']??''],['Email',$a_data[1]['email']??''],['Phone',$a_data[1]['tel']??''],['TAX ID',$a_data[1]['tax_id']??($a_data[1]['tax_no']??'')]]; foreach($rows as [$k,$v]): if(trim($v)==='') continue; ?>
+          <div class="ols3d-billing-row"><span><?= $k ?></span><span><?= htmlspecialchars($v) ?></span></div>
+          <?php endforeach; ?>
+        </div>
+        <?php else: ?>
+        <div class="ols3d-addr-card-body" id="deliveryDisplay" style="display:none;"></div>
+        <?php endif; ?>
+        <!-- Inline delivery form -->
+        <div id="deliveryForm" style="display:none;">
+          <div class="ols3d-inline-form">
+            <div class="ols3d-inline-form-grid">
+              <div class="ols3d-inline-form-field"><label>Company Name <span style="color:#EF4444">*</span></label><input type="text" id="d_company" placeholder="Company name"></div>
+              <div class="ols3d-inline-form-field"><label>Contact Name <span style="color:#EF4444">*</span></label><input type="text" id="d_contact" placeholder="Contact person"></div>
+              <div class="ols3d-inline-form-field full"><label>Address <span style="color:#EF4444">*</span></label><input type="text" id="d_address" placeholder="Street address"></div>
+              <div class="ols3d-inline-form-field"><label>City <span style="color:#EF4444">*</span></label><input type="text" id="d_city" placeholder="City"></div>
+              <div class="ols3d-inline-form-field"><label>State / Province</label><input type="text" id="d_state" placeholder="State or Province"></div>
+              <div class="ols3d-inline-form-field"><label>Postal Code <span style="color:#EF4444">*</span></label><input type="text" id="d_postal" placeholder="ZIP code"></div>
+              <div class="ols3d-inline-form-field"><label>Country <span style="color:#EF4444">*</span></label><input type="text" id="d_country" placeholder="Country"></div>
+              <div class="ols3d-inline-form-field"><label>Phone <span style="color:#EF4444">*</span></label><input type="text" id="d_phone" placeholder="Phone number"></div>
+              <div class="ols3d-inline-form-field"><label>Email <span style="color:#EF4444">*</span></label><input type="email" id="d_email" placeholder="Email address"></div>
+              <div class="ols3d-inline-form-field"><label>TAX / GST Number</label><input type="text" id="d_tax" placeholder="Tax ID (optional)"></div>
+            </div>
+            <div class="ols3d-inline-form-actions">
+              <button type="button" class="ols3d-inline-btn-cancel" onclick="toggleAddrCard('delivery')">Cancel</button>
+              <button type="button" class="ols3d-inline-btn-save" id="deliverySaveBtn" onclick="saveAddrInline('delivery')">Save Address</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <a href="?vp=<?= base64_encode('3d_order_roster') ?>&order_id=<?= $order_id_enc ?>"
+         class="ols3d-btn-secondary" style="justify-content:center;">
+        ← Back to Roster
+      </a>
+
+    </div><!-- /.ols3d-summary-stack -->
+
+  </div><!-- /.ols3d-checkout-grid -->
+
+</div><!-- /.ols3d-module -->
+
+<!-- Toast -->
+<div class="ols3d-toast" id="ols3dToast"></div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" crossorigin="anonymous"></script>
+
+<script>
+var BILLING_DATA  = <?= $billing_js ?>;
+var DELIVERY_DATA = <?= $delivery_js ?>;
+
+/* ── Toggle inline address form ── */
+function toggleAddrCard(type) {
+  var form    = document.getElementById(type + 'Form');
+  var display = document.getElementById(type + 'Display');
+  var btn     = document.getElementById(type + 'ToggleBtn');
+  var isOpen  = form.style.display !== 'none' && form.style.display !== '';
+
+  if (isOpen) {
+    form.style.display = 'none';
+    var data = type === 'billing' ? BILLING_DATA : DELIVERY_DATA;
+    if (display) display.style.display = data.company ? '' : 'none';
+    btn.textContent = data.company ? 'Edit' : '+ Add';
+    btn.className   = 'ols3d-addr-btn ' + (data.company ? 'ols3d-addr-btn-edit' : 'ols3d-addr-btn-add');
+  } else {
+    if (display) display.style.display = 'none';
+    form.style.display = 'block';
+    btn.textContent = 'Close';
+    btn.className   = 'ols3d-addr-btn ols3d-addr-btn-edit';
+    prefillForm(type);
+  }
+}
+
+function prefillForm(type) {
+  var data = type === 'billing' ? BILLING_DATA : DELIVERY_DATA;
+  var p    = type === 'billing' ? 'b_' : 'd_';
+  document.getElementById(p+'company').value = data.company || '';
+  document.getElementById(p+'contact').value = data.contact || '';
+  document.getElementById(p+'address').value = data.address || '';
+  document.getElementById(p+'city').value    = data.city    || '';
+  document.getElementById(p+'state').value   = data.state   || '';
+  document.getElementById(p+'postal').value  = data.postal  || '';
+  document.getElementById(p+'country').value = data.country || '';
+  document.getElementById(p+'phone').value   = data.phone   || '';
+  document.getElementById(p+'email').value   = data.email   || '';
+  document.getElementById(p+'tax').value     = data.tax     || '';
+}
+
+/* ── Save inline address ── */
+function saveAddrInline(type) {
+  var p    = type === 'billing' ? 'b_' : 'd_';
+  var data = type === 'billing' ? BILLING_DATA : DELIVERY_DATA;
+
+  var payload = {
+    mode:         data.enc_id ? 'edit' : 'add',
+    addr_type:    type,
+    company_name: document.getElementById(p+'company').value.trim(),
+    contact:      document.getElementById(p+'contact').value.trim(),
+    address_info: document.getElementById(p+'address').value.trim(),
+    city:         document.getElementById(p+'city').value.trim(),
+    state:        document.getElementById(p+'state').value.trim(),
+    zipcode:      document.getElementById(p+'postal').value.trim(),
+    country:      document.getElementById(p+'country').value.trim(),
+    tel:          document.getElementById(p+'phone').value.trim(),
+    email_info:   document.getElementById(p+'email').value.trim(),
+    tax_no:       document.getElementById(p+'tax').value.trim()
+  };
+
+  var required = ['company_name','contact','address_info','city','zipcode','country','tel','email_info'];
+  for (var i = 0; i < required.length; i++) {
+    if (!payload[required[i]]) { showToast('Please fill all required fields.'); return; }
+  }
+
+  if (data.enc_id) { payload.edit_addr_id = data.enc_id; }
+
+  var btn = document.getElementById(type + 'SaveBtn');
+  btn.disabled = true; btn.textContent = 'Saving…';
+
+  $.ajax({
+    type: 'POST', url: 'ajax/billing/save_address_modal.php', data: payload, dataType: 'json',
+    success: function(resp) {
+      if (resp.result === 'success') {
+        showToast(payload.mode === 'add' ? 'Address added!' : 'Address updated!');
+        setTimeout(function(){ location.reload(); }, 800);
+      } else {
+        showToast('Error: ' + (resp.msg || 'Save failed'));
+        btn.disabled = false; btn.textContent = 'Save Address';
+      }
+    },
+    error: function() {
+      showToast('Network error. Please try again.');
+      btn.disabled = false; btn.textContent = 'Save Address';
+    }
+  });
+}
+
+function showToast(msg) {
+  var t = document.getElementById('ols3dToast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 2800);
+}
+
+(function () {
+  var toast = document.getElementById('ols3dToast');
+  if (toast && toast.parentNode !== document.body) document.body.appendChild(toast);
+})();
+</script>
