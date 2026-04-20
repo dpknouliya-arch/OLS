@@ -4,11 +4,28 @@ include('db.php');
 $obj_user = json_decode(base64_decode($_SESSION["JOGOLS"]));
 $user_id = $obj_user->user_id;
 
-$sql_select = "SELECT draft_id,order_date,req_due_date,customer_po,project_name,COUNT(prod_id) AS num_prod,COUNT(re_order_id) AS num_re_order FROM tbl_draft_of WHERE user_id='" . $user_id . "' AND enable=1 GROUP BY draft_id ORDER BY draft_id DESC;";
-$rs_select = $conn->query($sql_select);
+
+$sql_select = "SELECT 
+    draft_id,
+    order_date AS order_date,
+     req_due_date AS req_due_date,
+     customer_po AS customer_po,
+     project_name AS project_name,
+    prod_id AS num_prod,
+    re_order_id AS num_re_order
+FROM tbl_draft_of
+WHERE user_id = ?
+AND enable = 1
+GROUP BY draft_id
+ORDER BY draft_id DESC
+";
+
+$stmt = $conn->prepare($sql_select);
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$rs_select = $stmt->get_result();
 
 $a_row_draft = array();
-
 while ($row_select = $rs_select->fetch_assoc()) {
 	$a_row_draft[($row_select["draft_id"])]["row_normal"] = $row_select;
 	$a_row_draft[($row_select["draft_id"])]["row_file"] = array();
@@ -99,114 +116,16 @@ while ($row_select = $rs_select->fetch_assoc()) {
 						</div>
 					</div>
 				</span>
-					<!-- <div id="draft_<?php echo $row_draft["draft_id"]; ?>" class="col-lg-4 col-md-6 col-sm-12 draft_box">
-						<div id="draft_card_<?php echo $row_draft["draft_id"]; ?>" class="draft_card"  style="padding:5px;">
-							
-							<table id="tbl_<?php echo $row_draft["draft_id"]; ?>" style="cursor: pointer; margin:0px 5px 10px 5px; width: 97%;" onclick="return showDraft('<?php echo $row_draft["draft_id"]; ?>');">
-								<tr>
-									<th width="40%">Ref.#</th><td><?php echo $row_draft["draft_id"]; ?></td>
-								</tr>
-								<tr>
-									<th>Add date:</th><td><?php echo (($row_draft["order_date"] == "0000-00-00") ? "" : date("F d, Y", strtotime($row_draft["order_date"]))); ?></td>
-								</tr>
-								<tr>
-									<th>Request Due:</th><td><?php echo (($row_draft["req_due_date"] == "0000-00-00") ? "" : date("F d, Y", strtotime($row_draft["req_due_date"]))); ?></td>
-								</tr>
-								<tr>
-									<th>Customer PO:</th><td><?php echo $row_draft["customer_po"]; ?></td>
-								</tr>
-								<tr>
-									<th>Project Name:</th><td><?php echo $row_draft["project_name"]; ?></td>
-								</tr>
-								<tr>
-									<th>Order Forms:</th>
-									<td>
-										<?php
-										echo $row_draft["num_prod"];
-										if ($row_draft["num_prod"] > $row_draft["num_re_order"] && $row_draft["num_re_order"] > 0) {
-											echo '<div class="show_re_order_p">RE-ORDER <i>(PARTIAL)</i></div>';
-										} else if ($row_draft["num_prod"] == $row_draft["num_re_order"]) {
-											echo '<div class="show_re_order">RE-ORDER</div>';
-										}
-										?>
-									</td>
-								</tr>
-							</table>
-							<div id="d_btn_<?php echo $row_draft["draft_id"]; ?>" style="float:right; margin-right: -20px; margin-top: -20px; cursor: pointer; " onclick="return deleteDraft('<?php echo $row_draft["draft_id"]; ?>');">
-								<i class="fa fa-trash-o" aria-hidden="true"></i>
-							</div>
-						</div>
-					</div> -->
+				
 			<?php
 			}
 			?>
 		</div>
 	</div>
 </div>
-<!-- <h4 align="center">Manage Order</h4>
-<div class="container-fluid">
-	<div class="row">
-		<?php
-		foreach ($a_row_draft as $draft_id => $a_data) {
 
-			$row_draft = array();
-			if (sizeof($a_data["row_normal"]) > 0) {
-				$row_draft = $a_data["row_normal"];
-				if (sizeof($a_data["row_file"]) > 0) {
-					$row_draft["num_prod"] = intval($a_data["row_normal"]["num_prod"]) + intval($a_data["row_file"]["num_prod"]);
-					$row_draft["num_re_order"] = intval($a_data["row_normal"]["num_re_order"]) + intval($a_data["row_file"]["num_re_order"]);
-				}
-			} else {
-				$row_draft = $a_data["row_file"];
-				if (sizeof($a_data["row_normal"]) > 0) {
-					$row_draft["num_prod"] = intval($a_data["row_normal"]["num_prod"]) + intval($a_data["row_file"]["num_prod"]);
-					$row_draft["num_re_order"] = intval($a_data["row_normal"]["num_re_order"]) + intval($a_data["row_file"]["num_re_order"]);
-				}
-			}
-		?>
-		<div id="draft_<?php echo $row_draft["draft_id"]; ?>" class="col-lg-4 col-md-6 col-sm-12 draft_box">
-			<div id="draft_card_<?php echo $row_draft["draft_id"]; ?>" class="draft_card"  style="padding:5px;">
-				
-				<table id="tbl_<?php echo $row_draft["draft_id"]; ?>" style="cursor: pointer; margin:0px 5px 10px 5px; width: 97%;" onclick="return showDraft('<?php echo $row_draft["draft_id"]; ?>');">
-					<tr>
-						<th width="40%">Ref.#</th><td><?php echo $row_draft["draft_id"]; ?></td>
-					</tr>
-					<tr>
-						<th>Add date:</th><td><?php echo (($row_draft["order_date"] == "0000-00-00") ? "" : date("F d, Y", strtotime($row_draft["order_date"]))); ?></td>
-					</tr>
-					<tr>
-						<th>Request Due:</th><td><?php echo (($row_draft["req_due_date"] == "0000-00-00") ? "" : date("F d, Y", strtotime($row_draft["req_due_date"]))); ?></td>
-					</tr>
-					<tr>
-						<th>Customer PO:</th><td><?php echo $row_draft["customer_po"]; ?></td>
-					</tr>
-					<tr>
-						<th>Project Name:</th><td><?php echo $row_draft["project_name"]; ?></td>
-					</tr>
-					<tr>
-						<th>Order Forms:</th>
-						<td>
-							<?php
-							echo $row_draft["num_prod"];
-							if ($row_draft["num_prod"] > $row_draft["num_re_order"] && $row_draft["num_re_order"] > 0) {
-								echo '<div class="show_re_order_p">RE-ORDER <i>(PARTIAL)</i></div>';
-							} else if ($row_draft["num_prod"] == $row_draft["num_re_order"]) {
-								echo '<div class="show_re_order">RE-ORDER</div>';
-							}
-							?>
-						</td>
-					</tr>
-				</table>
-				<div id="d_btn_<?php echo $row_draft["draft_id"]; ?>" style="float:right; margin-right: -20px; margin-top: -20px; cursor: pointer; " onclick="return deleteDraft('<?php echo $row_draft["draft_id"]; ?>');">
-					<i class="fa fa-trash-o" aria-hidden="true"></i>
-				</div>
-			</div>
-		</div>
-		<?php
-		}
-		?>
-	</div>
-</div> -->
+
+
 <form action="?vp=<?php echo base64_encode('edit_order'); ?>" id="form_edit" method="post">
 	<input type="hidden" name="draft_id" id="edit_draft_id">
 </form>
@@ -223,28 +142,7 @@ while ($row_select = $rs_select->fetch_assoc()) {
 		$('#draft_' + draft_id).show().css("max-width", "100%").addClass("col-md-12").addClass("col-sm-12").removeClass("col-md-3").removeClass("col-sm-3");
 
 
-		$('#d_edit_' + draft_id).html('<i class="fa fa-cog fa-spin fa-1x fa-fw"></i>Loading...');
-
-		$.ajax({
-			type: "POST",
-			dataType: "html",
-			url: "ajax/manage_draft/edit.php",
-			data: {
-				"draft_id": draft_id
-			},
-			success: function(resp) {
-				$('#d_edit_' + draft_id).html(resp);
-
-				$('.draft_card').animate({
-					width: "430%",
-					height: "550px"
-				}).css("height", "100%").css("min-height", "550px");
-
-				$('#btn_mini_' + draft_id).show();
-
-				$('#tbl_' + draft_id).hide();
-			}
-		});
+	
 	}
 
 	function minimizeDraft(draft_id) {
@@ -267,23 +165,10 @@ while ($row_select = $rs_select->fetch_assoc()) {
 
 	}
 
-	function deleteDraft(draft_id) {
 
-		if (confirm("Confirm to delete draft #" + draft_id + "?")) {
-			$.ajax({
-				type: "POST",
-				dataType: "json",
-				url: "ajax/manage_order/delete.php",
-				data: {
-					"draft_id": draft_id
-				},
-				success: function(resp) {
-					if (resp.result == "success") {
-						$('#draft_' + draft_id).remove();
-					}
 
-				}
-			});
-		}
-	}
+
+
+
+
 </script>

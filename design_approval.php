@@ -20,35 +20,39 @@ mysqli_set_charset($conn3, "utf8");
 
 
 
-//---Select Design from LKR
+//---Select Design from LR
 
-$sql_select = "SELECT order_head.order_id,order_head.order_name,employee.employee_name,order_head.order_status,order_head.order_create_date ";
+$sql = "SELECT 
+            order_head.order_id,
+            order_head.order_name,
+            employee.employee_name,
+            order_head.order_status,
+            order_head.order_create_date
+        FROM order_head
+        LEFT JOIN employee 
+            ON order_head.order_sale_id = employee.employee_id
+        WHERE order_head.customer_id = ?
+        ORDER BY order_head.order_create_date DESC";
 
-$sql_select .= "FROM order_head LEFT JOIN employee ON order_head.order_sale_id=employee.employee_id ";
+$stmt = $conn3->prepare($sql);
 
-$sql_select .= "WHERE order_head.customer_id=" . $customer_id . " ";
+if (!$stmt) {
+    die("Prepare failed: " . $conn3->error);
+}
 
-$sql_select .= "ORDER BY order_head.order_create_date DESC ";
-
-// echo $sql_select;
-
-$rs_select = $conn3->query($sql_select);
-
+$stmt->bind_param("i", $customer_id); 
+$stmt->execute();
+$rs_select = $stmt->get_result();  
 
 
 $a_row = array();
-
 $a_draft_num = array();
-
 $a_order_id_list = array();
 
 while ($row_select = $rs_select->fetch_assoc()) {
 
 
-
     $a_row[] = $row_select;
-
-
 
     if (!isset($a_draft[($row_select["order_id"])])) {
 
@@ -180,7 +184,68 @@ if (sizeof($a_order_id_list) > 0) {
         </div>
     </div>
 </div>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+
+
+
+	<div id="approvalModal" class="modal fade" role="dialog">
+		<div class="modal-dialog modal-lg">
+
+			<!-- Modal content-->
+			<div class="modal-content">
+				<div class="modal-header" >
+						<h4>Approve Design</h4>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<div>
+						<div class="form-group">
+							<label for="exampleInputEmail1" style="color:white;">DESIGN NAME</label>
+							<input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Input Design Option">
+						</div>
+						<div class="form-group">
+							<label for="exampleFormControlTextarea1" style="color:white;">Notes(If Any)</label>
+							<textarea name="approval_textarea" class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+						</div>
+						<button type="button" class="btn btn-warning approval_btn" onclick="approveDraft()">Approve Design</button>
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</div>
+
+	<div id="rejectModal" class="modal fade" role="dialog">
+		<div class="modal-dialog modal-lg">
+
+			<!-- Modal content-->
+			<div class="modal-content">
+				<div class="modal-header">
+						<h4>Reject Design</h4>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					
+				</div>
+				<div class="modal-body">
+					<form id="reject_form">
+						<div class="form-group">
+							<label for="exampleInputEmail2" style="color:white;">DESIGN NAME</label>
+							<input type="text" name="design_name" class="form-control" id="exampleInputEmail2" aria-describedby="emailHelp" placeholder="Input Design Option">
+							<input type="hidden" name="dd_id" id="dd_id_reject">
+						</div>
+						<div class="form-group">
+							<label for="exampleFormControlTextarea2" style="color:white;">Reject Reason(Important)</label>
+							<textarea name="reject_textarea" class="form-control" id="exampleFormControlTextarea2" rows="3"></textarea>
+						</div>
+						<button type="submit" class="btn btn-danger">Reject Design</button>
+					</form>
+				</div>
+			</div>
+
+		</div>
+	</div>
+
+
 <script type="text/javascript">
 function showDesignZone(order_id){
 	//$('#d_content_zone').html('<i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i> Loading...');
@@ -231,5 +296,133 @@ function showTab(draft_no,dd_id=''){
 	}, 3000);
 
 }
+
+
+
+
+	
+$(document).on('click', '.approval_modal', function() {
+var draft_id = $(this).attr('draft_id');
+$('.approval_btn').attr('dd_id', draft_id);
+$('#approvalModal').modal('show');
+})
+
+$(document).on('click', '.reject_modal', function() {
+var draft_id = $(this).attr('draft_id');
+$('#dd_id_reject').val(draft_id);
+$('#rejectModal').modal('show');
+})
+
+
+
+
+		function approveDraft() {
+
+			var dd_id = $('.approval_btn').attr("dd_id");
+			var approval_note = CKEDITOR.instances.exampleFormControlTextarea1.getData();
+			var design_note = $('#exampleInputEmail1').val();
+			if (design_note.length == 0) {
+				alert("Design Option can't be left blank");
+				return;
+			}
+
+			if (confirm("Confirm APPROVE?")) {
+
+				$.ajax({
+					type: "POST",
+					dataType: "json",
+					url: "ajax/design_approval/approve_draft.php",
+					data: {
+						"dd_id": dd_id,
+						"approval_note": approval_note,
+						"design_note": design_note
+					},
+					success: function(resp) {
+
+						if (resp.result == "success") {
+							var inner_approval = '<div class="btn_panel"><a type="button" href="#add_comment_btn" class="btn btn-primary add_cmt_btn" style="float:left;">Add Comment</a>';
+							inner_approval += '<center><div class="approve_status">APPROVED</div></center>';
+							inner_approval += '<div style="text-align: left; color: #F00;">* Note: Available to comment only in the latest Draft.</div>';
+							inner_approval += '</div>';
+
+							$('#approval_zone').html(inner_approval);
+							$('#approvalModal').modal('hide');
+						} else {
+							alert(resp.msg);
+						}
+
+					}
+				});
+
+			}
+
+		}
+
+		$(document).on('submit', '#reject_form', function(e) {
+			e.preventDefault();
+			var form = $(this);
+			var formdata = new FormData(form[0]);
+			if (confirm("Confirm REJECT?")) {
+
+				$.ajax({
+					type: "POST",
+					dataType: "json",
+					url: "ajax/design_approval/reject_draft.php",
+					data: formdata,
+					contentType: false,
+					processData: false,
+					success: function(resp) {
+
+						if (resp.result == "success") {
+							var inner_approval = '<div class="btn_panel"><a type="button" href="#add_comment_btn" class="btn btn-primary add_cmt_btn" style="float:left;">Add Comment</a>';
+							inner_approval += '<center><div class="reject_status">REJECTED</div></center>';
+							inner_approval += '<div style="text-align: left; color: #F00;">* Note: Available to comment only in the latest Draft.</div>';
+							inner_approval += '</div>';
+
+							$('#approval_zone').html(inner_approval);
+							$('#rejectModal').modal('hide');
+						} else {
+							alert(resp.msg);
+						}
+
+					}
+				});
+
+			}
+
+		})
+
+		function rejectDraft(dd_id) {
+
+			if (confirm("Confirm REJECT?")) {
+
+				$.ajax({
+					type: "POST",
+					dataType: "json",
+					url: "ajax/design_approval/reject_draft.php",
+					data: {
+						"dd_id": dd_id
+					},
+					success: function(resp) {
+
+						if (resp.result == "success") {
+							var inner_approval = '<div class="btn_panel"><a type="button" href="#add_comment_btn" class="btn btn-primary add_cmt_btn" style="float:left;">Add Comment</a>';
+							inner_approval += '<center><div class="reject_status">REJECTED</div></center>';
+							inner_approval += '<div style="text-align: left; color: #F00;">* Note: Available to comment only in the latest Draft.</div>';
+							inner_approval += '</div>';
+
+							$('#approval_zone').html(inner_approval);
+						} else {
+							alert(resp.msg);
+						}
+
+					}
+				});
+
+			}
+
+		}
+
+
 
 </script>

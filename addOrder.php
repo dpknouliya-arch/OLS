@@ -408,19 +408,7 @@ if ($num_row == 0) {
 
                                             <span class="themeBtn iconBTn teamAndRosterDetails" id="showTeamTabsSection">Save and Continue <figure class="m-0"><img src="images/vector/nextBtn.png" alt=""></figure></span>
 
-                                            <!-- <button class="btn themeBtn2 d-flex gap-3">
-                                                <figure class="m-0"><img src="images/vector/upload.png"alt=""></figure>                                                 
-                                                Upload Order Form
-                                            </button>
-                                            <input type="file" name="myFile" /> !-->
-
-
-
-                                            <!-- <span class="btn themeBtn2 iconBTn" onclick="return chooseUploadProcess(this);">
-                                                <figure class="m-0">
-                                                    <img src="images/vector/upload.png" alt=""> &nbsp; Upload Order Form
-                                            </span> -->
-
+                                         
 
                                             <span class="" style="height: 55px; width: 151px; overflow: hidden; position: relative ;top: 10px;">
                                                 <input type="file" class="form-control " accept=".xlsx" name="order_form_file" id="order_form_file">
@@ -912,22 +900,6 @@ addNewTeam Member Modal
 
 
 
-        $('#teamTab .nav-link').removeClass('active');
-
-        $('#table_showing .tab-pane').removeClass('active');
-
-
-
-        const teamTab = `
-                    <li class="nav-item" role="presentation">
-
-                        <a class="nav-link  active" id="fill-tab-${teamId}" data-bs-toggle="tab" href="#fill-tabpanel-${teamId}" role="tab" aria-controls="fill-tabpanel-${teamId}" aria-selected="true"> Team ${teamId} </a>
-
-                    </li>`;
-
-
-
-        $('#teamTab').append(teamTab);
 
 
 
@@ -956,7 +928,25 @@ addNewTeam Member Modal
 
                 $('.teamTabsSection').show(300); // Adjust duration as needed
                 $('#table_showing').append(response.html);
+                
 
+                
+                $('#teamTab .nav-link').removeClass('active');
+
+                $('#table_showing .tab-pane').removeClass('active');
+
+
+
+                const teamTab = `
+                        <li class="nav-item" role="presentation">
+
+                            <a class="nav-link  active" id="fill-tab-${teamId}" data-bs-toggle="tab" href="#fill-tabpanel-${teamId}" role="tab" aria-controls="fill-tabpanel-${teamId}" aria-selected="true"> Team ${teamId} </a>
+
+                        </li>`;
+
+
+
+                $('#teamTab').append(teamTab);
 
                 if (newOrderForm == true) {
                     $('#addNewTeam').modal('hide');
