@@ -77,23 +77,24 @@ if ($num_row == 0) {
         width: 0px;
     }
 
-    .form-horizontal .required{
-         border: none !important;
+    .form-horizontal .required {
+        border: none !important;
         color: red;
         height: 0px;
-        width: 0px; 
+        width: 0px;
     }
 
 
-     .addOrderPage table td select {
-            min-width: 6vw !important;
-            font-size: 13px !important;
-            text-align: center;
-        }
-        td,
-        th {
-            text-align: center !important;
-        }
+    .addOrderPage table td select {
+        min-width: 6vw !important;
+        font-size: 13px !important;
+        text-align: center;
+    }
+
+    td,
+    th {
+        text-align: center !important;
+    }
 </style>
 
 <div class="addOrderPage">
@@ -367,15 +368,15 @@ if ($num_row == 0) {
                                         <label for="" class="w-100 text-start  c-label">Year <span class="required">*</span> </label>
                                         <!-- <input type="text" name="input_on_year" id="input_on_year" value="" placeholder="Year"> -->
 
-                                         <select name="input_on_year" id="input_on_year" class="form-select">
-                                    <option value="">-- Select Year --</option>
-                                    <?php
-                                    $currentYear = date("Y");
-                                    for ($year = $currentYear - 5; $year <= $currentYear + 5; $year++) {
-                                        echo '<option value="' . $year . '">' . $year . '</option>';
-                                    }
-                                    ?>
-                                </select>
+                                        <select name="input_on_year" id="input_on_year" class="form-select">
+                                            <option value="">-- Select Year --</option>
+                                            <?php
+                                            $currentYear = date("Y");
+                                            for ($year = $currentYear - 5; $year <= $currentYear + 5; $year++) {
+                                                echo '<option value="' . $year . '">' . $year . '</option>';
+                                            }
+                                            ?>
+                                        </select>
 
 
                                     </div>
@@ -387,7 +388,7 @@ if ($num_row == 0) {
                                             $sql_product = "SELECT * FROM tbl_product ORDER BY prod_id ASC";
                                             $rs_product = $conn->query($sql_product);
                                             while ($row_product = $rs_product->fetch_assoc()) {
-                                                echo "<option value=\"" . $row_product["prod_id"] . '">' . $row_product["prod_name"] ."</option>";
+                                                echo "<option value=\"" . $row_product["prod_id"] . '">' . $row_product["prod_name"] . "</option>";
                                             }
                                             ?>
                                         </select>
@@ -395,7 +396,7 @@ if ($num_row == 0) {
                                         <input type="hidden" id="tmp_num_form" value="0">
                                     </div>
 
-                                 
+
                                     <div class="d-flex justify-content-between column2 formBottom">
                                         <div class="goBackBtn themeBtn2grey">
                                             <a href="#" class="goback switch-tab iconBTn" data-target="#order">
@@ -404,14 +405,15 @@ if ($num_row == 0) {
                                             </a>
                                         </div>
                                         <div class="d-flex gap-2">
+
                                             <span class="themeBtn iconBTn teamAndRosterDetails" id="showTeamTabsSection">Save and Continue <figure class="m-0"><img src="images/vector/nextBtn.png" alt=""></figure></span>
-                                           
-                                                <!-- <button class="btn themeBtn2 d-flex gap-3">
+
+                                            <!-- <button class="btn themeBtn2 d-flex gap-3">
                                                 <figure class="m-0"><img src="images/vector/upload.png"alt=""></figure>                                                 
                                                 Upload Order Form
                                             </button>
                                             <input type="file" name="myFile" /> !-->
-                                           
+
 
 
                                             <!-- <span class="btn themeBtn2 iconBTn" onclick="return chooseUploadProcess(this);">
@@ -419,24 +421,24 @@ if ($num_row == 0) {
                                                     <img src="images/vector/upload.png" alt=""> &nbsp; Upload Order Form
                                             </span> -->
 
-                                            
-                                                        <span class="btn themeBtn2 iconBTn">
-                                                              <input type="file"  class="form-control " accept=".xlsx" name="order_form_file" id="order_form_file">
-                                                        </span>
 
-                                                          <button class="orderFormUpload btn btn-sm" type="button">
-                                                            <figure class="m-0">
-                                                            <img src="images/vector/upload.png" alt="">
-                                                            </figure>
-                                                            &nbsp; Upload Order Form
-                                                            </button>
-                                                  
+                                            <span class="" style="height: 55px; width: 151px; overflow: hidden; position: relative ;top: 10px;">
+                                                <input type="file" class="form-control " accept=".xlsx" name="order_form_file" id="order_form_file">
+                                            </span>
+
+                                            <button class="orderFormUpload btn btn-sm btn themeBtn2 iconBTn" type="button">
+                                                <figure class="m-0">
+                                                    <img src="images/vector/upload.png" alt="">
+                                                </figure>
+                                                <span>Upload Order Form </span>
+                                            </button>
+
 
                                         </div>
                                     </div>
 
 
-                                
+
                             </div>
                         </div>
                         <div class="col-md-4 rightSide d-flex">
@@ -466,7 +468,7 @@ if ($num_row == 0) {
                         <div class="mt-4">
                             <ul class="nav nav-tabs whiteBg" id="teamTab" role="tablist">
                                 <li class="nav-item" role="presentation">
-                                    <a class="nav-link d-flex  open_add_new_modal" id="addNewTeam ">
+                                    <a class="nav-link d-flex  open_add_new_modal" id="addNewTeamButton">
                                         <figure class="m-0"><img src="images/vector/add.png" alt="" style="width: 16px;">
                                         </figure>
                                         Add New
@@ -577,30 +579,30 @@ addNewTeam Member Modal
 
                             <div class="form-group  ">
 
-                                <label for="">Team Name  <span class="required">*</span></label>
+                                <label for="">Team Name <span class="required">*</span></label>
 
-                                <input type="text" name="input_on_team_name" id="input_on_team_name_new"  placeholder="Team Name">
+                                <input type="text" name="input_on_team_name" id="input_on_team_name_new" placeholder="Team Name">
 
                             </div>
 
                             <div class="form-group  ">
 
-                                <label for="">Year  <span class="required">*</span> </label>
+                                <label for="">Year <span class="required">*</span> </label>
 
                                 <!-- <input type="text"  name="input_on_year" id="input_on_year_new" value="" placeholder="Year">  -->
 
 
-                                     <select name="input_on_year" id="input_on_year_new" class="form-select">
-                                       <option value="">-- Select Year --</option>
-                                            <?php
-                                            $currentYear = date("Y");
-                                            for ($year = $currentYear - 5; $year <= $currentYear + 5; $year++) {
-                                                echo '<option value="' . $year . '">' . $year . '</option>';
-                                            }
+                                <select name="input_on_year" id="input_on_year_new" class="form-select">
+                                    <option value="">-- Select Year --</option>
+                                    <?php
+                                    $currentYear = date("Y");
+                                    for ($year = $currentYear - 5; $year <= $currentYear + 5; $year++) {
+                                        echo '<option value="' . $year . '">' . $year . '</option>';
+                                    }
                                     ?>
 
-                                     </select>
-                               
+                                </select>
+
 
                             </div>
 
@@ -648,19 +650,30 @@ addNewTeam Member Modal
 
                     <span class="themeBtn text-center" id="AddNewTeamModal">Save and Continue</span>
 
-                    <div class="upload-btn-wrapper">
+                    <!-- <div class="upload-btn-wrapper"> -->
 
-                        <button class="btn themeBtn2 d-flex gap-3" type="button" onclick="return chooseUploadProcess(this);">
+                    <!-- <button class="btn themeBtn2 d-flex gap-3" type="button" onclick="return chooseUploadProcess(this);">
 
                             <figure class="m-0"><img src="images/vector/upload.png" alt=""></figure> Upload Order
 
                             Form
 
-                        </button>
+                        </button> -->
 
-                        <!-- <input type="file" name="myFile"> -->
+                    <span class="" style="height: 55px; width: 151px; overflow: hidden; position: relative ;top: 10px;">
+                        <input type="file" class="form-control " accept=".xlsx" name="new_order_form_file" id="new_order_form_file">
+                    </span>
 
-                    </div>
+                    <button class="UploadOrderFormNew btn btn-sm themeBtn2 iconBTn" type="button">
+                        <figure class="m-0">
+                            <img src="images/vector/upload.png" alt="">
+                        </figure>
+                        &nbsp; <span>Upload Order Form </span>
+                    </button>
+
+                    <!-- <input type="file" name="myFile"> -->
+
+                    <!-- </div> -->
 
                 </div>
 
@@ -756,8 +769,11 @@ addNewTeam Member Modal
 
         // Handle tab click
         tabs.forEach(tab => {
+            if (!tab) return false;
+
             tab.addEventListener('click', (event) => {
                 const href = tab.getAttribute('href');
+                if (!href) return false;
                 const tabId = href.substring(1); // Remove '#' from href
                 history.pushState({
                     tabId
@@ -812,18 +828,15 @@ addNewTeam Member Modal
 <!-- Toggles  -->
 
 <script>
+    function GetTotalCount() {
 
-  function GetTotalCount(){
-
-  }    
+    }
 
 
     $(document).ready(function() {
         $('#toggleGuide').click(function() {
             $('#detailsList').fadeToggle(300); // Adjust duration as needed
         });
-
-
 
     });
 
@@ -839,49 +852,73 @@ addNewTeam Member Modal
         });
     });
 
-    
-    $(document).on('click', '.orderFormUpload', function () {
-        let isValid = CheckOrderFormValidation(); 
+
+    $(document).on('click', '.orderFormUpload , .UploadOrderFormNew', function() {
+        let isValid = CheckOrderFormValidation();
+        let newOrderForm = $(this).hasClass('UploadOrderFormNew');
+
+        let spanText = $(this).find('span');
+        let button = $(this);
 
 
-        if(!isValid){
-             console.log("validation failed"); 
-             return false; 
+
+        if (newOrderForm == true) {
+            isValid = CheckOrderFormValidation(true);
         }
 
 
-            var prod_id = $('#prod_id').val();
-
-            var form_id = $('#form_id_inc').val();
-
-            var on_team_name = base64EncodeUnicode($('#input_on_team_name').val());
-
-            var on_year = window.btoa($('#input_on_year').val());
-            const teamId = $('#teamTab li').length;
-    
-        
-            let fileInput = $('#order_form_file')[0];
-            let file = fileInput.files[0];
-
-            if (!file) return;
-
-            let formData = new FormData();
-            formData.append('file', file);
-            formData.append('form_id' ,form_id) ; 
-            formData.append('prod_id' ,prod_id) ; 
-            formData.append('on_team_name' ,on_team_name) ; 
-            formData.append('teamno' , teamId) ; 
-            formData.append('on_year' , on_year) ; 
+        if (!isValid) {
+            console.log("validation failed");
+            return false;
+        }
 
 
 
-            $('#teamTab .nav-link').removeClass('active');
+        var prod_id = $('#prod_id').val();
 
-            $('#table_showing .tab-pane').removeClass('active');
+        var form_id = $('#form_id_inc').val();
+
+        var on_team_name = base64EncodeUnicode($('#input_on_team_name').val());
+
+        var on_year = window.btoa($('#input_on_year').val());
+        const teamId = $('#teamTab li').length;
+
+
+        if (newOrderForm) {
+            prod_id = $('#prod_id_new').val();
+            form_id = $('#form_id_inc').val();
+
+            on_team_name = base64EncodeUnicode($('#input_on_team_name_new').val());
+            on_year = window.btoa($('#input_on_year_new').val());
+        }
 
 
 
-            const teamTab = `
+        let fileInput = $('#order_form_file')[0];
+        if (newOrderForm == true) {
+            fileInput = $('#new_order_form_file')[0];
+        }
+        let file = fileInput.files[0];
+
+        if (!file) return;
+
+        let formData = new FormData();
+        formData.append('file', file);
+        formData.append('form_id', form_id);
+        formData.append('prod_id', prod_id);
+        formData.append('on_team_name', on_team_name);
+        formData.append('teamno', teamId);
+        formData.append('on_year', on_year);
+
+
+
+        $('#teamTab .nav-link').removeClass('active');
+
+        $('#table_showing .tab-pane').removeClass('active');
+
+
+
+        const teamTab = `
                     <li class="nav-item" role="presentation">
 
                         <a class="nav-link  active" id="fill-tab-${teamId}" data-bs-toggle="tab" href="#fill-tabpanel-${teamId}" role="tab" aria-controls="fill-tabpanel-${teamId}" aria-selected="true"> Team ${teamId} </a>
@@ -890,40 +927,49 @@ addNewTeam Member Modal
 
 
 
-            $('#teamTab').append(teamTab);
+        $('#teamTab').append(teamTab);
 
 
 
 
 
 
-            // 👉 Optional: add extra data
-            // formData.append('order_id', $('#order_id').val());
-
-            $.ajax({
-                url: 'ajax/add_order/upload_order_form.php', // 🔁 change to your PHP file
-                type: 'POST',
-                data: formData,
-                contentType: false,
-                processData: false,
-                dataType : 'json' , 
-                success: function (response) {
-                    if(response.upload == false){
-                         alert("Blank or wrong order form . Please add correct order form"); 
-                         return false ; 
-                    }
-
-
-                      $('.teamTabsSection').show(300); // Adjust duration as needed
-                     $('#table_showing').append(response.html);
-
-
-                },
-                error: function (xhr, status, error) {
-                    console.error("Upload failed:", error);
-                    alert('Upload failed');
+        // 👉 Optional: add extra data
+        // formData.append('order_id', $('#order_id').val());
+        spanText.text('Uploading.....');
+        button.attr('disabled', true);
+        $.ajax({
+            url: 'ajax/add_order/upload_order_form.php', // 🔁 change to your PHP file
+            type: 'POST',
+            data: formData,
+            contentType: false,
+            processData: false,
+            dataType: 'json',
+            success: function(response) {
+                button.removeAttr('disabled');
+                if (response.upload == false) {
+                    spanText.text('Upload Order Form');
+                    alert("Blank or wrong order form . Please add correct order form");
+                    return false;
                 }
-            });
+
+
+                $('.teamTabsSection').show(300); // Adjust duration as needed
+                $('#table_showing').append(response.html);
+
+
+                if (newOrderForm == true) {
+                    $('#addNewTeam').modal('hide');
+                }
+
+                spanText.text('Upload Order Form');
+
+            },
+            error: function(xhr, status, error) {
+                console.error("Upload failed:", error);
+                alert('Upload failed');
+            }
+        });
 
     });
 
@@ -933,13 +979,13 @@ addNewTeam Member Modal
     $(document).ready(function() {
         $('#AddNewTeamModal').click(function() {
 
-        let isValid = CheckOrderFormValidation(true); 
-        if(!isValid){
-             console.log("validation failed"); 
-             return false; 
-        }
+            let isValid = CheckOrderFormValidation(true);
+            if (!isValid) {
+                console.log("validation failed");
+                return false;
+            }
 
-            $('.teamTabsSection').show(300); // Adjust duration as needed
+
             var prod_id = $('#prod_id_new').val();
             var form_id = $('#form_id_inc').val();
 
@@ -947,7 +993,7 @@ addNewTeam Member Modal
             var on_year = window.btoa($('#input_on_year_new').val());
 
             $('.teamTabsSection').show(300); // Show the section
-         
+
 
             const teamId = $('#teamTab li').length;
             $('#teamTab .nav-link').removeClass('active');
@@ -1041,7 +1087,7 @@ addNewTeam Member Modal
     function base64EncodeUnicode(str) {
         return btoa(
             new TextEncoder().encode(str)
-                .reduce((data, byte) => data + String.fromCharCode(byte), '')
+            .reduce((data, byte) => data + String.fromCharCode(byte), '')
         );
     }
 
@@ -1058,7 +1104,7 @@ addNewTeam Member Modal
             }
 
 
-           
+
 
             var prod_id = $('#prod_id').val();
 
@@ -1074,13 +1120,13 @@ addNewTeam Member Modal
 
 
 
-            
+
             $('#teamTab .nav-link').removeClass('active');
-            
+
             $('#table_showing .tab-pane').removeClass('active');
-            
-            
-            
+
+
+
             const teamId = $('#teamTab li').length;
             const teamTab = `
 
@@ -1124,7 +1170,7 @@ addNewTeam Member Modal
 
                     //if(resp=="success"){
 
-                   $('.teamTabsSection').show(300); // Adjust duration as needed
+                    $('.teamTabsSection').show(300); // Adjust duration as needed
 
                     $('#table_showing').append(resp);
 
@@ -1374,23 +1420,21 @@ addNewTeam Member Modal
 </script>
 
 <script>
+    function removeTable(el) {
 
+        // Get current tab-pane
+        var $tabPane = $(el).closest('.tab-pane');
 
-   function removeTable(el) {
+        var tabPaneId = $tabPane.attr('id'); // e.g. fill-tabpanel-1
 
-    // Get current tab-pane
-    var $tabPane = $(el).closest('.tab-pane');
+        // Remove the tab-pane
+        $tabPane.remove();
 
-    var tabPaneId = $tabPane.attr('id'); // e.g. fill-tabpanel-1
+        // Remove corresponding tab button
+        $('button[data-bs-target="#' + tabPaneId + '"], a[href="#' + tabPaneId + '"]').remove();
 
-    // Remove the tab-pane
-    $tabPane.remove();
-
-    // Remove corresponding tab button
-    $('button[data-bs-target="#' + tabPaneId + '"], a[href="#' + tabPaneId + '"]').remove();
-
-    // Activate first available tab
-}
+        // Activate first available tab
+    }
 
     function addItemRow(form_id, prod_id) {
 
@@ -1455,20 +1499,20 @@ addNewTeam Member Modal
 
     }
 
-    
-    
-	function calculateQTY(prod_id, class_name) {
 
-		var qty_total = 0;
-		$('.' + class_name).each(function() {
-			if ($(this).val() != "") {
-				qty_total += parseInt($(this).val());
-			}
 
-		});
+    function calculateQTY(prod_id, class_name) {
 
-		$('#total_' + class_name).html(qty_total);
-	}
+        var qty_total = 0;
+        $('.' + class_name).each(function() {
+            if ($(this).val() != "") {
+                qty_total += parseInt($(this).val());
+            }
+
+        });
+
+        $('#total_' + class_name).html(qty_total);
+    }
 
 
     function checkBeforeSaveDraft() {
@@ -1811,7 +1855,7 @@ addNewTeam Member Modal
         //         	}
 
 
- 
+
         //         }
 
         //     });
@@ -1990,7 +2034,7 @@ addNewTeam Member Modal
 
     // Validation patterns
     const VALIDATION_PATTERNS = {
-        textNumber: /^(?=.*[a-zA-Z])[a-zA-Z0-9+\-\s]{3,30}$/,
+        textNumber: /^(?=.*[a-zA-Z]).{3,50}$/,
         city: /^[a-zA-Z\s]{2,80}$/, // Letters and spaces only
         text: /^[a-zA-Z\s]{2,50}$/, // Letters and spaces only
         zipcode: /^[a-zA-Z0-9\-\s]{2,20}$/, // Letters, numbers, hyphens
@@ -2069,11 +2113,11 @@ addNewTeam Member Modal
 
     function ValidateOnlyEmpty(selector, message) {
         let val = $(selector).val();
-        let selectedVal = $(selector).find('option:selected').val(); 
+        let selectedVal = $(selector).find('option:selected').val();
         let id = $(selector).attr('id');
 
 
-        if (!val || selectedVal=='') {
+        if (!val || selectedVal == '') {
             showFieldError(id, message);
             return false;
         }
@@ -2150,19 +2194,19 @@ addNewTeam Member Modal
         return isValid;
     }
 
-    function CheckOrderFormValidation(is_new=false) {
+    function CheckOrderFormValidation(is_new = false) {
         let isValid = true;
         $('.errorMessage').remove();
 
 
-       if(is_new){
-                 isValid &= validateField('#input_on_team_name_new', 'Invalid team name');
-                isValid &= ValidateOnlyEmpty('#input_on_year_new', 'Select Year');
-                isValid &= ValidateOnlyEmpty('#prod_id_new', 'Select Order Form');
-       }else{
-                isValid &= ValidateOnlyEmpty('#input_on_team_name',  'Invalid team name');
-                isValid &= ValidateOnlyEmpty('#input_on_year', 'Select Year');
-                isValid &= ValidateOnlyEmpty('#prod_id', 'Select Order Form');
+        if (is_new) {
+            isValid &= ValidateOnlyEmpty('#input_on_team_name_new', 'Invalid team name');
+            isValid &= ValidateOnlyEmpty('#input_on_year_new', 'Select Year');
+            isValid &= ValidateOnlyEmpty('#prod_id_new', 'Select Order Form');
+        } else {
+            isValid &= ValidateOnlyEmpty('#input_on_team_name', 'Invalid team name');
+            isValid &= ValidateOnlyEmpty('#input_on_year', 'Select Year');
+            isValid &= ValidateOnlyEmpty('#prod_id', 'Select Order Form');
         }
 
         return isValid;
