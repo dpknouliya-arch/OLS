@@ -67,19 +67,112 @@ if (isset($order_id)) {
 
     while ($row = $result_team->fetch_assoc()) {
         $order_team_data[] = $row;
-    }
+    }    
+}
+
+if (isset($designId)) {
+    $sql_designs = "SELECT * FROM designs WHERE id = ?";
+    $stmt_designs = $conn4->prepare($sql_designs);
+    $stmt_designs->bind_param("i", $designId);
+    $stmt_designs->execute();
+    $result_designs = $stmt_designs->get_result();
+
+    while ($row = $result_designs->fetch_assoc()) {
+        $order_design_data[] = $row;
+    }    
 }
 ?>
 
+<?php
+foreach ($order_design_data as $key => $value) {  
+?>
+
+    <input type="hidden" name="coller_id" value="<?= $value['coller_id']; ?>">
+
+    <input type="hidden" name="style_id" value="<?= $value['style_id']; ?>">
+
+    <input type="hidden" name="stripes_id" value="<?= $value['stripes_id']; ?>">
+
+    
+<?php
+}   
+?>
+<input type="hidden" name="order_id" value="<?= $order_id; ?>">
+<input type="hidden" name="design_id" value="<?= $designId; ?>">
+
+<style>
+    #threejs-container {
+
+        width: 100%;
+
+        height: 100%;
+
+    }
+
+    #threejs-container-user {
+
+        width: 100%;
+
+        height: 500px;
+
+    }
+</style>
+
 <section class="generatePO">
     <div class="container">
-        <div class="row" >
-            <div style="text-align: right;">
-                <span id="printBtn" style="margin-right: 20px;cursor: pointer;" class="blueBtn">
-                    <i class="fa fa-print" aria-hidden="true"></i>
-                </span>
+        <div class="row" >            
+            <div class="col-lg-6 col-md-6 OriginalModal">
+                <div id="preloader" class="preloader">
+                    <div class="preloader-content">
+                        <div class="preloader-spinner"></div>
+                        <div class="MainContent">
+                            <img src="../images/logo1.png" class="mob-logo">
+                            <div id="preloaderProgress" class="preloader-progress">
+                                0%
+                            </div>
+                            <div id="preloaderTimeRemaining" class="preloader-time">Loading...</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card h-100">
+                    <div id="threejs-container-user"></div>                   
+                </div>
             </div>
-            <div class="col-md-8 m-auto" id="pritn_details">
+             <div class="col-lg-6 col-md-6 OriginalModal">
+                <div class="card h-100">
+                    <div id="svgLoader" style="
+                        position: absolute;
+                        inset: 0;
+                        background: rgba(255,255,255,0.85);
+                        display: none;
+                        align-items: center;
+                        justify-content: center;
+                        z-index: 20;
+                    ">
+                        <div style="
+                            width: 60px;
+                            height: 60px;
+                            border: 6px solid #ddd;
+                            border-top: 6px solid #333;
+                            border-radius: 50%;
+                            animation: spin 1s linear infinite;
+                        "></div>
+                    </div>
+
+                    <div class="my-auto d-flex align-items-center" id="frontPreview"></div>
+
+                    <div class="my-auto d-flex align-items-center">
+                        <div id="backPreview">
+                        </div>
+                        <div>
+                            <figure class="h-100 my-auto d-flex align-items-center"><img src="../<?= $design['sock_design']; ?>" alt="" class="w-30"></figure>
+                        </div>
+                    </div>                                                    
+                    <!-- <figure class="h-100 my-auto d-flex align-items-center"><img src="../images/main/sectionArtApprovalMain.png" alt="" class="w-100"></figure> -->
+
+                </div>
+             </div>
+            <div class="col-md-12 m-auto" id="pritn_details">
 
                 <!-- PDF 1 -->
                 <div class="innerDiv">
@@ -93,7 +186,7 @@ if (isset($order_id)) {
                             
                         </div>
                         <div class="stepNavigate">
-                            <h6>Style <span class="styleName">The Premier Hockey Jersey</span></h6>
+                            <h6>Style <span class="styleName">The Premier Hockey Jersey</span> : Jog2026<?= $order['order_id'] ?> </h6>
                         </div>
                         <div class="modelAngleView grid4">
                             <figure>
@@ -161,12 +254,12 @@ if (isset($order_id)) {
                                                         <td>
                                                             <h6 class="tableDataStyle2">
                                                                 <span><?= htmlspecialchars($subKey) ?></span>
-                                                                <div class="colorArea">
+                                                                <div class="colorArea" style="padding: 5px 0px;">
                                                                     <?php
                                                                         $colorName = getPantonName($conn4, $subValue, $designId , 'colorName');
                                                                     ?>
                                                                     <span class="ColorApply activeColor" 
-                                                                        style="background-color: <?= $colorName ?>; box-shadow: rgba(0,0,0,0.35) 0px 5px 15px; border: 1px solid #55555536;"></span>
+                                                                        style="background-color: <?= $colorName ?>; box-shadow: rgba(0,0,0,0.35) 0px 5px 15px; border: 1px solid #55555536;padding: 1px 10px;border-radius: 50%;margin-right: 10px;"></span>
                                                                     <?= getPantonName($conn4, $subValue, $designId , 'pantonName') ?: "No matching panton name found." ?>
                                                                 </div>
                                                             </h6>
@@ -178,12 +271,12 @@ if (isset($order_id)) {
                                                     <td>
                                                         <h6 class="tableDataStyle2">
                                                             <span><?= htmlspecialchars($key) ?></span>
-                                                            <div class="colorArea">
+                                                            <div class="colorArea" style="padding: 5px 0px;">
                                                                 <?php
                                                                     $colorName = getPantonName($conn4, $zone, $designId , 'colorName');
                                                                 ?>
                                                                 <span class="ColorApply activeColor" 
-                                                                    style="background-color: <?= $colorName ?>; box-shadow: rgba(0,0,0,0.35) 0px 5px 15px; border: 1px solid #55555536;"></span>
+                                                                    style="background-color: <?= $colorName ?>; box-shadow: rgba(0,0,0,0.35) 0px 5px 15px; border: 1px solid #55555536;padding: 1px 10px;border-radius: 50%;margin-right: 10px;"></span>
                                                                 <?= getPantonName($conn4, $zone, $designId , 'pantonName') ?: "No matching panton name found." ?>
                                                             </div>
                                                         </h6>
@@ -373,57 +466,101 @@ if (isset($order_id)) {
                             <table class="table">
                                 <thead>
                                     <tr class="thead2">
-                                        <th scope="col">Player Name</th>
-                                        <th scope="col">Size</th>
-                                        <th scope="col">Jersey No.</th>
-                                        <th scope="col">Color</th>
-                                        <th scope="col">QTY</th>
-                                        <th scope="col">C or A</th>
-                                        <th scope="col">Flag</th>
-                                        <th scope="col">Name For Packing</th>
-                                        <th scope="col">Action</th>
+                                        <th>#</th>
+                                        <th>Name on Jersey</th>
+                                        <th>Pattern Cut</th>
+                                        <th>P or G</th>
+                                        <th>Jersey Size</th>
+                                        <th>Jersey No</th>
+                                        <th>Jersey Color</th>
+                                        <th>QTY</th>
+                                        <th>Jersey Color</th>
+                                        <th>QTY</th>
+                                        <th>Sock Size</th>
+                                        <th>Sock Color</th>
+                                        <th>QTY</th>
+                                        <th>Sock Color</th>
+                                        <th>QTY</th>
+                                        <th>C or A</th>
+                                        <th>Name For Packing</th>
+                                        <th>Notes</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <?php if (!empty($order_team_data)): ?>
-                                        <?php foreach ($order_team_data as $row): ?>
+                                        <?php $i = 1; foreach ($order_team_data as $row): ?>
                                             <tr>
-                                                <td><?= htmlspecialchars($row['name']) ?></td>
-                                                <td>
-                                                    <select class="w-100 border-none bg-none">
-                                                        <option <?= ($row['sizes'] == 'XS') ? 'selected' : '' ?>>XS</option>
-                                                        <option <?= ($row['sizes'] == 'S') ? 'selected' : '' ?>>S</option>
-                                                        <option <?= ($row['sizes'] == 'M') ? 'selected' : '' ?>>M</option>
-                                                        <option <?= ($row['sizes'] == 'L') ? 'selected' : '' ?>>L</option>
-                                                        <option <?= ($row['sizes'] == 'XL') ? 'selected' : '' ?>>XL</option>
-                                                        <option <?= ($row['sizes'] == '2XL') ? 'selected' : '' ?>>2XL</option>
-                                                        <option <?= ($row['sizes'] == '3XL') ? 'selected' : '' ?>>3XL</option>
-                                                        <option <?= ($row['sizes'] == '4XL') ? 'selected' : '' ?>>4XL</option>
-                                                        <option <?= ($row['sizes'] == '5XL') ? 'selected' : '' ?>>5XL</option>
-                                                    </select>
-                                                </td>
-                                                <td class="text-center"><?= htmlspecialchars($row['jerseyNos']) ?></td>
-                                                <td class="text-center"><?= htmlspecialchars($row['colors']) ?></td>
-                                                <td class="text-center"><?= htmlspecialchars($row['qtys']) ?></td>
-                                                <td class="text-center"><?= htmlspecialchars($row['corAs']) ?></td>
-                                                <td class="text-center"><?= ($row['flags'] == 'yes') ? '✔' : '-' ?></td>
-                                                <td class="text-center"><?= ($row['namepackings'] == 'yes') ? '✔' : '-' ?></td>
-                                                <td class="text-center">
-                                                    <button type="button" class="deleteRowButton" data-id="<?= $row['team_id'] ?>">
-                                                        <img src="images/icons/delete.png" alt="" class="iconImg"> Delete
-                                                    </button>
-                                                </td>
+                                                <td><?= $i++ ?></td>
+
+                                                <!-- Name -->
+                                                <td><?= htmlspecialchars($row['player_name']) ?></td>
+
+                                                <!-- Pattern Cut -->
+                                                <td><?= htmlspecialchars($row['pattern_cut']) ?></td>
+
+                                                <!-- Player or Goalie -->
+                                                <td><?= htmlspecialchars($row['player_or_goalie']) ?></td>
+
+                                                <!-- Jersey Size -->
+                                                <td><?= htmlspecialchars($row['jersey_size']) ?></td>
+
+                                                <!-- Jersey No -->
+                                                <td><?= htmlspecialchars($row['jersey_no']) ?></td>
+
+                                                <!-- Jersey Color -->
+                                                <td><?= htmlspecialchars($row['jersey_color']) ?></td>
+
+                                                <!-- Qty -->
+                                                <td><?= htmlspecialchars($row['jersey_qty']) ?></td>
+
+                                                <!-- Jersey Color 2 -->
+                                                <td><?= htmlspecialchars($row['jersey_color2']) ?></td>
+
+                                                <!-- Qty 2 -->
+                                                <td><?= htmlspecialchars($row['jersey_qty2']) ?></td>
+
+                                                <!-- Sock Size -->
+                                                <td><?= htmlspecialchars($row['sock_size']) ?></td>
+
+                                                <!-- Sock Color -->
+                                                <td><?= htmlspecialchars($row['sock_color']) ?></td>
+
+                                                <!-- Sock Qty -->
+                                                <td><?= htmlspecialchars($row['sock_qty']) ?></td>
+
+                                                <!-- Sock Color 2 -->
+                                                <td><?= htmlspecialchars($row['sock_color2']) ?></td>
+
+                                                <!-- Sock Qty 2 -->
+                                                <td><?= htmlspecialchars($row['sock_qty2']) ?></td>
+
+                                                <!-- C or A -->
+                                                <td><?= htmlspecialchars($row['cor_a']) ?></td>
+
+                                                <!-- Name For Packing -->
+                                                <td><?= htmlspecialchars($row['name_for_packing']) ?></td>
+
+                                                <!-- Notes -->
+                                                <td><?= htmlspecialchars($row['notes']) ?></td>
                                             </tr>
                                         <?php endforeach; ?>
                                     <?php else: ?>
-                                        <tr><td colspan="9" class="text-center">No team members found for this order.</td></tr>
-                                    <?php endif; ?>                                 
+                                        <tr>
+                                            <td colspan="18" class="text-center">No team members found</td>
+                                        </tr>
+                                    <?php endif; ?>                               
                                 </tbody>
                                 <tfoot>                                    
                                 </tfoot>
                             </table>
                         </div>
                     </div>
+                </div>
+                <div>
+                    <?php
+                    $order_id = customEncode($order_id);
+                    ?> 
+                    <a href="?vp=<?php echo base64_encode('order_info'); ?>&order_id=<?php echo $order_id; ?>" class="btn btn-primary">Continue Checkout</a>                    
                 </div>
             </div>
         </div>
@@ -636,6 +773,48 @@ if (isset($order_id)) {
     </div>
 </section>
 
+<script src="https://cdn.jsdelivr.net/npm/opentype.js@1.3.4/dist/opentype.min.js"></script>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/loaders/GLTFLoader.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/geometries/DecalGeometry.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/renderers/SVGRenderer.js"></script>
+
+    <script src="https://unpkg.com/three@0.160.0/examples/js/utils/BufferGeometryUtils.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+
+
+    <!-- Jquery -->
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+
+        integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+
+        crossorigin="anonymous"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
+
+        integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
+
+        crossorigin="anonymous"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.activity-indicator/1.0.0/jquery.activity-indicator.min.js"
+
+        integrity="sha512-vIgIa++fkxuAQ95xP3yHzA33Z+iwePLCFeeMcIOqmHhTEAvfBoFap1nswEwU/xE/o4oW0putZ6dbY7JS1emkdQ=="
+
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script type="module" src="js/3dmodel.js?ver=1.0"></script>
 <?php    
     function getPantonName($conn4, $zone, $designId, $type='pantonName') {
         // Step 1: Try direct match in colors table
