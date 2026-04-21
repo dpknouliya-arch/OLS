@@ -530,43 +530,49 @@ if ((isset($_SESSION['JOGOLS']) && ($_SESSION['JOGOLS'] != "")) || (isset($_SESS
                             </div>
 
                             <div class="rightHederSide d-flex gap-2 align-items-center">
-                                <div class="dropdown notificationDropdown">
+                                       <?php if(isset($_SESSION['JOGOLS']) ) {?>
 
-                                    <!-- Bell Icon -->
-                                    <button class="btn position-relative p-0  dropdown_notification_btn" type="button"
-                                        id="notificationDropdown"
-                                        data-bs-toggle="dropdown"
-                                        aria-expanded="false" style="border: none;">
-                                        <figure class="my-auto"><img src="assets/images/icons/notificationIcon.png" alt=""></figure>
+                                            <div class="dropdown notificationDropdown">
 
-                                        <!-- Notification Count -->
-                                        <span class="notificationBadge">
-                                            
-                                        </span>
-                                    </button>
+                                                <!-- Bell Icon -->
+                                                <button class="btn position-relative p-0  dropdown_notification_btn" type="button"
+                                                    id="notificationDropdown"
+                                                    data-bs-toggle="dropdown"
+                                                    aria-expanded="false" style="border: none;">
+                                                    <figure class="my-auto"><img src="assets/images/icons/notificationIcon.png" alt=""></figure>
 
-                                    <!-- Dropdown Panel -->
-                                    <ul class="dropdown-menu dropdown-menu-end notification-menu p-0"
-                                        aria-labelledby="notificationDropdown">
+                                                    <!-- Notification Count -->
+                                                    <span class="notificationBadge">
+                                                        
+                                                    </span>
+                                                </button>
 
-                                        <div class="dropdown-header">Notifications</div>
-                                            <div class="notification_dropdown_list">
+                                                <!-- Dropdown Panel -->
+                                        
+
+                                                <ul class="dropdown-menu dropdown-menu-end notification-menu p-0"
+                                                    aria-labelledby="notificationDropdown">
+
+                                                    <div class="dropdown-header">Notifications</div>
+                                                        <div class="notification_dropdown_list">
+                                                            
+                                                        </div>
+
                                                 
+
+                                                    <div class="dropdown-Footer d-flex gap-2 align-items-center">
+                                                        <button class="notification_action btn "  type="button" data-type="read">
+                                                            <figure class="my-auto"><img src="assets/images/icons/doubleCheck.png" alt=""></figure> Mark all as read
+                                                        </button>
+                                                        <button class="notification_action btn"  type="button"   data-type="delete">
+                                                            <figure class="my-auto"><img src="assets/images/icons/doubleCheck.png" alt=""></figure> Delete all
+                                                        </button>
+                                                    </div>
+                                                </ul>
+
                                             </div>
-
-                                       
-
-                                        <div class="dropdown-Footer d-flex gap-2 align-items-center">
-                                            <button class="notification_action btn "  type="button" data-type="read">
-                                                <figure class="my-auto"><img src="assets/images/icons/doubleCheck.png" alt=""></figure> Mark all as read
-                                            </button>
-                                            <button class="notification_action btn"  type="button"   data-type="delete">
-                                                <figure class="my-auto"><img src="assets/images/icons/doubleCheck.png" alt=""></figure> Delete all
-                                            </button>
-                                        </div>
-                                    </ul>
-
-                                </div>
+                                <?php   }   ?>
+                                
 
                                 <div class="rightAdminProfile  dropdown  ">
 

@@ -14,6 +14,8 @@ $customer_id = $obj_user->customer_id;
 
 
 
+
+
 $conn3 = new mysqli($serverName, $userName, $userPassword, $dbName3);
 
 mysqli_set_charset($conn3, "utf8");
@@ -90,8 +92,6 @@ if (sizeof($a_order_id_list) > 0) {
 
     while ($row_select2 = $rs_select2->fetch_assoc()) {
 
-
-
         $a_draft_num[($row_select2["order_id"])] = $row_select2["draft_num"];
 
     }
@@ -126,7 +126,13 @@ if (sizeof($a_order_id_list) > 0) {
                     foreach ($a_row as $key => $a_data) {
                         $count_row++;
                         $show_status = "";
-                        if (intval($a_data["order_status"]) >= 6) {
+                     
+                        if(intval($a_data["order_status"] == 99)){
+                             $show_status = "Design Concept";
+						}elseif(intval($a_data["order_status"] == 75)){
+                             $show_status = "New Design Request";
+						}
+                        elseif(intval($a_data["order_status"]) >= 6) {
                             $show_status = "Design Completed";
                         } else {
                             switch ($a_data["order_status"]) {
@@ -149,7 +155,10 @@ if (sizeof($a_order_id_list) > 0) {
                             </td>
                             <td class="text-center">
                                 <?php
+                                 
+
                                 if ($a_draft_num[($a_data["order_id"])] != "0") {
+
                                     $use_bg_color = "#AAA";
                                     if ($a_data["order_status"] == '2') {
                                         $use_bg_color = "#55F";
@@ -159,6 +168,7 @@ if (sizeof($a_order_id_list) > 0) {
                                 <?php
                                 }
                                 ?>
+								
                             </td>
                             <td class="text-center"><?php echo $a_data["employee_name"]; ?></td>
                             <td class="text-center">
@@ -201,11 +211,11 @@ if (sizeof($a_order_id_list) > 0) {
 				<div class="modal-body">
 					<div>
 						<div class="form-group">
-							<label for="exampleInputEmail1" style="color:white;">DESIGN NAME</label>
+							<label for="exampleInputEmail1" >DESIGN NAME</label>
 							<input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Input Design Option">
 						</div>
-						<div class="form-group">
-							<label for="exampleFormControlTextarea1" style="color:white;">Notes(If Any)</label>
+						<div class="form-group mb-2" >
+							<label for="exampleFormControlTextarea1">Notes(If Any)</label>
 							<textarea name="approval_textarea" class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
 						</div>
 						<button type="button" class="btn btn-warning approval_btn" onclick="approveDraft()">Approve Design</button>
@@ -229,12 +239,12 @@ if (sizeof($a_order_id_list) > 0) {
 				<div class="modal-body">
 					<form id="reject_form">
 						<div class="form-group">
-							<label for="exampleInputEmail2" style="color:white;">DESIGN NAME</label>
+							<label for="exampleInputEmail2">DESIGN NAME</label>
 							<input type="text" name="design_name" class="form-control" id="exampleInputEmail2" aria-describedby="emailHelp" placeholder="Input Design Option">
 							<input type="hidden" name="dd_id" id="dd_id_reject">
 						</div>
 						<div class="form-group">
-							<label for="exampleFormControlTextarea2" style="color:white;">Reject Reason(Important)</label>
+							<label for="exampleFormControlTextarea2" >Reject Reason(Important)</label>
 							<textarea name="reject_textarea" class="form-control" id="exampleFormControlTextarea2" rows="3"></textarea>
 						</div>
 						<button type="submit" class="btn btn-danger">Reject Design</button>
@@ -303,6 +313,7 @@ function showTab(draft_no,dd_id=''){
 	
 $(document).on('click', '.approval_modal', function() {
 var draft_id = $(this).attr('draft_id');
+
 $('.approval_btn').attr('dd_id', draft_id);
 $('#approvalModal').modal('show');
 })
@@ -319,8 +330,10 @@ $('#rejectModal').modal('show');
 		function approveDraft() {
 
 			var dd_id = $('.approval_btn').attr("dd_id");
-			var approval_note = CKEDITOR.instances.exampleFormControlTextarea1.getData();
-			var design_note = $('#exampleInputEmail1').val();
+			// var approval_note = CKEDITOR.instances.exampleFormControlTextarea1.getData(); 
+			 let approval_note = $('#exampleFormControlTextarea1').val();
+            var design_note =  $('#exampleInputEmail1').val().trim() ; 
+
 			if (design_note.length == 0) {
 				alert("Design Option can't be left blank");
 				return;

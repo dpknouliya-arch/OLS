@@ -27,8 +27,13 @@ $s_user_name = base64_decode($_POST["s_user_name"]);
 $s_user_pwd = base64_decode($_POST["s_password"]);
 $sub_email = base64_decode($_POST["sub_email"]);
 
-$sql_chk = "SELECT sub_user_id FROM tbl_sub_user WHERE s_user_name='".$s_user_name."';";
-$rs_chk = $conn->query($sql_chk);
+$stmt = $conn->prepare("SELECT sub_user_id FROM tbl_sub_user WHERE s_user_name=?");
+$stmt->bind_param("s", $s_user_name);
+$stmt->execute();
+$rs_chk = $stmt->get_result();
+
+
+
 
 if($rs_chk->num_rows > 0){
 
@@ -36,12 +41,13 @@ if($rs_chk->num_rows > 0){
 	$a_result["msg"] = "Duplicate User name.";
 
 }else{
+      
+    
+	$stmt = $conn->prepare("INSERT INTO tbl_sub_user (parent_user_id,s_user_name,nick_name,s_user_pwd,sub_email,date_add) VALUES (?, ?, ?, ?, ?, ?)");
+	$date_add = date("Y-m-d H:i:s");
+	$stmt->bind_param("isssss", $user_id, $s_user_name, $nick_name, $s_user_pwd, $sub_email, $date_add);
 
-	$sql_insert = "INSERT INTO tbl_sub_user (parent_user_id,s_user_name,nick_name,s_user_pwd,sub_email,date_add) VALUES (";
-	$sql_insert .= "'".$user_id."','".$s_user_name."','".addslashes($nick_name)."','".$s_user_pwd."','".$sub_email."','".date("Y-m-d H:i:s")."'";
-	$sql_insert .= "); ";
-
-	if($conn->query($sql_insert)){
+	if($stmt->execute()){
 
 		$a_result["result"] = "success";
 
@@ -98,8 +104,10 @@ if($rs_chk->num_rows > 0){
 
 		$a_result["inner_new_card"] = $inner;
 
-		$sql_count = "SELECT COUNT(*) AS num_row_su FROM tbl_sub_user WHERE parent_user_id='".$user_id."';";
-		$rs_count = $conn->query($sql_count);
+		$stmt_count = $conn->prepare("SELECT COUNT(*) AS num_row_su FROM tbl_sub_user WHERE parent_user_id=?");
+		$stmt_count->bind_param("i", $user_id);
+		$stmt_count->execute();
+		$rs_count = $stmt_count->get_result();
 		$row_count = $rs_count->fetch_assoc();
 
 		$a_result["num_row_su"] = intval($row_count["num_row_su"]);
