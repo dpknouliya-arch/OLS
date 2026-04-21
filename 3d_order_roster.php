@@ -5,83 +5,62 @@ include 'encryption_helper.php';
 $obj_user = json_decode(base64_decode($_SESSION["JOGOLS"]));
 $user_id  = $obj_user->user_id;
 
-if (isset($_GET['order_id'])) {
-    $order_id = customDecode($_GET['order_id']);
-
-    $sql  = "SELECT * FROM design_order WHERE order_id = ?";
-    $stmt = $conn4->prepare($sql);
-    $stmt->bind_param("i", $order_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    if ($result->num_rows > 0) {
-        $order       = $result->fetch_assoc();
-        $designId    = $order['design_id'];
-        $sock_design = $order['sock_design'];
-        $added_date  = $order['added_date'];
-    } else {
-        echo "<p>No design found for this Order ID.</p>";
-        exit;
-    }
-} else {
+if (!isset($_GET['order_id'])) {
     echo "<p>Invalid order ID.</p>";
     exit;
 }
 
-$order_team_data   = [];
-$order_design_data = [];
+$order_id = customDecode($_GET['order_id']);
 
-$sql_team  = "SELECT * FROM order_team WHERE order_id = ?";
-$stmt_team = $conn4->prepare($sql_team);
-$stmt_team->bind_param("i", $order_id);
-$stmt_team->execute();
-$result_team = $stmt_team->get_result();
-while ($row = $result_team->fetch_assoc()) {
-    $order_team_data[] = $row;
+/* ✅ API CALL */
+$apiUrl = "http://localhost:9090/jog_3d/api/CategorySub/get_roster_details.php?order_id=$order_id";
+
+$token = "413d893dbf3f4ffd4619712fd15ba501ed5acaf687253ab8961baf0482aaee78"; // replace with actual token
+
+$ch = curl_init();
+curl_setopt($ch, CURLOPT_URL, $apiUrl);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_HTTPHEADER, [
+    "Authorization: $token",
+    "Content-Type: application/json"
+]);
+
+$response = curl_exec($ch);
+
+if (curl_errno($ch)) {
+    echo curl_error($ch);
+    exit;
 }
 
-$sql_designs  = "SELECT * FROM designs WHERE id = ?";
-$stmt_designs = $conn4->prepare($sql_designs);
-$stmt_designs->bind_param("i", $designId);
-$stmt_designs->execute();
-$result_designs = $stmt_designs->get_result();
-while ($row = $result_designs->fetch_assoc()) {
-    $order_design_data[] = $row;
+curl_close($ch);
+
+$data = json_decode($response, true);
+
+if (!$data || !$data['status']) {
+    echo "<p>API Error</p>";
+    exit;
 }
 
-$design_name    = !empty($order_design_data[0]['name'])       ? $order_design_data[0]['name']       : '—';
-$jersey_type    = !empty($order_design_data[0]['modal_type']) ? $order_design_data[0]['modal_type'] : '—';
+//echo "<pre>"; print_r($data); echo "</pre>"; // debug
+/* ✅ MAP DATA */
+$order = $data['order'];
+$order_team_data = $data['team'];
+$order_design_data = [$data['design']];
+$color_list = $data['colors'];
+
+$designId = $order['design_id'];
+$added_date = $order['added_date'];
+
+$design_name  = $order_design_data[0]['name'] ?? '—';
+$jersey_type  = $order_design_data[0]['modal_type'] ?? '—';
+
 $order_id_enc   = customEncode($order_id);
 $order_date_fmt = !empty($added_date) ? date('d-m-Y H:i:s', strtotime($added_date)) : '—';
+
 $team_name_val  = htmlspecialchars($order['on_team_name'] ?? '');
-$team_year_val  = htmlspecialchars($order['on_year']      ?? '');
+$team_year_val  = htmlspecialchars($order['on_year'] ?? '');
 
-// Detect PK column name (id or team_id)
-$pk_col = 'id';
-$ck = $conn4->query("SELECT id FROM order_team LIMIT 1");
-if (!$ck) {
-    $ck2 = $conn4->query("SELECT team_id FROM order_team LIMIT 1");
-    if ($ck2) $pk_col = 'team_id';
-}
-
-// Fetch color list dynamically from DB
-$color_list = [];
-$color_res  = $conn4->query("SELECT name FROM colors ORDER BY name");
-if ($color_res) {
-    while ($cr = $color_res->fetch_assoc()) {
-        $color_list[] = $cr['name'];
-    }
-}
-if (empty($color_list)) {
-    $color_list = ['Red','Navy','Black','White','Royal Blue','Forest Green','Gold','Maroon'];
-}
-
-// Map PK into each row so JS can track it for UPDATE vs INSERT
-foreach ($order_team_data as &$row) {
-    $row['team_id'] = (int)($row[$pk_col] ?? 0);
-}
-unset($row);
-
+/* 👇 Important for JS */
 $existing_rows_json = json_encode($order_team_data);
 $color_list_json    = json_encode($color_list);
 ?>
@@ -334,8 +313,12 @@ $color_list_json    = json_encode($color_list);
 
     Array.prototype.forEach.call(tbody.rows, function (tr) {
       var cells = tr.cells;
-      /* col 0 = trash btn; data cols start at 1 */
-      function v(i) { var el = cells[i].querySelector('input,select'); return el ? el.value : ''; }
+
+      function v(i) {
+        var el = cells[i].querySelector('input,select');
+        return el ? el.value : '';
+      }
+
       rows.push({
         team_id:          parseInt(tr.dataset.tid || '0', 10),
         player_name:      v(1),
@@ -365,19 +348,37 @@ $color_list_json    = json_encode($color_list);
     btn.disabled = true;
     btn.textContent = 'Saving…';
 
-    fetch('ajax/roster/save_roster.php', {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ order_id: ORDER_ID, rows: rows, team_name: teamName, team_year: teamYear })
+    /* ✅ CHANGE ONLY THIS PART */
+    fetch('http://localhost:9090/jog_3d/api/CategorySub/save_roster.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        // 'Authorization': 'Bearer YOUR_TOKEN'  // optional
+      },
+      body: JSON.stringify({
+        order_id: ORDER_ID,
+        rows: rows,
+        team_name: teamName,
+        team_year: teamYear
+      })
     })
     .then(function (r) {
       if (!r.ok) throw new Error('HTTP ' + r.status);
       return r.json();
     })
     .then(function (data) {
-      if (data.success) {
-        showToast('Roster saved (' + (data.inserted||0) + ' added, ' + (data.updated||0) + ' updated, ' + (data.deleted||0) + ' removed)');
-        setTimeout(function () { window.location.href = CHECKOUT_URL; }, 1000);
+      if (data.status) {   // 👈 API uses "status"
+        showToast(
+          'Roster saved (' +
+          (data.inserted || 0) + ' added, ' +
+          (data.updated || 0) + ' updated, ' +
+          (data.deleted || 0) + ' removed)'
+        );
+
+        setTimeout(function () {
+          window.location.href = CHECKOUT_URL;
+        }, 1000);
+
       } else {
         showToast('Error: ' + (data.message || 'Save failed'));
         btn.disabled = false;

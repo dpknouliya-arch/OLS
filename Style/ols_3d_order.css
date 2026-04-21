@@ -20,6 +20,7 @@
   margin: -20px -30px 0;
   padding: 28px 32px;
   color: var(--text-dark);
+  padding: 50px;
 }
 
 .ols3d-module *,
@@ -251,11 +252,11 @@
 
 /* 3D viewer */
 .ols3d-preview-area {
-  height: 300px; position: relative;
+  height: auto; position: relative;
   background: #F8F9FC;
   overflow: hidden;
 }
-#threejs-container-user { width: 100%; height: 300px; }
+#threejs-container-user { width: 100%; height: 700px; }
 .ols3d-preview-footer {
   padding: 14px 20px; display: flex; gap: 6px; border-top: 1px solid var(--border);
 }
@@ -445,7 +446,7 @@
 /* ── Checkout Layout ─────────────────────────── */
 .ols3d-checkout-grid {
   display: grid;
-  grid-template-columns: 1fr 320px;
+  grid-template-columns: 1fr 620px;
   gap: 20px; align-items: start; margin-bottom: 20px;
 }
 @media (max-width: 900px) { .ols3d-checkout-grid { grid-template-columns: 1fr; } }

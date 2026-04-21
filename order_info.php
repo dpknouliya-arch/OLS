@@ -246,7 +246,7 @@ $delivery_js = json_encode([
         <div class="ols3d-design-thumb">
           <div class="ols3d-design-thumb-img">
             <?php if (!empty($design_image)): ?>
-            <img src="https://jogsports.com/jogdigital/admin/uploads/designs/images/<?= htmlspecialchars($design_image) ?>" alt="<?= htmlspecialchars($design_name) ?>">
+            <img src="http://65.1.164.81/jogdigital/admin/uploads/designs/images/<?= htmlspecialchars($design_image) ?>" alt="<?= htmlspecialchars($design_name) ?>">
             <?php else: ?>
             <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#CBD3E8" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             <?php endif; ?>

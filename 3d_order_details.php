@@ -6,43 +6,115 @@ $obj_user = json_decode(base64_decode($_SESSION["JOGOLS"]));
 $user_id  = $obj_user->user_id;
 
 if (isset($_GET['order_id'])) {
-    $order_id = customDecode($_GET['order_id']);
 
-    $sql  = "SELECT * FROM design_order WHERE order_id = ?";
-    $stmt = $conn4->prepare($sql);
-    $stmt->bind_param("i", $order_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
+  $order_id = customDecode($_GET['order_id']);    
 
-    if ($result->num_rows > 0) {
-        $order    = $result->fetch_assoc();
-        $designId = $order['design_id'];
-        $sock_design = $order['sock_design'];
-        $added_date  = $order['added_date'];
+  $apiUrl = "http://localhost:9090/jog_3d/api/CategorySub/get_order.php?order_id=$order_id";
 
-        $zones = json_decode($order['colorDecals'], true);
-        $logos = json_decode($order['imagedecals'], true);
-        $texts = json_decode($order['textdecals'], true);
+  $token = "413d893dbf3f4ffd4619712fd15ba501ed5acaf687253ab8961baf0482aaee78"; // replace with actual token
 
-        $fab_ary = [
-            'Base'     => $order['fabric_base'],
-            'Neck'     => $order['fabric_neck'],
-            'Mesh'     => $order['fabric_mesh'],
-            'Shoulder' => $order['fabric_shoulder'],
-        ];
+  $ch = curl_init();
 
-        $jersey_coller = $order['fabric_neck'];
-        $jsname        = '';
-        $stripes_name  = '';
+  curl_setopt($ch, CURLOPT_URL, $apiUrl);
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+  curl_setopt($ch, CURLOPT_HTTPHEADER, [
+      "Authorization: $token",
+      "Content-Type: application/json"
+  ]);
 
-        $frontImage = $order['front_image'] ?? '';
-        $backImage  = $order['back_image']  ?? '';
-        $leftImage  = $order['left_image']  ?? '';
-        $rightImage = $order['right_image'] ?? '';
-    } else {
-        echo "<p>No design found for this Order ID.</p>";
+    $response = curl_exec($ch);
+
+    if (curl_errno($ch)) {
+        echo "API Error: " . curl_error($ch);
         exit;
     }
+
+    curl_close($ch);
+
+    $result = json_decode($response, true);
+    $data = $result['data'] ?? null;
+    if (!$data || empty($data)) {
+        echo "<p>No data found.</p>";
+        exit;
+    }
+
+    // ✅ Map API response    
+    $order = $data;
+    
+    $order_team_data = $data['team'] ?? [];
+    $order_design_data = isset($data['design']) ? [$data['design']] : [];
+
+    $designId = $order['design_id'] ?? 0;
+    $added_date = $order['added_date'] ?? '';
+
+    // ✅ Already arrays (no need json_decode if API is correct)
+    //$zones = json_decode($order['colorDecals'] ?? '[]', true);
+    $zones = json_decode($order['colorDecals'], true);
+    $logos = json_decode($order['imagedecals'] ?? '[]', true);
+    $texts = json_decode($order['textdecals'] ?? '[]', true);     
+    
+    function getFabricName($fabId, $token) {
+      if (empty($fabId)) return '';
+      $url = "http://localhost:9090/jog_3d/api/CategorySub/get_fabric_byid.php?fab=" . $fabId;
+      $ch = curl_init();
+      curl_setopt($ch, CURLOPT_URL, $url);
+      curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+      curl_setopt($ch, CURLOPT_HTTPHEADER, [
+          "Authorization: $token",
+          "Content-Type: application/json"
+      ]);
+      $response = curl_exec($ch);
+      if (curl_errno($ch)) {
+          return ''; // fail silently (or log)
+      }
+      curl_close($ch);
+      $res = json_decode($response, true);
+      return $res['data']['title'] ?? '';
+    }
+    function getCollarName($colId, $token) {
+      if (empty($colId)) return '';
+      $url = "http://localhost:9090/jog_3d/api/CategorySub/get_collar_byid.php?coller=" . $colId;
+      $ch = curl_init();
+      curl_setopt($ch, CURLOPT_URL, $url);
+      curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+      curl_setopt($ch, CURLOPT_HTTPHEADER, [
+          "Authorization: $token",
+          "Content-Type: application/json"
+      ]);
+      $response = curl_exec($ch);
+      if (curl_errno($ch)) {
+          return ''; // fail silently (or log)
+      }
+      curl_close($ch);
+      $res = json_decode($response, true);      
+      return $res['data']['title'] ?? '';
+    }
+
+    // Fabric
+    $fab_ary = [
+        'Base'     => getFabricName($order['fabric_base'], $token),
+        'Neck'     => getFabricName($order['fabric_neck'], $token),
+        'Mesh'     => getFabricName($order['fabric_mesh'], $token),
+        'Shoulder' => getFabricName($order['fabric_shoulder'], $token),
+    ];
+
+    $jersey_coller = getCollarName($order['coller_id'], $token);
+    $jsname        = '';
+    $stripes_name  = '';
+
+    $frontImage = $order['front_image'] ?? '';
+    $backImage  = $order['back_image'] ?? '';
+    $leftImage  = $order['left_image'] ?? '';
+    $rightImage = $order['right_image'] ?? '';
+
+    // Design
+    $design_name  = $order['name'] ?? '—';
+    $jersey_type  = $order['modal_type'] ?? '—';
+    $design_image = $order['image'] ?? '';
+
+    $order_date_fmt = !empty($added_date) ? date('d-m-Y H:i:s', strtotime($added_date)) : '—';
+    $order_id_enc   = customEncode($order_id);    
+
 } else {
     echo "<p>Invalid order ID.</p>";
     exit;
@@ -73,13 +145,6 @@ if (isset($designId)) {
         $order_design_data[] = $row;
     }
 }
-
-$design_name  = !empty($order_design_data[0]['name'])       ? $order_design_data[0]['name']       : '—';
-$jersey_type  = !empty($order_design_data[0]['modal_type']) ? $order_design_data[0]['modal_type'] : '—';
-$design_image = !empty($order_design_data[0]['image'])      ? $order_design_data[0]['image']      : '';
-
-$order_date_fmt = !empty($added_date) ? date('d-m-Y H:i:s', strtotime($added_date)) : '—';
-$order_id_enc   = customEncode($order_id);
 
 function getPantonName($conn4, $zone, $designId, $type = 'pantonName') {
     $sql  = "SELECT panton_name, name FROM colors WHERE name = ?";
@@ -127,13 +192,11 @@ function getPantonName($conn4, $zone, $designId, $type = 'pantonName') {
 <link rel="stylesheet" href="Style/ols_3d_order.css">
 
 <!-- Hidden fields for downstream use -->
-<?php foreach ($order_design_data as $value): ?>
-<input type="hidden" name="coller_id"  value="<?= htmlspecialchars($value['coller_id'])  ?>">
-<input type="hidden" name="style_id"   value="<?= htmlspecialchars($value['style_id'])   ?>">
-<input type="hidden" name="stripes_id" value="<?= htmlspecialchars($value['stripes_id']) ?>">
-<?php endforeach; ?>
-<input type="hidden" name="order_id"  value="<?= $order_id ?>">
-<input type="hidden" name="design_id" value="<?= $designId ?>">
+<input type="hidden" name="coller_id"  value="<?= htmlspecialchars($order['coller_id'])  ?>">
+<input type="hidden" name="style_id"   value="<?= htmlspecialchars($order['style_id'])   ?>">
+<input type="hidden" name="stripes_id" value="<?= htmlspecialchars($order['stripes_id']) ?>">
+<input type="hidden" name="order_id"  value="<?= $order['order_id'];?>">
+<input type="hidden" name="design_id" value="<?= $order['design_id']; ?>">
 
 <style>
 @keyframes spin { to { transform: rotate(360deg); } }
@@ -235,40 +298,24 @@ function getPantonName($conn4, $zone, $designId, $type = 'pantonName') {
         <span class="ols3d-panel-title">Customer Art Approval</span>
         <span class="ols3d-badge ols3d-badge-preapproval">Pre-approval</span>
       </div>
-      <div class="ols3d-panel-body">
-        <div class="ols3d-art-dark">
-          <?php if (!empty($frontImage)): ?>
-          <div class="ols3d-art-view">
-            <img src="<?= htmlspecialchars($frontImage) ?>" alt="Front">
-            <figcaption>Front</figcaption>
-          </div>
-          <?php endif; ?>
-          <?php if (!empty($backImage)): ?>
-          <div class="ols3d-art-view">
-            <img src="<?= htmlspecialchars($backImage) ?>" alt="Back">
-            <figcaption>Back</figcaption>
-          </div>
-          <?php endif; ?>
-          <?php if (!empty($leftImage)): ?>
-          <div class="ols3d-art-view">
-            <img src="<?= htmlspecialchars($leftImage) ?>" alt="Left">
-            <figcaption>Left</figcaption>
-          </div>
-          <?php endif; ?>
-          <?php if (!empty($rightImage)): ?>
-          <div class="ols3d-art-view">
-            <img src="<?= htmlspecialchars($rightImage) ?>" alt="Right">
-            <figcaption>Right</figcaption>
-          </div>
-          <?php endif; ?>
-          <?php if (empty($frontImage) && empty($backImage)): ?>
-            <p style="color:#555;font-size:12px;">No preview images available.</p>
-          <?php endif; ?>
+      <div class="ols3d-panel-body">        
+        <div id="svgLoader" style="position: relative;inset: 0;background: rgba(255,255,255,0.85);display: none;align-items: center;justify-content: center;z-index: 20;">
+            <div style="width: 60px;height: 60px;border: 6px solid #ddd;border-top: 6px solid #333;border-radius: 50%;animation: spin 1s linear infinite;">                            
+            </div>
         </div>
-        <div class="ols3d-art-actions">
-          <button class="ols3d-btn-approve">✓ Approve</button>
-          <button class="ols3d-btn-changes">Request Changes</button>
+        <div class="my-auto d-flex align-items-center" id="frontPreview"></div>
+        <div class="my-auto d-flex align-items-center">
+            <div id="backPreview">
+            </div>
+            <div>
+                <figure class="h-100 my-auto d-flex align-items-center"><img src="../<?= $design['sock_design']; ?>" alt="" class="w-30"></figure>
+            </div>
+        </div>                          
+        <div class="ols3d-art-actions">        
         </div>
+        <button class="ols3d-btn-approve">✓ Approve</button>
+        <button class="ols3d-btn-changes">Request Changes</button>
+      </div>
       </div>
     </div>
 
