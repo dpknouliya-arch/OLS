@@ -12,7 +12,7 @@ $status = $_GET['status'] ?? NULL;
 
 ?>
 
-
+ 
 <style>
     :root {
         --primaryText: 28px;
