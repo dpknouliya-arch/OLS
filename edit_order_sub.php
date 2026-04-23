@@ -131,10 +131,21 @@ $s_of_id_list = implode(",", $a_of_id);
 									</tr>
 									<tbody id="prod_item_<?php echo $form_id; ?>">
 										<?php
+
+										$sum_qty_top1 = 0;
+										$sum_qty_top2 = 0;
+										$sum_qty_bottom1 = 0;
+										$sum_qty_bottom2 = 0;
 										for ($m = 0; $m < $num_item; $m++) {
 
 											$row_count = $m + 1;
 											$edit_item = $a_item[$of_id][$m];
+
+
+											$sum_qty_top1 += $edit_item["qty_top1"];
+											$sum_qty_top2 += $edit_item["qty_top2"];
+											$sum_qty_bottom1 += $edit_item["qty_bottom1"];
+											$sum_qty_bottom2 += $edit_item["qty_bottom2"];
 										?>
 											<tr id="prod_item_<?php echo $form_id; ?>_<?php echo $row_count; ?>">
 												<td class="iconBTn" onclick="return deleteItemRow(<?php echo $form_id; ?>,<?php echo $edit_item["oi_id"]; ?>,1,<?php echo $row_count; ?>);">
@@ -224,14 +235,14 @@ $s_of_id_list = implode(",", $a_of_id);
 										<th></th>
 										<th></th>
 										<th></th>
-										<th id="total_jersey_qty_<?php echo $form_id; ?>">0</th>
+										<th id="total_jersey_qty_<?php echo $form_id; ?>"><?= $sum_qty_top1 ?></th>
 										<th></th>
-										<th id="total_jersey_qty2_<?php echo $form_id; ?>">0</th>
+										<th id="total_jersey_qty2_<?php echo $form_id; ?>"><?= $sum_qty_top2 ?></th>
 										<th></th>
 										<th></th>
-										<th id="total_sock_qty_<?php echo $form_id; ?>">0</th>
+										<th id="total_sock_qty_<?php echo $form_id; ?>"><?= $sum_qty_bottom1 ?></th>
 										<th></th>
-										<th id="total_sock_qty2_<?php echo $form_id; ?>">0</th>
+										<th id="total_sock_qty2_<?php echo $form_id; ?>"><?= $sum_qty_bottom2 ?></th>
 										<th></th>
 										<th></th>
 									</tr>
@@ -287,7 +298,7 @@ $s_of_id_list = implode(",", $a_of_id);
 										}
 										?>
 										<th style="width:70px;"><?php echo $split_name1; ?> Size</th>
-										<th><?php echo $split_name1; ?> #</th>
+										<th><?php echo $split_name1; ?> #  </th>
 										<th><?php echo $split_name1; ?> Color</th>
 										<th style="width:60px;">QTY</th>
 										<th style="width:70px;"><?php echo $split_name2; ?> Size</th>
@@ -297,10 +308,15 @@ $s_of_id_list = implode(",", $a_of_id);
 									</tr>
 									<tbody id="prod_item_<?php echo $form_id; ?>">
 										<?php
+										$sum_qty_top1 = 0;
+										$sum_qty_bottom1 = 0;
 										for ($m = 0; $m < $num_item; $m++) {
 
 											$row_count = $m + 1;
 											$edit_item = $a_item[$of_id][$m];
+
+											$sum_qty_top1 += $edit_item["qty_top1"];
+											$sum_qty_bottom1 += $edit_item["qty_bottom1"];
 										?>
 											<tr id="prod_item_<?php echo $form_id; ?>_<?php echo $row_count; ?>">
 												<td style="border-width: 0px; background-color: #FFA; font-size: 16px; color: #F00; cursor: pointer; text-align: right;" onclick="return deleteItemRow(<?php echo $form_id; ?>,<?php echo $edit_item["oi_id"]; ?>,<?php echo $prod_id; ?>,<?php echo $row_count; ?>,2);">
@@ -421,10 +437,10 @@ $s_of_id_list = implode(",", $a_of_id);
 										<?php
 										}
 										?>
-										<th id="total_jersey_qty_<?php echo $form_id; ?>">0</th>
+										<th id="total_jersey_qty_<?php echo $form_id; ?>"><?= $sum_qty_top1 ?></th>
 										<th></th>
 										<th></th>
-										<th id="total_sock_qty_<?php echo $form_id; ?>">0</th>
+										<th id="total_sock_qty_<?php echo $form_id; ?>"><?= $sum_qty_bottom1 ?></th>
 										<th></th>
 									</tr>
 								</table>
@@ -493,10 +509,12 @@ $s_of_id_list = implode(",", $a_of_id);
 									</tr>
 									<tbody id="prod_item_<?php echo $form_id; ?>">
 										<?php
+										$sum_qty_top1 = 0;
 										for ($m = 0; $m < $num_item; $m++) {
 
 											$row_count = $m + 1;
 											$edit_item = $a_item[$of_id][$m];
+											$sum_qty_top1 += $edit_item["qty_top1"];
 										?>
 											<tr id="prod_item_<?php echo $form_id; ?>_<?php echo $row_count; ?>">
 												<td style="border-width: 0px; background-color: #FFA; font-size: 16px; color: #F00; cursor: pointer; text-align: right;" onclick="return deleteItemRow(<?php echo $form_id; ?>,<?php echo $edit_item["oi_id"]; ?>,<?php echo $prod_id; ?>,<?php echo $row_count; ?>,1);">
@@ -618,7 +636,7 @@ $s_of_id_list = implode(",", $a_of_id);
 										<?php
 										}
 										?>
-										<th id="total_jersey_qty_<?php echo $form_id; ?>">0</th>
+										<th id="total_jersey_qty_<?php echo $form_id; ?>"><?= $sum_qty_top1 ?></th>
 										<th></th>
 									</tr>
 								</table>

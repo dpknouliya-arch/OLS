@@ -367,7 +367,7 @@ $maximum_sub_user = 20;
 
         edit_td_s_user_name += '<input type="hidden" id="old_s_user_name' + sub_user_id + '" value="' + $('#td_s_user_name' + sub_user_id).html() + '">';
 
-        edit_td_s_user_name += '<span id="sp_check_result' + sub_user_id + '" style="font-size: 16px; padding-left: 5px;"></span>';
+        edit_td_s_user_name += '<span id="sp_check_result' + sub_user_id + '" style="font-size: 16px; padding-left: 5px; display:block; "></span>';
 
         $('#td_s_user_name' + sub_user_id).html(edit_td_s_user_name);
 
@@ -442,6 +442,7 @@ $maximum_sub_user = 20;
 
 
                     $('#sp_check_result').html('');
+                    $('#sp_check_result' + sub_user_id ).html('');
 
 
 
@@ -523,10 +524,9 @@ $maximum_sub_user = 20;
 
                     alert("Duplicate user");
 
-                    $('#sp_check_result' + sub_user_id).html('<font color=red><i class="fa fa-times"></i></font>');
-
+                
                         if(resp2.username =='Fail'){
-                        $('#sp_check_result' + sub_user_id ).html('<font color=red><i class="fa fa-times"></i></font>');
+                         $('#sp_check_result' + sub_user_id).html('<font color=red><i class="fa fa-times"></i></font>');
                     }
 
                     if(resp2.email =='Fail'){

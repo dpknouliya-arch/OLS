@@ -27,7 +27,6 @@ include('../../db.php');
 $sales_user_id = $_POST["sales_user_id"];
 
 
-
 $sql_s_user = "SELECT * FROM tbl_sales_user WHERE sales_user_id='" . $sales_user_id . "'; ";
 $rs_s_user = $conn->query($sql_s_user);
 
@@ -78,7 +77,7 @@ if ($rs_s_user->num_rows == 0) {
 
     $html .= "</div>";
 
-    $sales_data = "SELECT * FROM `tbl_sales_assignments` WHERE `sales_user_id` = $sales_user_id AND enable=1";
+    $sales_data = "SELECT * FROM tbl_sales_assignments WHERE `sales_user_id` = $sales_user_id AND enable=1";
 
     $html .= "<div class='allUser'>";
 

@@ -20,6 +20,7 @@ $user_id = $obj_user->user_id;
 $customer_id = $obj_user->customer_id;
 
 
+
 $conn3 = new mysqli($serverName, $userName, $userPassword, $dbName3);
 mysqli_set_charset($conn3, "utf8");
 
@@ -59,6 +60,8 @@ if ($num_draft == 0) {
 
 		$draft_no--;
 	}
+
+	$firstDraftData = [] ; 
 ?>
 
 	<style>
@@ -137,80 +140,111 @@ if ($num_draft == 0) {
 			<button title="Back" class="goBackBtn themeBtn2grey  iconBTn" type="button" onclick="return showContentZone();">
 				<figure class="m-0"><img src="images/vector/previousBtn.png" alt=""></figure> Go Back
 			</button>
+		
 			<?php
-
+            
 			foreach ($a_draft as $key => $draft_row) {
+
 				if ($first_dd_id == "") {
 					$first_dd_id = $draft_row["dd_id"];
+					
 				}
+
+				$draft_no = $draft_row["draft_no"] ; 
+
+			
+
 			?>
 				<button type="button" id="tab_id<?php echo $draft_row["draft_no"]; ?>" class="themeBtn  iconBTn tab_btn <?php if ($draft_row["draft_no"] == $num_draft) {
 																															echo 'active_tab';
 																														} ?>" onclick="return showTab(<?php echo $draft_row["draft_no"]; ?>,<?php echo $draft_row["dd_id"]; ?>);">
 					Draft <?php echo $draft_row["draft_no"]; ?>
 				</button>
+
+		
+
+				     
+		  
 			<?php
+
+			    
 			}
 			?>
 		</div>
-		<div id="approval_zone">
-			<?php
-			if ($draft_row["draft_no"] == $num_draft && $order_status == "2") {
-				if ($draft_row["approve_status"] == "new") {
-			?>
-					<div class="btn_panel">
-						<a type="button" href="#add_comment_btn" class="btn btn-primary add_cmt_btn" style="float:left;">Add Comment</a>
-						<button type="button" class="btn btn-success approval_modal" style="width:150px" draft_id="<?php echo $draft_row["dd_id"]; ?>">Approve</button>
-						<button type="button" class="btn btn-danger reject_modal" style="width:150px;" draft_id="<?php echo $draft_row["dd_id"]; ?>">Reject</button>
-					
-						<div style="text-align: left; color: #F00;">* Note: Available to comment only in the latest Draft.</div>
-					</div>
-				<?php
-				} else {
+
+
+
+		<?php 
+            foreach ($a_draft as $key => $draft_row) {
+				$draft_no = $draft_row["draft_no"] ; 
 				?>
-					<div class="btn_panel">
-						<a type="button" href="#add_comment_btn" class="btn btn-primary add_cmt_btn" style="float:left;">Add Comment</a>
-
+					<div id="approval_zone<?= $draft_no ?>"  style="<?=$draft_row["draft_no"] != $num_draft  ? "display:none; " :""?>" class="approval_zone_draft_<?=$draft_no?>  approval_zone_all"> 
 						<?php
+						
+						if ($draft_row["draft_no"] == $num_draft && $order_status == "2") {
+							
+							if ($draft_row["approve_status"] == "new") {
+						?>
+								<div class="btn_panel">
+									<a type="button" href="#add_comment_btn" class="btn btn-primary add_cmt_btn" style="float:left; margin-right:3px; ">Add Comment</a>
+									<button type="button" class="btn btn-success approval_modal" style="width:150px" draft_id="<?php echo $draft_row["dd_id"]; ?>">Approve</button>
+									<button type="button" class="btn btn-danger reject_modal" style="width:150px;" draft_id="<?php echo $draft_row["dd_id"]; ?>">Reject</button>
+								
+									<div style="text-align: left; color: #F00;">* Note: Available to comment only in the latest Draft.</div>
+								</div>
+							<?php
+							} else {
+							?>
+								<div class="btn_panel">
+									<a type="button" href="#add_comment_btn" class="btn btn-primary add_cmt_btn" style="float:left;">Add Comment</a>
 
-						$tmp_app_time = '';
-						if ($draft_row["approve_time"] != "") {
-							$tmp_app_time = '&nbsp;&nbsp;<span class="statusAlertDate">' . $draft_row["approve_time"] . '</span>';
-						}
+									<?php
 
-						if ($draft_row["approve_status"] == "approved") {
-							echo '<div class="status_box"><span class="approve_status">APPROVED</span>' . $tmp_app_time . '</div>';
+									$tmp_app_time = '';
+									if ($draft_row["approve_time"] != "") {
+										$tmp_app_time = '&nbsp;&nbsp;<span class="statusAlertDate">' . $draft_row["approve_time"] . '</span>'; 
+									}
+
+									if ($draft_row["approve_status"] == "approved") {
+										echo '<div class="status_box"><span class="approve_status">APPROVED</span>' . $tmp_app_time . '</div>';
+									} else {
+										echo '<div class="status_box"><span class="reject_status">REJECTED</span>' . $tmp_app_time . '</div>';
+									}
+									?>
+
+									<div style="text-align: left; color: #F00;">* Note: Available to comment only in the latest Draft.</div>
+								</div>
+							<?php
+							}
 						} else {
-							echo '<div class="status_box"><span class="reject_status">REJECTED</span>' . $tmp_app_time . '</div>';
+							
+							?>
+							<div class="btn_panel">
+								<center>
+									<?php
+									$tmp_app_time = '';
+									if ($draft_row["approve_time"] != "") {
+										$tmp_app_time = '&nbsp;&nbsp;<span class="statusAlertDate">' . $draft_row["approve_time"] . '</span>';
+									}
+
+									if ($draft_row["approve_status"] == "approved") {
+										echo '<div class="status_box"><span class="approve_status">APPROVED</span>' . $tmp_app_time . '</div>';
+									} else {
+										echo '<div class="status_box  "><span class="reject_status">REJECTED</span>' . $tmp_app_time . '</div>';
+									}
+									?>
+								</center>
+							</div>
+						<?php
 						}
 						?>
-
-						<div style="text-align: left; color: #F00;">* Note: Available to comment only in the latest Draft.</div>
 					</div>
-				<?php
-				}
-			} else {
-				?>
-				<div class="btn_panel">
-					<center>
-						<?php
-						$tmp_app_time = '';
-						if ($draft_row["approve_time"] != "") {
-							$tmp_app_time = '&nbsp;&nbsp;<span class="statusAlertDate">' . $draft_row["approve_time"] . '</span>';
-						}
-
-						if ($draft_row["approve_status"] == "approved") {
-							echo '<div class="status_box"><span class="approve_status">APPROVED</span>' . $tmp_app_time . '</div>';
-						} else {
-							echo '<div class="status_box"><span class="reject_status">REJECTED</span>' . $tmp_app_time . '</div>';
-						}
-						?>
-					</center>
-				</div>
-			<?php
+				<?
 			}
-			?>
-		</div>
+		?>
+		
+		
+	
 	</div>
 
 	<?php
@@ -244,6 +278,9 @@ if ($num_draft == 0) {
 
 		}*/
 	?>
+		
+
+
 		<div id="d_show_design<?php echo $draft_row["draft_no"]; ?>" style="width: 100%; <?php if ($draft_row["draft_no"] != $num_draft) {
 																								echo 'display:none; ';
 																							} ?>" class="d_show_design">
@@ -293,6 +330,9 @@ if ($num_draft == 0) {
 				}
 
 			?>
+      
+
+
 				<div id="showIMG<?php echo $draft_row["order_file_id"]; ?>">
 
 					<table style="width: 100%; border-spacing: 0px; margin-top: -2px;">

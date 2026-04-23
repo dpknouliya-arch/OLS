@@ -41,9 +41,9 @@ if ((isset($_SESSION['JOGOLS']) && ($_SESSION['JOGOLS'] != "")) || (isset($_SESS
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
         <!-- Css  -->
-        <link rel="stylesheet" href="Style/main.css?var=10.2">
+        <link rel="stylesheet" href="Style/main.css?var=10.3">
         <link rel="stylesheet" href="Style/default.css?var=2.3">
-        <link rel="stylesheet" href="Style/sidebar.css?var=1.7">
+        <link rel="stylesheet" href="Style/sidebar.css?var=1.9">
         <link rel="stylesheet" href="Style/resposive.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
@@ -746,7 +746,7 @@ if ((isset($_SESSION['JOGOLS']) && ($_SESSION['JOGOLS'] != "")) || (isset($_SESS
         <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
        
         <script src="js/main.js"></script>
-        <script src="js/Notification.js?var=13"></script>
+        <script src="js/Notification.js?var=15"></script>
 
         <!-- ionIcons -->
 

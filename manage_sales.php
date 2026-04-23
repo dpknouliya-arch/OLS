@@ -146,7 +146,7 @@ $maximum_sub_user = 20;
 
             <div class="d-flex justify-content-between align-items-center px-0 pb-3">
 
-                <h6>Sales Rep. List (2)</h6>
+                <h6>Sales Rep. List</h6>
 
                 <button type="button" class="btn btn-dark iconBTn XSmall" data-bs-toggle="modal" data-bs-target="#addSalesUser">
 
@@ -234,15 +234,7 @@ $maximum_sub_user = 20;
 
 
 
-                                </div>
-
-
-                                  <!-- 
-                                <button class="btn btn-primary btn_action" onclick="return sendEmailSU('<?=$row_s_user['sales_user_id']?>');" title="Send user info to Email.">';
-
-							                     <i class="fa fa-envelope-o"></i><i class="fa fa-angle-double-right" aria-hidden="true"></i> Mail
-
-						               </button> -->
+                                </div>  
                             </td>
 
                             <td>

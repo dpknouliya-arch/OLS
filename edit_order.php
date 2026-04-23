@@ -409,6 +409,12 @@ $s_of_id_list = implode(",", $a_of_id);
 	#team .leftSide .boxes {
 		padding: 1vw;
 	}
+
+	.required{
+		 border: none !important;
+		 color: red !important;
+		 height: 0px;
+	}
 </style>
 
 <div class="editORderPage">
@@ -464,39 +470,39 @@ $s_of_id_list = implode(",", $a_of_id);
 										<!-- <input type="text" name="Project Name" value="Larsen Yang LLC"> -->
 									</div>
 									<div class="form-group column2">
-										<label for="">Contact</label>
+										<label for="">Contact <span class="required">*</span></label>
 										<input type="text"  name="contact" id="bi_contact"   maxlength="50" value="<?php echo $a_data[0]["bill_contact_name"]; ?>">
 										
 									</div>
 
 									<div class="form-group">
-										<label for="">City</label>
+										<label for="">City <span class="required">*</span> </label>
 										<input type="text" name="city" id="bi_city" maxlength="80" value="<?php echo $a_data[0]["bill_city"]; ?>">
 									</div>
 
 									<div class="form-group">
-										<label for="">ZipCode</label>
+										<label for="">ZipCode <span class="required">*</span> </label>
 										<input type="text" name="zip_code" id="bi_zip_code" maxlength="20" value="<?php echo $a_data[0]["bill_zip_code"]; ?>">
 									</div>
 									<div class="form-group column2">
-										<label for="">Country</label>
+										<label for="">Country <span class="required">*</span> </label>
 										<input type="text"   name="country" id="bi_country"  maxlength="200" value="<?php echo $a_data[0]["bill_country"]; ?>">
 									</div>
 									<div class="form-group column2">
-										<label for="">TAX-ID</label>
+										<label for="">TAX-ID </label>
 										<input type="text" name="tax_id" id="bi_tax_id" maxlength="30" value="<?php echo $a_data[0]["bill_tax_id"]; ?>">
 									</div>
 									<div class="form-group column2">
-										<label for="">Tel</label>
+										<label for="">Tel <span class="required">*</span> </label>
 										<input type="text" name="tel" id="bi_tel" maxlength="30" value="<?php echo $a_data[0]["bill_tel"]; ?>">
 									</div>
 									<div class="form-group column2">
-										<label for="">Email</label>
+										<label for="">Email <span class="required">*</span> </label>
 										<input type="text" name="email" id="bi_email" maxlength="200" value="<?php echo $a_data[0]["bill_email"]; ?>">
 									</div>
 
 									<div class="form-group column2">
-										<label for="">Address</label>
+										<label for="">Address <span class="required">*</span> </label>
 										<textarea name="address_info" id="bi_address" class="form-control" rows="3"><?php echo $a_data[0]["bill_address"]; ?></textarea>
 									</div>
 								</fieldset>
@@ -529,21 +535,21 @@ $s_of_id_list = implode(",", $a_of_id);
 										<input type="text" name="d_company_name" id="de_company_name" maxlength="150" value="<?php echo $a_data[0]["deli_comp_name"]; ?>">
 									</div>
 									<div class="form-group column2">
-										<label for="">Contact</label>
+										<label for="">Contact <span class="required">*</span> </label>
 										<input type="text" name="d_contact" id="de_contact" maxlength="200" value="<?php echo $a_data[0]["deli_contact_name"]; ?>">
 									
 									</div>
 									<div class="form-group">
-										<label for="">City</label>
+										<label for="">City <span class="required">*</span> </label>
 										<input type="text" name="d_city" id="de_city" maxlength="80" value="<?php echo $a_data[0]["deli_city"]; ?>">
 									</div>
 
 									<div class="form-group">
-										<label for="">ZipCode</label>
+										<label for="">ZipCode <span class="required">*</span>  </label>
 										<input type="text" name="d_zip_code" id="de_zip_code" maxlength="20" value="<?php echo $a_data[0]["deli_zip_code"]; ?>">
 									</div>
 									<div class="form-group column2">
-										<label for="">Country</label>
+										<label for="">Country <span class="required">*</span> </label>
 										<input type="text" name="d_country" id="de_country" maxlength="50" value="<?php echo $a_data[0]["deli_country"]; ?>">
 									</div>
 									<div class="form-group column2">
@@ -551,19 +557,18 @@ $s_of_id_list = implode(",", $a_of_id);
 										<input type="text" name="d_tax_id" id="de_tax_id" maxlength="30" value="<?php echo $a_data[0]["deli_tax_id"]; ?>">
 									</div>
 									<div class="form-group column2">
-										<label for="">Tel</label>
+										<label for="">Tel <span class="required">*</span> </label>
 										<input type="text" name="d_tel" id="de_tel" maxlength="30" value="<?php echo $a_data[0]["deli_tel"]; ?>">
 									</div>
 									<div class="form-group column2">
-										<label for="">Email</label>
+										<label for="">Email <span class="required">*</span> </label>
 										<input type="text" name="d_email" id="de_email" maxlength="200" value="<?php echo $a_data[0]["deli_email"]; ?>">
 									</div>
 
 									<div class="form-group column2">
-										<label for="">Address</label>
+										<label for="">Address <span class="required">*</span> </label>
 										<textarea name="d_address_info" class="form-control" id="de_address" rows="3"> <?php echo $a_data[0]["deli_address"]; ?></textarea>
-										<!-- <textarea class="form-control" id="exampleFormControlTextarea1"
-											rows="3">Necessitatibus volup</textarea> -->
+										
 									</div>
 								</fieldset>
 							</div>
@@ -609,13 +614,13 @@ $s_of_id_list = implode(",", $a_of_id);
 							</div>
 
 							<div class="form-group  ">
-								<label for="">Game / Event date</label>
+								<label for="">Game / Event date <span class="required">*</span> </label>
 								<input type="date" name="game_event_date" id="game_event_date" style="width: 100%;" value="<?php echo ($a_data[0]["game_event_date"] == "0000-00-00") ? "" : $a_data[0]["game_event_date"]; ?>">
 								<span class="game_errormsg" style="color: red;font-size: 14px;padding: 12px 20px 6px 20px;"></span>
 							</div>
 
 							<div class="form-group">
-								<label for="">Request due date</label>
+								<label for="">Request due date <span class="required">*</span></label>
 
 								<input type="date" name="req_due_date" id="req_due_date" style="width: 100%;" value="<?php echo ($a_data[0]["req_due_date"] == "0000-00-00") ? "" : $a_data[0]["req_due_date"]; ?>">
 								<span class="req_errormsg" style="color: red;font-size: 14px;padding: 12px 20px 6px 20px;"></span>
@@ -644,15 +649,8 @@ $s_of_id_list = implode(",", $a_of_id);
 								<div class="styled-select">
 									<select style="width: 100%; font-size: 14px;" name="sales_rep" id="sales_rep">
 										<?php
-										$stmt = $conn3->prepare("SELECT * FROM employee WHERE employee_position_id = ? ORDER BY employee_id ASC");
-
-										if (!$stmt) {
-										die("Prepare failed: " . $conn3->error);
-										}
-
-										$position_id = 5;
-										$stmt->bind_param("i", $position_id);
-                                        $emps = $stmt->get_result();
+										$sql_new = "SELECT * FROM employee WHERE employee_position_id='5'";
+										$emps = $conn3->query($sql_new);
 										$num_rows = $emps->num_rows;
 										if ($num_rows > 0) {
 											while ($row_selection = $emps->fetch_assoc()) {
@@ -2157,7 +2155,7 @@ $s_of_id_list = implode(",", $a_of_id);
 																		}
 																		?>
 																		<th style="width:80px; text-align: center;"><?php echo $split_name1; ?> Size</th>
-																		<th style="text-align: center;"><?php echo $split_name1; ?> #</th>
+																		<th style="text-align: center;"><?php echo $split_name1; ?> # </th>
 																		<th style="text-align: center;"><?php echo $split_name1; ?> Color</th>
 																		<th style="width:50px; text-align: center;">QTY</th>
 																		<th style="width:80px; text-align: center;"><?php echo $split_name2; ?> Size</th>
@@ -2315,7 +2313,7 @@ $s_of_id_list = implode(",", $a_of_id);
 
 																		if ($row_product["have_number"] == "1") {
 																		?>
-																			<th style="text-align: center;"><?php echo $split_name; ?> #</th>
+																			<th style="text-align: center;"><?php echo $split_name; ?> # </th>
 																		<?php
 																		}
 																		?>
@@ -2406,11 +2404,6 @@ $s_of_id_list = implode(",", $a_of_id);
 																		<?php
 																		}
 
-																		if ($row_product["have_number"] == "1") {
-																		?>
-																			<th></th>
-																		<?php
-																		}
 																		?>
 																		<th style="text-align: center;"><?php echo $sum_qty_top1; ?></th>
 																		<th></th>
@@ -3480,8 +3473,8 @@ $s_of_id_list = implode(",", $a_of_id);
         isValid &= validateField('#bi_city', VALIDATION_PATTERNS.city, 'Only letters and spaces allowed');
         isValid &= validateField('#de_city', VALIDATION_PATTERNS.city, 'Only letters and spaces allowed');
 
-        isValid &= validateField('#bi_address', VALIDATION_PATTERNS.text, 'Only letters and spaces allowed');
-        isValid &= validateField('#de_address', VALIDATION_PATTERNS.text, 'Only letters and spaces allowed');
+        isValid &= ValidateOnlyEmpty('#bi_address',  'Please fill the address');
+        isValid &= ValidateOnlyEmpty('#de_address','Please fill the address');
 
         isValid &= validateField('#bi_zip_code', VALIDATION_PATTERNS.zipcode, 'Invalid zipcode');
         isValid &= validateField('#de_zip_code', VALIDATION_PATTERNS.zipcode, 'Invalid zipcode');

@@ -338,7 +338,7 @@ include('db.php');
 
                                 <label for=""> Contact <span class="required-star">*</span></label>
 
-                                <input type="tel" name="contact" id="edit_contact" class="form-control" maxlength="30" placeholder="Add Contact Number..">
+                                <input type="tel" name="contact" id="edit_contact" class="form-control" maxlength="30" placeholder="Add Contact Name">
                                 <div id="error_contact" class="validation-message"></div>
 
                             </div>

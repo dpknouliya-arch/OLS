@@ -243,7 +243,7 @@ if (sizeof($a_order_id_list) > 0) {
 							<input type="text" name="design_name" class="form-control" id="exampleInputEmail2" aria-describedby="emailHelp" placeholder="Input Design Option">
 							<input type="hidden" name="dd_id" id="dd_id_reject">
 						</div>
-						<div class="form-group">
+						<div class="form-group mb-2">
 							<label for="exampleFormControlTextarea2" >Reject Reason(Important)</label>
 							<textarea name="reject_textarea" class="form-control" id="exampleFormControlTextarea2" rows="3"></textarea>
 						</div>
@@ -299,6 +299,11 @@ function showTab(draft_no,dd_id=''){
 
 	$('.d_show_design').hide();
 	$('#d_show_design'+draft_no).show();
+
+
+	$('.approval_zone_all').hide(); 
+	$('.approval_zone_draft_'+draft_no).show(); 
+
 
 	setTimeout(function(){
 
