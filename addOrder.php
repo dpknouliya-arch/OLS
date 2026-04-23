@@ -1418,21 +1418,35 @@ addNewTeam Member Modal
 </script>
 
 <script>
-    function removeTable(el) {
+ 
+ function removeTable(el) {
 
-        // Get current tab-pane
-        var $tabPane = $(el).closest('.tab-pane');
+    // Get current tab-pane
+    var $tabPane = $(el).closest('.tab-pane');
+    var tabPaneId = $tabPane.attr('id');
 
-        var tabPaneId = $tabPane.attr('id'); // e.g. fill-tabpanel-1
+    // Find corresponding tab button BEFORE removing pane
+    var $tabBtn = $('button[data-bs-target="#' + tabPaneId + '"], a[href="#' + tabPaneId + '"]');
+    var $li = $tabBtn.closest('li');
 
-        // Remove the tab-pane
-        $tabPane.remove();
+    // Remove tab-pane
+    $tabPane.remove();
 
-        // Remove corresponding tab button
-        $('button[data-bs-target="#' + tabPaneId + '"], a[href="#' + tabPaneId + '"]').remove();
+    // Remove tab button + li
+    // $li.remove();
 
-        // Activate first available tab
+    // Activate first available tab
+    var $firstTab = $('.nav-tabs button:first, .nav-tabs a:first');
+
+    if ($firstTab.length) {
+        $firstTab.addClass('active');
+
+        var target = $firstTab.attr('data-bs-target') || $firstTab.attr('href');
+        $(target).addClass('show active');
     }
+}
+
+
 
     function addItemRow(form_id, prod_id) {
 
