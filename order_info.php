@@ -5,40 +5,19 @@ include 'encryption_helper.php';
 $obj_user = json_decode(base64_decode($_SESSION["JOGOLS"]));
 $user_id  = $obj_user->user_id;
 
-if (isset($_GET['order_id'])) {
-    $order_id = customDecode($_GET['order_id']);
-    $sql  = "SELECT * FROM design_order WHERE order_id = ?";
-    $stmt = $conn4->prepare($sql);
-    $stmt->bind_param("i", $order_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    if ($result->num_rows > 0) {
-        $order       = $result->fetch_assoc();
-        $designId    = $order['design_id'];
-        $sock_design = $order['sock_design'];
-        $added_date  = $order['added_date'];
-    } else { echo "<p>No design found.</p>"; exit; }
-} else { echo "<p>Invalid order ID.</p>"; exit; }
-
-$order_team_data = [];
-$order_design_data = [];
-
+if (!isset($_GET['order_id'])) { echo "<p>Invalid order ID.</p>"; exit; }
 $order_id = customDecode($_GET['order_id']);
-$sql_team = "SELECT * FROM order_team WHERE order_id = ?";
-$stmt_team = $conn4->prepare($sql_team);
-$stmt_team->bind_param("i", $order_id);
-$stmt_team->execute();
-$result_team = $stmt_team->get_result();
-while ($row = $result_team->fetch_assoc()) { $order_team_data[] = $row; }
 
-if (isset($designId)) {
-    $sql_designs = "SELECT * FROM designs WHERE id = ?";
-    $stmt_designs = $conn4->prepare($sql_designs);
-    $stmt_designs->bind_param("i", $designId);
-    $stmt_designs->execute();
-    $result_designs = $stmt_designs->get_result();
-    while ($row = $result_designs->fetch_assoc()) { $order_design_data[] = $row; }
-}
+$api_result = callAPI("get_order.php?order_id=$order_id");
+$data       = $api_result['data'] ?? null;
+if (!$data) { echo "<p>No data found.</p>"; exit; }
+
+$order             = $data;
+$order_team_data   = $data['team']   ?? [];
+$order_design_data = isset($data['design']) ? [$data['design']] : [];
+$designId          = $order['design_id']   ?? 0;
+$sock_design       = $order['sock_design'] ?? '';
+$added_date        = $order['added_date']  ?? '';
 
 $a_data = [0 => null, 1 => null];
 $sql_select = "SELECT * FROM tbl_address WHERE user_id='" . (int)$user_id . "' AND enable=1 AND (is_billing_addr=1 OR is_deliver_addr=1) ORDER BY is_billing_addr DESC, is_deliver_addr DESC";
@@ -271,7 +250,7 @@ $delivery_js = json_encode([
         <div class="ols3d-design-thumb">
           <div class="ols3d-design-thumb-img">
             <?php if (!empty($design_image)): ?>
-            <img src="https://jogsports.com/jogdigital/admin/uploads/designs/images/<?= htmlspecialchars($design_image) ?>" alt="<?= htmlspecialchars($design_name) ?>">
+            <img src="http://65.1.164.81/jogdigital/admin/uploads/designs/images/<?= htmlspecialchars($design_image) ?>" alt="<?= htmlspecialchars($design_name) ?>">
             <?php else: ?>
             <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#CBD3E8" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             <?php endif; ?>

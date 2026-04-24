@@ -28,6 +28,10 @@ if($conn->query($sql_insert1)){
 	$row_next_id = $rs_next_id->fetch_assoc();
 	$new_of_id = $row_next_id["next_of_id"];
 
+
+
+
+ 
 	$sql_update1 = "UPDATE tbl_draft_of SET of_id='".$new_of_id."',draft_id='".$draft_id."',order_date='".date("Y-m-d")."',req_due_date=NULL,order_status='new',order_code=NULL,code_match=NULL,ship_status=NULL,date_add='".$add_date."',re_order_id=lkr_order_main_id,lkr_order_main_id=NULL WHERE of_id='".$of_id."';";
 	$conn->query($sql_update1);
 
@@ -37,6 +41,8 @@ if($conn->query($sql_insert1)){
 	/*$sql_update2 = "UPDATE tbl_draft_oi SET of_id='".$new_of_id."' WHERE of_id='".$of_id."';";
 	$conn->query($sql_update2);*/
 
+}else{
+	 die ("Else") ; 
 }
 
 $a_result["result"] = "success";

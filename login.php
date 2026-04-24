@@ -175,22 +175,7 @@
                                 <br>
                                 <div class="form-group">
                                     <div class="grid2">
-                                        <button type="submit" class="themeBtn border-none submit-btn  column2" onclick="return signInsub();">Login</button>
-                                        <!-- <button class="link_cls themeBtn2grey MemberForgotPasswordBtn" id="MemberForgotPasswordBtn">Forgot password?</button>
-                                        <p class="text-center column2 mb-0">or</p>
-                                        <div class="forGetPassNote column2" style="display: none;">
-                                            <div class="form-group" style="padding-bottom: 4px;">
-                                                <div class="input-group" style="margin: 0 0 15px 0px;">
-                                                    <label for="" class="XSmall">You will get an email with link inside. And you can change password by following that link</label>
-                                                    <div class="input-group-prepend d-flex position-relative">
-                                                        <button class="input-group-text">
-                                                            <ion-icon name="send-outline"></ion-icon>
-                                                        </button>
-                                                        <input type="text" name="user_email" id="user_email" class="form-control" placeholder="Email" value="">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div> -->
+                                        <button type="submit" class="themeBtn border-none submit-btn  column2" >Login</button>
                                         <p class="text-center column2 mb-0">or</p>
                                         <a class="btn teamMemberLoginBtn team_m_login column2" href="#userLogin"> User - Login Here</a>
                                         <a href="#SalesLogin" class="btn salesLoginOls team_m_login column2" id="salesloginform">Login as Sales</a>
@@ -324,25 +309,7 @@
     <!-- ionIcons -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        // $(document).ready(function() {
 
-        //     $('#salesloginform').click(function() {
-
-        //         $('#loginFormSeles').show(300); // Adjust duration as needed
-
-        //         $('#loginForm').hide(300);
-
-        //     });
-
-        //     $('#salesloginOls').click(function() {
-
-        //         $('#loginForm').show(300);
-
-        //         $('#loginFormSeles').hide(300);
-
-        //     });
-
-        // });
         $(document).ready(function() {
             $('.userForgotPasswordBtn').click(function() {
                 $('.forGetPassNote').fadeToggle(300); // Adjust duration as needed
@@ -568,10 +535,13 @@
         function signInsub() {
             var user_name = $('#user_name_sub').val();
             var user_password = $('#user_password_sub').val();
+
             if (user_name == '' || user_password == '') {
                 alert('Please input User name and Password.');
                 return false;
             }
+
+            let errMsg= $('#loginFormSub').find('#err_msg'); 
             $.ajax({
                 type: "POST",
                 dataType: "json",
@@ -583,11 +553,11 @@
                 success: function(resp) {
                     //alert(resp.result);
                     if (resp.result == "success") {
-                        $('#err_msg').hide();
+                        errMsg.hide();
                         //alert("success");
-                        window.location.href = "../?vp=<?php echo base64_encode("order_form_sub"); ?>";
+                        window.location.href = "./?vp=<?php echo base64_encode("order_form_sub"); ?>";
                     } else {
-                        $('#err_msg').show();
+                        errMsg.show();
                     }
                 }
 
@@ -615,8 +585,22 @@
                 success: function(resp) {
                     if (resp.result == "success") {
                         $('#err_msg').hide();
-                        alert("login success"); 
+                       
                         //alert("success");
+                        // apiLoginJS(user_email, user_password)
+                        //     .then(apiResp => {
+
+                        //         console.log(apiResp);
+
+                        //         if (apiResp.token) {
+                        //             localStorage.setItem("API_TOKEN", apiResp.token); // store in browser
+                        //         }
+
+                        //         window.location.href = "./?vp=ZGFzaGJvcmFkTWFpbg==";
+                        //     });
+
+
+
                         if (resp.first_login != 0) {
                             window.location.href = "./?vp=ZGFzaGJvcmFkTWFpbg==";
                         } else {
@@ -631,6 +615,20 @@
 
         }
 
+        // function apiLoginJS(email, password) {
+        //     return fetch("api/login.php", {
+        //         method: "POST",
+        //         headers: {
+        //             "Content-Type": "application/json"
+        //         },
+        //         body: JSON.stringify({
+        //             email: email,
+        //             password: password
+        //         })
+        //     })
+        //     .then(res => res.json());
+        // }
+
 
 
         function signInSales() {
@@ -640,6 +638,8 @@
                 alert('Please input Username.');
                 return false;
             }
+
+            let errorMsg = $('#loginFormSeles').find('#err_msg');
             $.ajax({
                 type: "POST",
                 dataType: "json",
@@ -650,15 +650,15 @@
                 },
                 success: function(resp) {
                     if (resp.result == "success") {
-                        $('#err_msg').hide();
+                        errorMsg.hide();
                         //alert("success");
                         if (resp.first_login != 0) {
-                            window.location.href = "../?vp=<?php echo base64_encode("sales_dash"); ?>";
+                            window.location.href = "./?vp=<?php echo base64_encode("sales_dash"); ?>";
                         } else {
-                            window.location.href = "../?vp=<?php echo base64_encode("sales_dash"); ?>";
+                            window.location.href = "./?vp=<?php echo base64_encode("sales_dash"); ?>";
                         }
                     } else {
-                        $('#err_msg').show();
+                        errorMsg.show();
                     }
                 }
             });

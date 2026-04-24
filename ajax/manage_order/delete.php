@@ -1,6 +1,9 @@
 <?php
 session_start();
 
+include('../../db.php');
+include('../../encryption_helper.php');
+
 if( !isset($_SESSION["JOGOLS"]) ){
 
 	$a_result["result"] = "fail";
@@ -9,28 +12,63 @@ if( !isset($_SESSION["JOGOLS"]) ){
 	exit();
 }
 
-include('../../db.php');
 
-$a_of_id = array();
 
-$sql_select = "SELECT DISTINCT of_id FROM tbl_draft_of WHERE draft_id='".$_POST["draft_id"]."'";
-$rs_select = $conn->query($sql_select);
-while($row_draft = $rs_select->fetch_assoc()){
+	$a_of_id = array();
+	$draft_id = isset($_POST['draft_id']) ? customDecode($_POST['draft_id']) : 0;
 
-	$a_of_id[] = $row_draft["of_id"];
+	$a_of_id = [];
 
+	// 👉 Start transaction
+	$conn->begin_transaction();
+
+try {
+
+  
+
+    // ✅ Step 1: Get of_id list safely
+    $stmt = $conn->prepare("SELECT DISTINCT of_id FROM tbl_draft_of WHERE of_id = ?");
+    $stmt->bind_param("i", $draft_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    while ($row = $result->fetch_assoc()) {
+        $a_of_id[] = $row["of_id"];
+    }
+
+    // ✅ Step 2: Delete from tbl_draft_oi (only if IDs exist)
+    if (!empty($a_of_id)) {
+
+        // create placeholders (?, ?, ?)
+        $placeholders = implode(',', array_fill(0, count($a_of_id), '?'));
+
+        $types = str_repeat('i', count($a_of_id));
+
+        $stmt = $conn->prepare("DELETE FROM tbl_draft_oi WHERE of_id IN ($placeholders)");
+        $stmt->bind_param($types, ...$a_of_id);
+        $stmt->execute();
+    }
+
+    // ✅ Step 3: Delete from tbl_draft_of
+    $stmt = $conn->prepare("DELETE FROM tbl_draft_of WHERE of_id = ?");
+    $stmt->bind_param("i", $draft_id);
+    $stmt->execute();
+
+    // ✅ Commit if all good
+    $conn->commit();
+
+    $a_result["result"] = "success";
+
+} catch (Exception $e) {
+
+    $conn->rollback();
+
+    $a_result["result"] = "error";
+    $a_result["message"] = $e->getMessage();
 }
 
-$s_of_id = implode(",", $a_of_id);
-
-$delete_item = "DELETE FROM tbl_draft_oi WHERE of_id IN (".$s_of_id."); ";
-$conn->query($delete_item);
-
-$delete_order_form = "DELETE FROM tbl_draft_of WHERE draft_id='".$_POST["draft_id"]."'; ";
-$conn->query($delete_order_form);
 
 
-$a_result["result"] = "success";
 
 echo json_encode($a_result);
 ?>

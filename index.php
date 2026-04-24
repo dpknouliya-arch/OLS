@@ -41,9 +41,9 @@ if ((isset($_SESSION['JOGOLS']) && ($_SESSION['JOGOLS'] != "")) || (isset($_SESS
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
         <!-- Css  -->
-        <link rel="stylesheet" href="Style/main.css?var=10.2">
+        <link rel="stylesheet" href="Style/main.css?var=10.3">
         <link rel="stylesheet" href="Style/default.css?var=2.3">
-        <link rel="stylesheet" href="Style/sidebar.css?var=1.7">
+        <link rel="stylesheet" href="Style/sidebar.css?var=1.9">
         <link rel="stylesheet" href="Style/resposive.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
@@ -210,8 +210,8 @@ if ((isset($_SESSION['JOGOLS']) && ($_SESSION['JOGOLS'] != "")) || (isset($_SESS
                                 <span class="menu-title">Add Order
                                 </span>
                             </a>
-                        </li>
-                        <li class="nav-item  <?php if ($_GET['vp'] == base64_encode('manage_order')) {
+                        </li>  
+                        <li class="nav-item  <?php if ($_GET['vp'] == base64_encode('manage_order')  ||  strpos(base64_decode($_GET['vp']), 'edit_order') !== false) {
                                                     echo 'active';
                                                 } ?> ">
                             <a class="nav-link" href="?vp=<?php echo base64_encode('manage_order'); ?>">
@@ -290,6 +290,14 @@ if ((isset($_SESSION['JOGOLS']) && ($_SESSION['JOGOLS'] != "")) || (isset($_SESS
                                 <span class="menu-title">Manage Users</span>
                             </a>
                         </li>
+
+
+                    <li class="nav-item <?php if($_GET['vp'] == base64_encode('archived')){echo 'active' ;}?>">
+                            <a class="nav-link" href="?vp=<?php echo base64_encode('archived');?>">
+                            <i class="menu-icon fa fa-archive"></i>
+                            <span class="menu-title">Archived Orders</span>
+                            </a>
+                    </li>
 
 
                         <!-- <li class="nav-item ">
@@ -530,43 +538,49 @@ if ((isset($_SESSION['JOGOLS']) && ($_SESSION['JOGOLS'] != "")) || (isset($_SESS
                             </div>
 
                             <div class="rightHederSide d-flex gap-2 align-items-center">
-                                <div class="dropdown notificationDropdown">
+                                       <?php if(isset($_SESSION['JOGOLS']) ) {?>
 
-                                    <!-- Bell Icon -->
-                                    <button class="btn position-relative p-0  dropdown_notification_btn" type="button"
-                                        id="notificationDropdown"
-                                        data-bs-toggle="dropdown"
-                                        aria-expanded="false" style="border: none;">
-                                        <figure class="my-auto"><img src="assets/images/icons/notificationIcon.png" alt=""></figure>
+                                            <div class="dropdown notificationDropdown">
 
-                                        <!-- Notification Count -->
-                                        <span class="notificationBadge">
-                                            
-                                        </span>
-                                    </button>
+                                                <!-- Bell Icon -->
+                                                <button class="btn position-relative p-0  dropdown_notification_btn" type="button"
+                                                    id="notificationDropdown"
+                                                    data-bs-toggle="dropdown"
+                                                    aria-expanded="false" style="border: none;">
+                                                    <figure class="my-auto"><img src="assets/images/icons/notificationIcon.png" alt=""></figure>
 
-                                    <!-- Dropdown Panel -->
-                                    <ul class="dropdown-menu dropdown-menu-end notification-menu p-0"
-                                        aria-labelledby="notificationDropdown">
+                                                    <!-- Notification Count -->
+                                                    <span class="notificationBadge">
+                                                        
+                                                    </span>
+                                                </button>
 
-                                        <div class="dropdown-header">Notifications</div>
-                                            <div class="notification_dropdown_list">
+                                                <!-- Dropdown Panel -->
+                                        
+
+                                                <ul class="dropdown-menu dropdown-menu-end notification-menu p-0"
+                                                    aria-labelledby="notificationDropdown">
+
+                                                    <div class="dropdown-header">Notifications</div>
+                                                        <div class="notification_dropdown_list">
+                                                            
+                                                        </div>
+
                                                 
+
+                                                    <div class="dropdown-Footer d-flex gap-2 align-items-center">
+                                                        <button class="notification_action btn "  type="button" data-type="read">
+                                                            <figure class="my-auto"><img src="assets/images/icons/doubleCheck.png" alt=""></figure> Mark all as read
+                                                        </button>
+                                                        <button class="notification_action btn"  type="button"   data-type="delete">
+                                                            <figure class="my-auto"><img src="assets/images/icons/doubleCheck.png" alt=""></figure> Delete all
+                                                        </button>
+                                                    </div>
+                                                </ul>
+
                                             </div>
-
-                                       
-
-                                        <div class="dropdown-Footer d-flex gap-2 align-items-center">
-                                            <button class="notification_action btn "  type="button" data-type="read">
-                                                <figure class="my-auto"><img src="assets/images/icons/doubleCheck.png" alt=""></figure> Mark all as read
-                                            </button>
-                                            <button class="notification_action btn"  type="button"   data-type="delete">
-                                                <figure class="my-auto"><img src="assets/images/icons/doubleCheck.png" alt=""></figure> Delete all
-                                            </button>
-                                        </div>
-                                    </ul>
-
-                                </div>
+                                <?php   }   ?>
+                                
 
                                 <div class="rightAdminProfile  dropdown  ">
 
@@ -740,7 +754,7 @@ if ((isset($_SESSION['JOGOLS']) && ($_SESSION['JOGOLS'] != "")) || (isset($_SESS
         <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
        
         <script src="js/main.js"></script>
-        <script src="js/Notification.js?var=13"></script>
+        <script src="js/Notification.js?var=15"></script>
 
         <!-- ionIcons -->
 

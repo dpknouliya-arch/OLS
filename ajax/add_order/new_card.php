@@ -182,7 +182,12 @@
 
                             <?php
 
-                            // Calculate number of rows needed - use Excel data count or default to 16
+                             $totalqty1 = 0; 
+                             $totalqty2 = 0 ; 
+                             $totalqty3 = 0; 
+                             $totalqty4 = 0; 
+
+                            // Calculate number of rows needed - use Excel data count or default to 10
                             $row_count = !empty($excel_data) ? count($excel_data) : 10;
 
 
@@ -239,10 +244,23 @@
                                 $ca_val = strtolower(getExcelValue($excel_row, 15));
 
 
+                                         
+                            $excel_val_qty1 = (int)(getExcelValue($excel_row, 6) ?? 0);
+                            $execel_val_qty2 = (int)(getExcelValue($excel_row, 8) ?? 0 ) ; 
+                            $excel_val_qty3 = (int) (getExcelValue($excel_row, 11) ?? 0);
+                            $excel_val_qty4 = (int) (getExcelValue($excel_row, 13) ?? 0);
+
+                            $totalqty1 += $excel_val_qty1;
+                            $totalqty2 += $execel_val_qty2;
+                            $totalqty3 += $excel_val_qty3;
+                            $totalqty4 += $excel_val_qty4;
+
+
+
 
                             ?>
 
-                                <tr id="prod_item_<?php echo $form_id; ?>_<?= $tet ?>">
+                                <tr id="prod_item_<?php echo $form_id; ?>_<?= $tet ?>"  data-prod_id="<?= $prod_id ?>"  data-form_id = <?= $form_id ?> >
 
                                     <td>
 
@@ -392,20 +410,20 @@
                             <th></th>
                             <th></th>
 
-                            <th id="total_jersey_qty_<?php echo $form_id; ?>">0</th>
+                            <th id="total_jersey_qty_<?php echo $form_id; ?>"><?= $totalqty1 ?></th>
 
                             <th></th>
 
-                            <th id="total_jersey_qty2_<?php echo $form_id; ?>">0</th>
+                            <th id="total_jersey_qty2_<?php echo $form_id; ?>"><?= $totalqty2 ?></th>
 
                             <th></th>
                             <th></th>
 
-                            <th id="total_sock_qty_<?php echo $form_id; ?>">0</th>
+                            <th id="total_sock_qty_<?php echo $form_id; ?>"><?= $totalqty3 ?></th>
 
                             <th></th>
 
-                            <th id="total_sock_qty2_<?php echo $form_id; ?>">0</th>
+                            <th id="total_sock_qty2_<?php echo $form_id; ?>"><?= $totalqty4 ?></th>
 
                             <th></th>
                             <th></th>
@@ -602,7 +620,7 @@
                                 $pg_val = strtolower(getExcelValue($excel_row, $row_product["choose_pg"] == "1" ? ($row_product["have_name"] == "1" ? 2 : 1) : 0));
                             ?>
 
-                                <tr id="prod_item_<?php echo $form_id; ?>_<?= $tet ?>">
+                                <tr id="prod_item_<?php echo $form_id; ?>_<?= $tet ?>" data-prod_id="<?= $prod_id ?>"  data-form_id = <?= $form_id ?>>
 
                                     <td>
 
@@ -1104,7 +1122,7 @@
 
                             ?>
 
-                                <tr id="prod_item_<?php echo $form_id; ?>_<?= $tet ?>">
+                                <tr id="prod_item_<?php echo $form_id; ?>_<?= $tet ?>"  data-prod_id="<?= $prod_id ?>"  data-form_id = <?= $form_id ?> >
 
                                     <td>
 

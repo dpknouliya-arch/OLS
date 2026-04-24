@@ -12,7 +12,7 @@ $status = $_GET['status'] ?? NULL;
 
 ?>
 
-
+ 
 <style>
     :root {
         --primaryText: 28px;
@@ -356,6 +356,8 @@ $status = $_GET['status'] ?? NULL;
     .pageHeader {
     margin: 0 auto;
 }
+
+
 </style>
 
 

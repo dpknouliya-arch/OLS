@@ -12,7 +12,7 @@ include('../../db.php');
 
 $user_details = json_decode(base64_decode($_SESSION['JOGOLS']));
 $user_id = $user_details->user_id;
-$customer_id = $user_details->customer_id;
+$customer_id = $user_details->customer_id; 
 
 
 // ============== SECURE: Use prepared statements for all queries ==============
@@ -79,8 +79,7 @@ $result = $stmt->get_result();
 $locker_result = $result->fetch_all(MYSQLI_ASSOC);
 
 
-// ============== SECURE: Parameterized filter inputs ==============
-$orderDetails = isset($_POST['orderDetails']) ? (int)$_POST['orderDetails'] : 0;
+$orderDetails = isset($_POST['orderDetails']) ? $_POST['orderDetails'] : 0;
 $year = isset($_POST['year']) ? (int)$_POST['year'] : 0;
 $invoice = isset($_POST['inv_status']) ? $_POST['inv_status'] : NULL;
 $search = isset($_POST['search']) ? $_POST['search'] : NULL;
@@ -93,95 +92,64 @@ $where_condition = "";
 $bind_params = [];
 $bind_types = "";
 
-// Build where clause with prepared statement parameters
+
+
+
+$limit_sql  = $orderDetails ? " LIMIT $offset, $per_page "  :   " LIMIT 5";
+$where_condition = "";
+
 if ($orderDetails) {
-    if (!empty($year)) {
-        $where_condition .= " AND YEAR(qd.created_date) = ? ";
-        $bind_params[] = $year;
-        $bind_types .= 'i';
-    }
-
-    if (!empty($invoice)) {
-        // Validate invoice status to prevent injection
-        $allowed_statuses = ['Paid', 'Outstanding', 'Pending'];
-        if (in_array($invoice, $allowed_statuses)) {
-            if ($invoice === 'Paid') {
-                $where_condition .= " AND calc.invoice_status = 'Paid' ";
-            } elseif ($invoice === 'Outstanding') {
-                $where_condition .= " AND calc.invoice_status = 'Outstanding' ";
-            } elseif ($invoice === 'Pending') {
-                $where_condition .= " AND (calc.invoice_status IS NULL OR calc.invoice_status NOT IN ('Paid','Outstanding')) ";
-            }
-        }
-    }
-
-    if (!empty($search)) {
-        $search_param = "%{$search}%";
-        $where_condition .= " AND (tqd.est_number LIKE ? OR
-                                     tqd.cust_name LIKE ?  OR
-                                     tqd.po_number LIKE ? OR
-                                     tp.prod_name LIKE ? OR
-                                     qd.conv_by LIKE ?  OR
-                                     qd.jog_code LIKE ?) ";
-        // Add search parameter 6 times for each LIKE
-        for ($i = 0; $i < 6; $i++) {
-            $bind_params[] = $search_param;
-        }
-        $bind_types .= 'ssssss';
-    }
-
-    // Add pagination params
-    $bind_params[] = $offset;
-    $bind_params[] = $per_page;
-    $bind_types .= 'ii';
+	$where_condition  = "  AND YEAR(qd.created_date)='$year'  
+		                        AND (('$invoice' = 'Paid'    AND calc.invoice_status = 'Paid')
+		 					    OR ('$invoice' = 'Outstanding'  AND calc.invoice_status = 'Outstanding')
+  					  	        OR ('$invoice' = 'Pending' AND (calc.invoice_status IS NULL OR calc.invoice_status NOT IN ('Paid','Outstanding')))
+								)";
+	if ($search) {
+		$where_condition .= " AND (tqd.est_number LIKE '%$search%' OR 
+			                             tqd.cust_name LIKE '%$search%'  OR 
+										 tqd.po_number LIKE '%$search%' OR 
+										 tp.prod_name  LIKE '%$search%' OR 
+                                         qd.conv_by   LIKE '%$search%'  OR 
+										 qd.jog_code LIKE '%$search%' 
+										 ) ";
+	}
 }
 
-$sql = "SELECT qd.conv_id AS conv_id,
-               qd.jog_code AS ex_code,
-               qd.conv_by AS sales_person,
-               qd.created_date AS order_date,
-               qd.conv_status AS sales_status,
-               qd.invoice_link AS invoice_link,
+$ex_codes = "'".implode("','"  , $codes)."'"; 
 
-               tqd.qdoc_id AS qdoc_id,
-               tqd.est_number AS estimate_number,
-               tqd.cust_name AS customer_name,
-               tqd.po_number AS po_number,
+$sql = "SELECT  qd.conv_id AS conv_id ,
+	               qd.jog_code AS ex_code , 
+	               qd.conv_by AS sales_person  ,   
+	               qd.created_date AS order_date  , 
+				   qd.conv_status AS sales_status ,
+				   qd.invoice_link AS invoice_link,  
 
-               COUNT(tqi.qdoci_id) AS total_items,
-               SUM(tqi.qty) AS total_qty,
-               tqi.pro_type AS product_type,
+				   tqd.qdoc_id AS qdoc_id , 
+				   tqd.est_number AS estimate_number , 
+				   tqd.cust_name AS customer_name ,
+				   tqd.po_number AS po_number ,  
+ 
+                   COUNT(tqi.qdoci_id) AS total_items , 
+				   SUM(tqi.qty) AS total_qty , 
+				   tqi.pro_type AS product_type , 
+                   
+				  CASE WHEN tqd.inv_no IS NULL THEN 'Not Created'
+                       WHEN calc.invoice_status = 'Paid' THEN 'Paid'
+                       WHEN calc.invoice_status = 'Outstanding' THEN 'Unpaid'
+                       ELSE 'Pending'
+				 END AS invoice_status ,
+                
+				tp.prod_name AS product_name 
+				FROM quotation_data AS qd  
+				LEFT JOIN  tbl_quote_doc AS tqd  ON tqd.qdoc_id = qd.qdoci_id 
+				LEFT JOIN  tbl_quote_item AS tqi ON tqi.qdoc_id = qd.qdoci_id 
+				LEFT JOIN  tbl_product AS tp     ON tp.prod_type = tqi.pro_type  
+				LEFT JOIN  calculator AS calc    ON calc.invoice = tqd.inv_no  
+		   Where   qd.jog_code IN($ex_codes)  $where_condition  GROUP BY tqi.qdoc_id  ORDER BY qd.created_date DESC  $limit_sql";
 
-              CASE WHEN tqd.inv_no IS NULL THEN 'Not Created'
-                   WHEN calc.invoice_status = 'Paid' THEN 'Paid'
-                   WHEN calc.invoice_status = 'Outstanding' THEN 'Unpaid'
-                   ELSE 'Pending'
-             END AS invoice_status,
 
-            tp.prod_name AS product_name
-            FROM quotation_data AS qd
-            LEFT JOIN tbl_quote_doc AS tqd ON tqd.qdoc_id = qd.qdoci_id
-            LEFT JOIN tbl_quote_item AS tqi ON tqi.qdoc_id = qd.qdoci_id
-            LEFT JOIN tbl_product AS tp ON tp.prod_type = tqi.pro_type
-            LEFT JOIN calculator AS calc ON calc.invoice = tqd.inv_no
-       WHERE qd.jog_code IN ($placeholders) $where_condition
-       GROUP BY tqi.qdoc_id
-       ORDER BY qd.created_date DESC $limit_sql";
 
-// Prepare the statement with dynamic parameters
-$stmt = $conn5->prepare($sql);
-if (!$stmt) {
-    die('Prepare failed: ' . $conn5->error);
-}
-
-// Build parameter array: first codes, then filter params
-$params = array_merge($codes, $bind_params);
-$types = str_repeat('s', count($codes)) . $bind_types;
-
-$stmt->bind_param($types, ...$params);
-$stmt->execute();
-$sales_result = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
-$stmt->close();
+$sales_result = $conn5->query($sql)->fetch_all(MYSQLI_ASSOC);
 
 
 $total_rows = COUNT($sales_result);

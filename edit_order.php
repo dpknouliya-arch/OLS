@@ -1,6 +1,8 @@
 <?php
 include('check-session.php');
 include('db.php');
+include('encryption_helper.php');
+
 
 
 $obj_user = json_decode(base64_decode($_SESSION["JOGOLS"]));
@@ -19,8 +21,13 @@ $TTL_SHELL = 0;
 $ttl_top = 0;
 $ttl_bottom = 0;
 
-$sql_draft = "SELECT * FROM tbl_draft_of WHERE draft_id='" . $draft_id . "' AND enable=1 ORDER BY of_id ASC;";
-$rs_draft = $conn->query($sql_draft);
+
+
+$sql_draft = "SELECT * FROM tbl_draft_of WHERE draft_id = ? AND enable = 1 ORDER BY of_id ASC";
+$stmt = $conn->prepare($sql_draft);
+$stmt->bind_param("s", $draft_id); // use "s" if draft_id is string
+$stmt->execute();
+$rs_draft = $stmt->get_result();
 $num_row = $rs_draft->num_rows;
 
 
@@ -39,8 +46,12 @@ if ($num_row > 0) {
 	exit();
 }
 
-$sql_sub_user = "SELECT sub_user_id,nick_name FROM tbl_sub_user WHERE parent_user_id='" . $user_id . "' AND enable=1 ORDER BY nick_name ASC; ";
-$rs_sub_user = $conn->query($sql_sub_user);
+$sql_sub_user = "SELECT sub_user_id,nick_name FROM tbl_sub_user WHERE parent_user_id= ?  AND enable=1 ORDER BY nick_name ASC";
+$stmt = $conn->prepare($sql_sub_user);
+$stmt->bind_param("i", $user_id); // use "s" if draft_id is string
+$stmt->execute();
+$rs_sub_user = $stmt->get_result();
+
 
 if ($rs_sub_user->num_rows > 0) {
 	while ($row_sub_user = $rs_sub_user->fetch_assoc()) {
@@ -398,6 +409,12 @@ $s_of_id_list = implode(",", $a_of_id);
 	#team .leftSide .boxes {
 		padding: 1vw;
 	}
+
+	.required{
+		 border: none !important;
+		 color: red !important;
+		 height: 0px;
+	}
 </style>
 
 <div class="editORderPage">
@@ -453,45 +470,39 @@ $s_of_id_list = implode(",", $a_of_id);
 										<!-- <input type="text" name="Project Name" value="Larsen Yang LLC"> -->
 									</div>
 									<div class="form-group column2">
-										<label for="">Country</label>
-										<input type="text" name="country" id="bi_country" maxlength="50" value="<?php echo $a_data[0]["bill_country"]; ?>">
-										<!-- <div class="styled-select">
-											<select id="country">
-												<option value="country Option" selected>USA</option>
-												<option value="country Option">country 2</option>
-												<option value="country Option">country 3</option>
-											</select>
-										</div> -->
+										<label for="">Contact <span class="required">*</span></label>
+										<input type="text"  name="contact" id="bi_contact"   maxlength="50" value="<?php echo $a_data[0]["bill_contact_name"]; ?>">
+										
 									</div>
 
 									<div class="form-group">
-										<label for="">City</label>
+										<label for="">City <span class="required">*</span> </label>
 										<input type="text" name="city" id="bi_city" maxlength="80" value="<?php echo $a_data[0]["bill_city"]; ?>">
 									</div>
 
 									<div class="form-group">
-										<label for="">ZipCode</label>
+										<label for="">ZipCode <span class="required">*</span> </label>
 										<input type="text" name="zip_code" id="bi_zip_code" maxlength="20" value="<?php echo $a_data[0]["bill_zip_code"]; ?>">
 									</div>
 									<div class="form-group column2">
-										<label for="">Contact</label>
-										<input type="text" name="contact" id="bi_contact" maxlength="200" value="<?php echo $a_data[0]["bill_contact_name"]; ?>">
+										<label for="">Country <span class="required">*</span> </label>
+										<input type="text"   name="country" id="bi_country"  maxlength="200" value="<?php echo $a_data[0]["bill_country"]; ?>">
 									</div>
 									<div class="form-group column2">
-										<label for="">TAX-ID</label>
+										<label for="">TAX-ID </label>
 										<input type="text" name="tax_id" id="bi_tax_id" maxlength="30" value="<?php echo $a_data[0]["bill_tax_id"]; ?>">
 									</div>
 									<div class="form-group column2">
-										<label for="">Tel</label>
+										<label for="">Tel <span class="required">*</span> </label>
 										<input type="text" name="tel" id="bi_tel" maxlength="30" value="<?php echo $a_data[0]["bill_tel"]; ?>">
 									</div>
 									<div class="form-group column2">
-										<label for="">Email</label>
+										<label for="">Email <span class="required">*</span> </label>
 										<input type="text" name="email" id="bi_email" maxlength="200" value="<?php echo $a_data[0]["bill_email"]; ?>">
 									</div>
 
 									<div class="form-group column2">
-										<label for="">Address</label>
+										<label for="">Address <span class="required">*</span> </label>
 										<textarea name="address_info" id="bi_address" class="form-control" rows="3"><?php echo $a_data[0]["bill_address"]; ?></textarea>
 									</div>
 								</fieldset>
@@ -510,7 +521,7 @@ $s_of_id_list = implode(",", $a_of_id);
 											<label for="check" class="XSmall">
 												Same
 												as Billing Info
-												<span><!-- This span is needed to create the "checkbox" element --></span>
+												<span></span>
 											</label>
 										</div>
 
@@ -524,27 +535,21 @@ $s_of_id_list = implode(",", $a_of_id);
 										<input type="text" name="d_company_name" id="de_company_name" maxlength="150" value="<?php echo $a_data[0]["deli_comp_name"]; ?>">
 									</div>
 									<div class="form-group column2">
-										<label for="">Country</label>
+										<label for="">Contact <span class="required">*</span> </label>
 										<input type="text" name="d_contact" id="de_contact" maxlength="200" value="<?php echo $a_data[0]["deli_contact_name"]; ?>">
-										<!-- <div class="styled-select">
-											<select id="country">
-												<option value="country Option " selected>USA</option>
-												<option value="country Option">country 2</option>
-												<option value="country Option">country 3</option>
-											</select>
-										</div> -->
+									
 									</div>
 									<div class="form-group">
-										<label for="">City</label>
+										<label for="">City <span class="required">*</span> </label>
 										<input type="text" name="d_city" id="de_city" maxlength="80" value="<?php echo $a_data[0]["deli_city"]; ?>">
 									</div>
 
 									<div class="form-group">
-										<label for="">ZipCode</label>
+										<label for="">ZipCode <span class="required">*</span>  </label>
 										<input type="text" name="d_zip_code" id="de_zip_code" maxlength="20" value="<?php echo $a_data[0]["deli_zip_code"]; ?>">
 									</div>
 									<div class="form-group column2">
-										<label for="">Contact</label>
+										<label for="">Country <span class="required">*</span> </label>
 										<input type="text" name="d_country" id="de_country" maxlength="50" value="<?php echo $a_data[0]["deli_country"]; ?>">
 									</div>
 									<div class="form-group column2">
@@ -552,19 +557,18 @@ $s_of_id_list = implode(",", $a_of_id);
 										<input type="text" name="d_tax_id" id="de_tax_id" maxlength="30" value="<?php echo $a_data[0]["deli_tax_id"]; ?>">
 									</div>
 									<div class="form-group column2">
-										<label for="">Tel</label>
+										<label for="">Tel <span class="required">*</span> </label>
 										<input type="text" name="d_tel" id="de_tel" maxlength="30" value="<?php echo $a_data[0]["deli_tel"]; ?>">
 									</div>
 									<div class="form-group column2">
-										<label for="">Email</label>
+										<label for="">Email <span class="required">*</span> </label>
 										<input type="text" name="d_email" id="de_email" maxlength="200" value="<?php echo $a_data[0]["deli_email"]; ?>">
 									</div>
 
 									<div class="form-group column2">
-										<label for="">Address</label>
+										<label for="">Address <span class="required">*</span> </label>
 										<textarea name="d_address_info" class="form-control" id="de_address" rows="3"> <?php echo $a_data[0]["deli_address"]; ?></textarea>
-										<!-- <textarea class="form-control" id="exampleFormControlTextarea1"
-											rows="3">Necessitatibus volup</textarea> -->
+										
 									</div>
 								</fieldset>
 							</div>
@@ -578,12 +582,7 @@ $s_of_id_list = implode(",", $a_of_id);
 
 
 						<div class="submitBUtton column2">
-							<!-- <a  class="themeBtn iconBTn" data-target="#order" data-bs-toggle="tab" role="tab" aria-controls="order" aria-selected="false">
-								Save and Continue 3333
-								<figure class="m-0"><img src="images/vector/nextBtn.png" alt=""></figure>
-							</a> -->
-
-
+				
 							<a class="themeBtn iconBTn movetoOrderItem">
 								Save and Continue
 								<figure class="m-0"><img src="images/vector/nextBtn.png" alt=""></figure>
@@ -615,13 +614,13 @@ $s_of_id_list = implode(",", $a_of_id);
 							</div>
 
 							<div class="form-group  ">
-								<label for="">Game / Event date</label>
+								<label for="">Game / Event date <span class="required">*</span> </label>
 								<input type="date" name="game_event_date" id="game_event_date" style="width: 100%;" value="<?php echo ($a_data[0]["game_event_date"] == "0000-00-00") ? "" : $a_data[0]["game_event_date"]; ?>">
 								<span class="game_errormsg" style="color: red;font-size: 14px;padding: 12px 20px 6px 20px;"></span>
 							</div>
 
 							<div class="form-group">
-								<label for="">Request due date</label>
+								<label for="">Request due date <span class="required">*</span></label>
 
 								<input type="date" name="req_due_date" id="req_due_date" style="width: 100%;" value="<?php echo ($a_data[0]["req_due_date"] == "0000-00-00") ? "" : $a_data[0]["req_due_date"]; ?>">
 								<span class="req_errormsg" style="color: red;font-size: 14px;padding: 12px 20px 6px 20px;"></span>
@@ -698,6 +697,7 @@ $s_of_id_list = implode(",", $a_of_id);
 						</div>
 					</div>
 				</div>
+
 				<div class="tab-pane tab-pane-forboc fade" id="team" role="tabpanel" aria-labelledby="team-tab">
 					<div class="row">
 						<div class="col-md-8 leftSide">
@@ -712,16 +712,34 @@ $s_of_id_list = implode(",", $a_of_id);
 									</div>
 									<div class="form-group">
 										<label for="" class=" ">Year</label>
-										<input type="text" name="input_on_year" id="input_on_year" value="" maxlength="50">
+										<select class="form-select" name="input_on_year" id="input_on_year">
+										<option value="">-- Select Year --</option>
+                                             <?php
+                                            $currentYear = date("Y");
+                                            for ($year = $currentYear - 5; $year <= $currentYear + 5; $year++) {
+                                                echo '<option value="' . $year . '">' . $year . '</option>';
+                                            }
+                                            ?>
+										</select>
+										
 									</div>
 
 									<div class="form-group column2">
 										<label for="" class=" ">Order Form</label>
 										<div class="styled-select column2">
 											<select id="prod_id">
+												<option value="">--Select Order Form --</option>
 												<?php
-												$sql_product = "SELECT * FROM tbl_product ORDER BY prod_id ASC";
-												$rs_product = $conn->query($sql_product);
+												$stmt = $conn->prepare("SELECT * FROM tbl_product ORDER BY prod_id ASC");
+
+												if (!$stmt) {
+												die("Prepare failed: " . $conn->error);
+												}
+
+												$stmt->execute();
+
+												$rs_product = $stmt->get_result();
+								
 
 												while ($row_product = $rs_product->fetch_assoc()) {
 													echo "<option value=\"" . $row_product["prod_id"] . '">' . $row_product["prod_name"] . "</option>'; ";
@@ -743,21 +761,29 @@ $s_of_id_list = implode(",", $a_of_id);
 												Continue <figure class="m-0"><img src="images/vector/nextBtn.png" alt=""></figure>
 											</span>
 
-											<div class="upload-btn-wrapper">
+											<!-- <div class="upload-btn-wrapper"> -->
 												<!-- <button class="btn themeBtn2 d-flex gap-3">
 													<figure class="m-0"><img src="images/vector/upload.png"
 															alt=""></figure> Upload Order Form
 												</button>
-												<input type="file" name="myFile" /> -->
+												<input type="file" name="myFile" /> 
+												</figure> -->
 
 
-
-												</figure>
-												<span class="btn themeBtn2 d-flex gap-3" onclick="return chooseUploadProcess();">
-													<figure class="m-0">
-														<img src="images/vector/upload.png" alt=""> Upload Order Form
+												
+												<span class="" style="height: 55px; width: 151px; overflow: hidden; position: relative ;top: 10px;">
+													<input type="file" class="form-control " accept=".xlsx" name="order_form_file" id="order_form_file">
 												</span>
-											</div>
+
+												<button class="orderFormUpload btn btn-sm btn themeBtn2 iconBTn" type="button">
+													<figure class="m-0">
+														<img src="images/vector/upload.png" alt="">
+													</figure>
+													<span>Upload Order Form </span>
+												</button>
+
+
+											<!-- </div> -->
 										</div>
 									</div>
 								</fieldset>
@@ -784,17 +810,27 @@ $s_of_id_list = implode(",", $a_of_id);
 						<div class="mt-4">
 							<ul class="nav nav-tabs whiteBg" id="teamTab" role="tablist">
 								<?php
-								$sql_draft = "SELECT * FROM tbl_draft_of WHERE draft_id='" . $draft_id . "' AND enable=1 ORDER BY of_id ASC;";
-								$rs_draft = $conn->query($sql_draft);
+								$sql_draft = "SELECT * FROM tbl_draft_of 
+								WHERE draft_id = ? 
+								AND enable = 1 
+								ORDER BY of_id ASC";
+
+								$stmt = $conn->prepare($sql_draft);
+
+								$stmt->bind_param("s", $draft_id); 
+
+								$stmt->execute();
+
+								$rs_draft = $stmt->get_result();
 								$a_item = array();
 								$i = 0;
 								while ($row_item = $rs_draft->fetch_assoc()) {
 								?>
 									<li class="nav-item" role="presentation">
-										<a class="nav-link <?php if ($i == 0) {
+										<a class="nav-link   teamDetailsNavitems  <?php if ($i == 0) {
 																echo "active";
 																$fisrtid = $row_item["of_id"];
-															} ?> " id="fill-tab-<?php echo $row_item["of_id"]; ?>" data-bs-toggle="tab" href="#fill-tabpanel-<?php echo $row_item["of_id"]; ?>" role="tab" aria-controls="fill-tabpanel-<?php echo $row_item["of_id"]; ?>" aria-selected="true"> Team <?php echo $row_item["of_id"]; ?> </a>
+															} ?> " id="fill-tab-<?php echo $row_item["of_id"]; ?>" data-bs-toggle="tab" href="#fill-tabpanel-<?php echo $row_item["of_id"]; ?>" role="tab"  data-i = "<?= $i ?>"   aria-controls="fill-tabpanel-<?php echo $row_item["of_id"]; ?>" aria-selected="true"> Team <?php echo $row_item["of_id"]; ?> </a>
 									</li>
 								<?php
 									$i++;
@@ -826,17 +862,22 @@ $s_of_id_list = implode(",", $a_of_id);
 
 										$form_id = $k + 1;
 
-										$sql_product = "SELECT * FROM tbl_product WHERE prod_id='" . $prod_id . "';";
-										$rs_product = $conn->query($sql_product);
-										$row_product = $rs_product->fetch_assoc();
+										$stmt = $conn->prepare("SELECT * FROM tbl_product WHERE prod_id = ? LIMIT 1");
+										$stmt->bind_param("i", $prod_id); // use "s" if prod_id is string
+
+										$stmt->execute();
+
+										$rs_product = $stmt->get_result();
+
+										$row_product = $rs_product->fetch_assoc(); // ✅ same final variable
 
 										if ($a_data[$k]["xls_name"] != "") {
 									?>
 											<center id="sameteam<?php echo $of_id; ?>">
-												<div class="tab-content" id="tab-content">
+												   <div class="tab-content" id="tab-content">
 													<div class="tab-pane <?php if ($fisrtid == $of_id) {
 																				echo "active";
-																			} ?>" id="fill-tabpanel-<?php echo $of_id; ?>" role="tabpanel" aria-labelledby="fill-tab-<?php echo $of_id; ?>">
+																			} ?>" id="fill-tabpanel-<?php echo $of_id; ?>" role="tabpanel" aria-labelledby="fill-tab-<?php echo $of_id; ?>"  data-first_id = "<?= $fisrtid ?>">
 														<div class="prod_card" id="prod_card<?php echo $form_id; ?>" card-id="<?php echo $form_id; ?>">
 															<input type="hidden" id="obj_size<?php echo $form_id; ?>" value="<?php echo base64_encode(json_encode($a_size)); ?>">
 															<input type="hidden" name="prod_id_list[<?php echo $form_id; ?>]" value="1">
@@ -856,6 +897,8 @@ $s_of_id_list = implode(",", $a_of_id);
 																	</span>
 																	<?php echo " (" . $row_product["prod_name"] . ")"; ?>
 																	<?php if ($a_data[$k]["re_order_id"] == "") { ?>
+
+
 																		<i class="fa fa-minus-circle" style="font-size: 16px; color: #F00; cursor: pointer;" onclick="return deleteProductCard(<?php echo $form_id; ?>);"></i>
 																	<?php } else { ?>
 																		(RE-ORDER) <i class="fa fa-minus-circle" style="font-size: 16px; color: #999; " title="Re-Order form can not be deleted."></i>
@@ -882,15 +925,36 @@ $s_of_id_list = implode(",", $a_of_id);
 
 										} else if ($is_assigned == "0") {
 
-											$sql_size = "SELECT * FROM tbl_size WHERE prod_id='" . $prod_id . "' AND enable=1 ORDER BY split_order ASC,sort_no ASC;";
-											$rs_size = $conn->query($sql_size);
+											$sql_size = "SELECT * FROM tbl_size 
+											WHERE prod_id = ? 
+											AND enable = 1 
+											ORDER BY split_order ASC, sort_no ASC";
 
+											$stmt = $conn->prepare($sql_size);
+
+											if (!$stmt) {
+											die("Prepare failed: " . $conn->error);
+											}
+
+											$stmt->bind_param("i", $prod_id); // use "s" if prod_id is string
+
+											$stmt->execute();
+
+											$rs_size = $stmt->get_result();
+										
 											$a_size = array();
 											while ($row_size = $rs_size->fetch_assoc()) {
 												$a_size[($row_size["split_order"])][] = $row_size;
 												$spl_order = $row_size["split_order"];
 											}
 
+											$ttl_jersey = 0;
+											$ttl_jersey_qty_2 = 0;
+											$ttl_sock_qty = 0;
+											$ttl_sock_qty_2 = 0;
+											$TTL_SHELL = 0;
+											$ttl_top = 0;
+											$ttl_bottom = 0;
 
 
 											$num_item = isset($a_item[$of_id]) ? sizeof($a_item[$of_id]) : 0;
@@ -901,7 +965,7 @@ $s_of_id_list = implode(",", $a_of_id);
 													<div class="tab-content" id="tab-content">
 														<div class="tab-pane <?php if ($fisrtid == $of_id) {
 																					echo "active";
-																				} ?>" id="fill-tabpanel-<?php echo $of_id; ?>" role="tabpanel" aria-labelledby="fill-tab-<?php echo $of_id; ?>">
+																				} ?>" id="fill-tabpanel-<?php echo $of_id; ?>" role="tabpanel" aria-labelledby="fill-tab-<?php echo $of_id; ?>"   data-first_id = "<?= $fisrtid ?>">
 															<div class="prod_card" id="prod_card<?php echo $form_id; ?>" card-id="<?php echo $form_id; ?>">
 																<input type="hidden" id="obj_size<?php echo $form_id; ?>" value="<?php echo base64_encode(json_encode($a_size)); ?>">
 																<input type="hidden" name="prod_id_list[<?php echo $form_id; ?>]" value="1">
@@ -909,7 +973,7 @@ $s_of_id_list = implode(",", $a_of_id);
 																<input type="hidden" id="edit_of_id<?php echo $form_id; ?>" name="edit_of_id[<?php echo $form_id; ?>]" value="<?php echo $of_id; ?>">
 																<table class="tbl_item_form hockey&sock" style="width: 100%;">
 																	<tr class="theader">
-																		<th class="tablecount text-center">01</th>
+																		<th class="tablecount text-center"></th>
 																		<th colspan="15" class="text-center">
 																			<h6 class="my-auto">
 																				<span class="sp_outter_panel" id="sp_outter_panel<?php echo $form_id; ?>">
@@ -931,21 +995,7 @@ $s_of_id_list = implode(",", $a_of_id);
 																					(RE-ORDER) <i class="fa fa-minus-circle" style="font-size: 16px; color: #999; " title="Re-Order form can not be deleted."></i>
 																				<?php } ?>
 																			</h6>
-																			<!-- <div class="d-inline"><h6><?php echo $form_name; ?>(<?php echo $row_product["prod_name"]; ?>) <i class="fa fa-minus-circle" data-toggle="tooltip" title="Click to delete order form" style="font-size: 16px; color: #F00; cursor: pointer;" onclick="return deleteProductCard(<?php echo $form_id; ?>);"></i></h6> 
-																			<span class="d-inline m-2" onclick="return editFormName(<?php echo $form_id; ?>);">
-																				<figure class="m-0 d-inline"><img
-																						src="images/vector/edit.png" alt="">
-																				</figure>
-																			</span>
-																			<a href="#" class="d-inline deleteTable"
-																				onclick="removeTable(this)">
-
-																				<figure class="m-0 d-inline"><img
-																						src="images/vector/delter.png" alt="">
-																				</figure>
-
-																			</a>
-																			</div> -->
+																			
 																		</th>
 																		<th colspan="2">
 																			<?php
@@ -1204,7 +1254,7 @@ $s_of_id_list = implode(",", $a_of_id);
 																		<th class="tablecount">01</th>
 																		<th colspan="15">
 																			<div class="d-inline">
-																				<h6><?php echo $form_name; ?>(<?php echo $row_product["prod_name"]; ?>) <i class="fa fa-minus-circle" data-toggle="tooltip" title="Click to delete order form" style="font-size: 16px; color: #F00; cursor: pointer;" onclick="return deleteProductCard(<?php echo $form_id; ?>);"></i></h6>
+																				<h6><?php echo $form_name; ?>(<?php echo $row_product["prod_name"]; ?>) <i class="fa fa-minus-circle" data-toggle="tooltip" title="Click to delete order form" style="font-size: 16px; color: #F00; cursor: pointer;"></i></h6>
 																				<a href="#" class="d-inline m-2">
 																					<figure class="m-0 d-inline"><img
 																							src="images/vector/edit.png" alt="">
@@ -1454,21 +1504,19 @@ $s_of_id_list = implode(",", $a_of_id);
 																<input type="hidden" name="prod_id_list[<?php echo $form_id; ?>]" value="<?php echo $prod_id ?>">
 																<input type="hidden" id="form_name_list<?php echo $form_id; ?>" name="form_name_list[<?php echo $form_id; ?>]" value="<?php echo $form_name; ?>">
 																<input type="hidden" id="edit_of_id<?php echo $form_id; ?>" name="edit_of_id[<?php echo $form_id; ?>]" value="<?php echo $of_id; ?>">
-																<table class="tbl_item_form Bag-Hat-Accessories" style="width: 100%;">
+																<table class="tbl_item_form Bag-Hat-Accessories"  data-delete_id = "<?= customEncode($of_id) ?>"   style="width: 100%;">
 																	<tr class="theader">
 																		<th class="tablecount text-center">01</th>
 																		<th colspan="7">
 																			<div class="d-inline">
-																				<!-- <h6><?php echo $form_name; ?>(<?php echo $row_product["prod_name"]; ?>) <i class="fa fa-minus-circle" data-toggle="tooltip" title="Click to delete order form" style="font-size: 16px; color: #F00; cursor: pointer;" onclick="return deleteProductCard(<?php echo $form_id; ?>);"></i></h6> -->
+																				
+																
 																				<h6 class="my-auto text-center"><?php echo $form_name; ?>(<?php echo $row_product["prod_name"]; ?>)
-																					<!-- 
-																					<figure class="m-0 d-inline"><img
-																							src="images/vector/edit.png" alt="">
-																					</figure> -->
-
-																					<figure class="m-0 d-inline iconBTn" onclick="return deleteProductCard(<?php echo $form_id; ?>);">
+																				<button class="delete_form_btn bg-transparent border-none p-0 m-0" type="button">
+																					<figure class="m-0 d-inline iconBTn" >
 																						<img src="images/vector/delter.png" alt="" style="width: 30px; background: #FFF; padding: 6px;margin-left: 20px;">
 																					</figure>
+																				</button>
 
 
 
@@ -2108,7 +2156,7 @@ $s_of_id_list = implode(",", $a_of_id);
 																		}
 																		?>
 																		<th style="width:80px; text-align: center;"><?php echo $split_name1; ?> Size</th>
-																		<th style="text-align: center;"><?php echo $split_name1; ?> #</th>
+																		<th style="text-align: center;"><?php echo $split_name1; ?> # </th>
 																		<th style="text-align: center;"><?php echo $split_name1; ?> Color</th>
 																		<th style="width:50px; text-align: center;">QTY</th>
 																		<th style="width:80px; text-align: center;"><?php echo $split_name2; ?> Size</th>
@@ -2266,7 +2314,7 @@ $s_of_id_list = implode(",", $a_of_id);
 
 																		if ($row_product["have_number"] == "1") {
 																		?>
-																			<th style="text-align: center;"><?php echo $split_name; ?> #</th>
+																			<th style="text-align: center;"><?php echo $split_name; ?> # </th>
 																		<?php
 																		}
 																		?>
@@ -2357,11 +2405,6 @@ $s_of_id_list = implode(",", $a_of_id);
 																		<?php
 																		}
 
-																		if ($row_product["have_number"] == "1") {
-																		?>
-																			<th></th>
-																		<?php
-																		}
 																		?>
 																		<th style="text-align: center;"><?php echo $sum_qty_top1; ?></th>
 																		<th></th>
@@ -2393,6 +2436,8 @@ $s_of_id_list = implode(",", $a_of_id);
 						</div>
 					</div>
 				</div>
+
+
 			</div>
 	</div>
 	</form>
@@ -2415,7 +2460,7 @@ $s_of_id_list = implode(",", $a_of_id);
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-	console.log("Draft id  " + "<?php echo $draft_id ?>");
+
 
 	function editFormName(form_id) {
 
@@ -2730,17 +2775,31 @@ $s_of_id_list = implode(",", $a_of_id);
 		$('#sp_outter_panel' + form_id).css("border", "0px").css("padding", "0px").css("background-color", "transparent");
 	}
 
+
+
+    function base64EncodeUnicode(str) {
+        return btoa(
+            new TextEncoder().encode(str)
+            .reduce((data, byte) => data + String.fromCharCode(byte), '')
+        );
+    }
+
+
+
 	$(document).ready(function() {
 		$('#showTeamTabsSection').click(function() {
+			let  isValid = CheckOrderFormValidation();
 
-			if ($('#input_on_team_name').val() == "") {
-				alert("Please fill the Team Name.");
-				return false;
-			}
+            if (!isValid) {
+                console.log("Validation issue");
+                return false;
+            }
+
+
 			$('.teamTabsSection').show(300); // Adjust duration as needed
 			var prod_id = $('#prod_id').val();
 			var form_id = $('#form_id_inc').val();
-			var on_team_name = window.btoa($('#input_on_team_name').val());
+			var on_team_name = base64EncodeUnicode($('#input_on_team_name').val());
 			var on_year = window.btoa($('#input_on_year').val());
 
 			$('.teamTabsSection').show(300); // Show the section
@@ -2823,8 +2882,14 @@ $s_of_id_list = implode(",", $a_of_id);
 		}
 
 	}
-
+ 
 	function movetoteam() {
+        let isValid = CheckBillingFormValidation(); 
+		if(!isValid){
+			 return false ; 
+		}
+
+
 		const orderTab = document.querySelector('#team-tab');
 		const tab = new bootstrap.Tab(orderTab);
 		tab.show();
@@ -2835,6 +2900,16 @@ $s_of_id_list = implode(",", $a_of_id);
 
 
 	$(document).on('click', '.movetoOrderItem', function() {
+
+	  let isValid = CheckBillingFormValidation(); 
+	
+	 
+	  if(!isValid){
+			 return false ; 
+		}
+
+
+
 		const orderTab = document.querySelector('#order-tab');
 
 		const tab = new bootstrap.Tab(orderTab);
@@ -3146,57 +3221,82 @@ $s_of_id_list = implode(",", $a_of_id);
 	}
 </script>
 <script>
-	document.addEventListener('DOMContentLoaded', () => {
-		const tabs = document.querySelectorAll('.nav-link'); // Select all tabs
-		const tabContent = document.querySelectorAll('.tab-pane-forboc'); // Select all tab content sections
 
-		// Function to activate a tab
-		function activateTab(tabId) {
-			// Add the 'active' class only to the tab that matches the active tab
+	
+		document.addEventListener('DOMContentLoaded', () => {
+			const tabs = document.querySelectorAll('.nav-link');
+			const tabContent = document.querySelectorAll('.tab-pane-forboc');
+
+			// Function to activate a tab
+			function activateTab(tabId) {
+
+				tabs.forEach(tab => {
+					if (tab.classList.contains('teamDetailsNavitems')) {
+					return;
+					}
+					tab.classList.remove('active');
+					if (tab.getAttribute('href') === `#${tabId}`) {
+						tab.classList.add('active');
+					}
+				});
+
+				tabContent.forEach(content => {
+					content.classList.remove('show', 'active');
+					if (content.id === tabId) {
+						content.classList.add('show', 'active');
+					}
+				});
+			}
+
+			// // Handle tab click
+	
 			tabs.forEach(tab => {
-				tab.classList.remove('active'); // Remove 'active' from all tabs first
-				if (tab.getAttribute('href') === `#${tabId}`) {
-					tab.classList.add('active'); // Add 'active' to the clicked tab
-				}
+			tab.addEventListener('show.bs.tab', function (event) {
+
+			let currentTab = event.relatedTarget; // ✅ tab you're leaving
+			let nextTab = event.target;           // ✅ tab you're going to
+
+			let currentId = nextTab ? nextTab.id : null;
+			let isValid = true;
+
+			
+
+			// 👉 VALIDATE CURRENT TAB (not next tab)
+			if (currentId === 'order-tab') {
+				isValid = CheckBillingFormValidation();
+			} else if (currentId === 'team-tab') {
+				isValid = CheckOrderInformationValidation();
+			}
+
+			 
+			
+
+			if (!isValid) {
+				event.preventDefault(); // ✅ THIS WILL NOW WORK
+			}
+			});
 			});
 
-			// Show and activate the corresponding tab content
-			tabContent.forEach(content => {
-				content.classList.remove('show', 'active'); // Remove 'show' and 'active' from all content
-				if (content.id === tabId) {
-					content.classList.add('show', 'active'); // Show and activate the content of the active tab
-				}
-			});
-		}
+			// Handle back/forward
+			window.addEventListener('popstate', (event) => {
+				const tabId = event.state?.tabId || 'billing';
+               
 
-		// Handle tab click
-		tabs.forEach(tab => {
-			tab.addEventListener('click', (event) => {
-				const href = tab.getAttribute('href');
-				const tabId = href.substring(1); // Remove '#' from href
-				history.pushState({
-					tabId
-				}, '', href); // Update the browser's history
+				activateTab(tabId);
 			});
+
+			// Initial load
+			const initialTabId = window.location.hash
+				? window.location.hash.substring(1)
+				: 'billing';
+
+			activateTab(initialTabId);
+
+			if (!window.location.hash) {
+				history.replaceState({ tabId: 'billing' }, '', '#billing');
+			}
 		});
 
-		// Handle back/forward navigation
-		window.addEventListener('popstate', (event) => {
-			const tabId = event.state?.tabId || 'billing'; // Default to 'billing' if no hash
-			activateTab(tabId);
-		});
-
-		// Handle initial load
-		const initialTabId = window.location.hash ? window.location.hash.substring(1) : 'billing';
-		activateTab(initialTabId);
-
-		// Ensure a default tab is always active
-		if (!window.location.hash) {
-			history.replaceState({
-				tabId: 'billing'
-			}, '', '#billing'); // Update history with the default tab
-		}
-	});
 
 
     // same as billing info 
@@ -3233,6 +3333,387 @@ $s_of_id_list = implode(",", $a_of_id);
          }
     })
 
+
+
+
+
+	
+    // Validation patterns
+    const VALIDATION_PATTERNS = {
+        textNumber: /^(?=.*[a-zA-Z]).{3,50}$/,
+        city: /^[a-zA-Z\s]{2,80}$/, // Letters and spaces only
+        text: /^[a-zA-Z\s]{2,50}$/, // Letters and spaces only
+        zipcode: /^[a-zA-Z0-9\-\s]{2,20}$/, // Letters, numbers, hyphens
+        tel: /^[0-9+\-\s\(\)]{3,30}$/, // Numbers, +, -, spaces, parentheses
+        email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/ // Standard email 
+    };
+
+    // Check the first step 
+
+
+
+	
+
+
+
+
+    function showFieldError(fieldId, message) {
+        let mainDiv = $('#' + fieldId).closest('.form-group');
+        // Remove existing error first
+        mainDiv.find('.errorMessage').remove();
+
+        let errorMessage = '<p class="errorMessage" style="color:red;">' + message + '</p>';
+        mainDiv.append(errorMessage);
+    }
+
+    function clearFieldError(fieldId) {
+        let mainDiv = $('#' + fieldId).closest('.form-group');
+        mainDiv.find('.errorMessage').remove();
+    }
+
+
+    function validateField(selector, pattern, message, canEmpty = false) {
+        let val = $(selector).val().trim();
+        let id = $(selector).attr('id');
+
+        // 👉 Case 1: Field is empty
+        if (!val) {
+            if (canEmpty) {
+                clearFieldError(id);
+                return true; // empty is allowed
+            } else {
+                showFieldError(id, message);
+                return false; // empty NOT allowed
+            }
+        }
+
+        // 👉 Case 2: Field has value → must match pattern
+        if (!pattern.test(val)) {
+            showFieldError(id, message);
+            return false;
+        }
+
+        // 👉 Valid case
+        clearFieldError(id);
+        return true;
+    }
+
+
+	function validateDateField(selector, message) {
+		let val = $(selector).val();
+		let id = $(selector).attr('id');
+
+		if (!val) {
+			showFieldError(id, message);
+			return false;
+		}
+
+		// Check valid date
+		let date = new Date(val);
+		if (isNaN(date.getTime())) {
+			showFieldError(id, "Invalid date");
+			return false;
+		}
+
+		clearFieldError(id);
+		return true;
+	}
+
+	function ValidateOnlyEmpty(selector, message) {
+		let val = $(selector).val();
+		let selectedVal = $(selector).find('option:selected').val();
+		let id = $(selector).attr('id');
+
+
+		if (!val || selectedVal == '') {
+			showFieldError(id, message);
+			return false;
+		}
+
+		clearFieldError(id);
+		return true;
+	}
+
+	
+    function CheckBillingFormValidation() {
+        let isValid = true;
+
+        $('.errorMessage').remove();
+
+        // TEXT FIELDS
+        isValid &= validateField('#bi_contact', VALIDATION_PATTERNS.text, 'Invalid contact name');
+        isValid &= validateField('#de_contact', VALIDATION_PATTERNS.text, 'Invalid contact name');
+
+        isValid &= validateField('#bi_country', VALIDATION_PATTERNS.text, 'Only letters and spaces allowed');
+        isValid &= validateField('#de_country', VALIDATION_PATTERNS.text, 'Only letters and spaces allowed');
+
+        isValid &= validateField('#bi_city', VALIDATION_PATTERNS.city, 'Only letters and spaces allowed');
+        isValid &= validateField('#de_city', VALIDATION_PATTERNS.city, 'Only letters and spaces allowed');
+
+        isValid &= ValidateOnlyEmpty('#bi_address',  'Please fill the address');
+        isValid &= ValidateOnlyEmpty('#de_address','Please fill the address');
+
+        isValid &= validateField('#bi_zip_code', VALIDATION_PATTERNS.zipcode, 'Invalid zipcode');
+        isValid &= validateField('#de_zip_code', VALIDATION_PATTERNS.zipcode, 'Invalid zipcode');
+
+        isValid &= validateField('#bi_tel', VALIDATION_PATTERNS.tel, 'Invalid telephone number');
+        isValid &= validateField('#de_tel', VALIDATION_PATTERNS.tel, 'Invalid telephone number');
+
+        isValid &= validateField('#bi_email', VALIDATION_PATTERNS.email, 'Invalid email address');
+        isValid &= validateField('#de_email', VALIDATION_PATTERNS.email, 'Invalid email address');
+
+        isValid &= validateField('#bi_company_name', VALIDATION_PATTERNS.textNumber, 'Invalid company name', true);
+        isValid &= validateField('#de_company_name', VALIDATION_PATTERNS.textNumber, 'Invalid company name', true);
+
+
+        return Boolean(isValid);
+    }
+
+
+    function CheckOrderInformationValidation() {
+        let isValid = true;
+
+        $('.errorMessage').remove();
+
+        let eventDateValid = validateDateField('#game_event_date', 'Please select event date');
+        let dueDateValid = validateDateField('#req_due_date', 'Please select due date');
+
+        if (!eventDateValid || !dueDateValid) {
+            isValid = false;
+        }
+
+        // 🔥 Optional: logical validation (important)
+        let eventDate = $('#game_event_date').val();
+        let dueDate = $('#req_due_date').val();
+
+        if (eventDate && dueDate) {
+            if (new Date(dueDate) < new Date(eventDate)) {
+                showFieldError('req_due_date', 'Due date cannot be before event date');
+                isValid = false;
+            }
+        }
+
+        isValid &= validateField('#project_name', VALIDATION_PATTERNS.textNumber, 'Invalid order name', true);
+        isValid &= validateField('#customer_po', VALIDATION_PATTERNS.textNumber, 'Invalid customer PO', true);
+
+
+
+        return isValid;
+    }
+
+    function CheckOrderFormValidation(is_new = false) {
+        let isValid = true;
+        $('.errorMessage').remove();
+
+
+        if (is_new) {
+            isValid &= ValidateOnlyEmpty('#input_on_team_name_new', 'Invalid team name');
+            isValid &= ValidateOnlyEmpty('#input_on_year_new', 'Select Year');
+            isValid &= ValidateOnlyEmpty('#prod_id_new', 'Select Order Form');
+        } else {
+            isValid &= ValidateOnlyEmpty('#input_on_team_name', 'Invalid team name');
+            isValid &= ValidateOnlyEmpty('#input_on_year', 'Select Year');
+            isValid &= ValidateOnlyEmpty('#prod_id', 'Select Order Form');
+        }
+
+        return isValid;
+    }
+
+
+
+		//  delete draft function 
+
+   $(document).on('click' , '.delete_form_btn'  , function(){
+	   let closestTable = $(this).closest('.tbl_item_form') ; 
+	   let draft_id = closestTable.data('delete_id'); 
+
+	   let tab_pane = closestTable.closest('.tab-pane') ;
+	 
+	 
+	   deleteDraft(draft_id ,tab_pane) ;  
+   }) ; 
+
+
+
+	function deleteDraft(draft_id ,tab_pane) {
+
+		if (confirm("Confirm to delete draft #" + draft_id + "?")) {
+			$.ajax({
+				type: "POST",
+				dataType: "json",
+				url: "ajax/manage_order/delete.php",
+				data: {
+					"draft_id": draft_id
+				},
+				success: function(resp) {
+
+					if (resp.result == "success") {
+						    let centerElement = tab_pane.closest('center') ; 
+	                       let active_nav_link = tab_pane.attr('aria-labelledby'); 
+
+						   centerElement.remove(); 
+						   $('#'+active_nav_link).remove(); 
+					}
+
+				}
+			});
+		}
+	}
+
+
+
+
+    $(document).on('click', '.orderFormUpload', function() {
+        let isValid = CheckOrderFormValidation();
+        let spanText = $(this).find('span');
+        let button = $(this);
+
+        if (!isValid) {
+            console.log("validation failed");
+            return false;
+        }
+
+
+
+        var prod_id = $('#prod_id').val();
+
+        var form_id = $('#form_id_inc').val();
+
+        var on_team_name = base64EncodeUnicode($('#input_on_team_name').val());
+
+        var on_year = window.btoa($('#input_on_year').val());
+        const teamId = $('#teamTab li').length;
+        let fileInput = $('#order_form_file')[0];
+        let file = fileInput.files[0];
+
+        if (!file) return;
+
+        let formData = new FormData();
+        formData.append('file', file);
+        formData.append('form_id', form_id);
+        formData.append('prod_id', prod_id);
+        formData.append('on_team_name', on_team_name);
+        formData.append('teamno', teamId);
+        formData.append('on_year', on_year);
+
+
+
+
+
+
+
+
+
+
+        // 👉 Optional: add extra data
+        // formData.append('order_id', $('#order_id').val());
+        spanText.text('Uploading.....');
+        button.attr('disabled', true);
+        $.ajax({
+            url: 'ajax/add_order/upload_order_form.php', // 🔁 change to your PHP file
+            type: 'POST',
+            data: formData,
+            contentType: false,
+            processData: false,
+            dataType: 'json',
+            success: function(response) {
+                button.removeAttr('disabled');
+                if (response.upload == false) {
+                    spanText.text('Upload Order Form');
+                    alert("Blank or wrong order form . Please add correct order form");
+                    return false;
+                }
+
+
+				$('#teamTab .nav-link').removeClass('active');
+
+				$('#table_showing .tab-pane').removeClass('active');
+
+
+
+				const teamTab = `
+				<li class="nav-item" role="presentation">
+
+				<a class="nav-link  active" id="fill-tab-${teamId}" data-bs-toggle="tab" href="#fill-tabpanel-${teamId}" role="tab" aria-controls="fill-tabpanel-${teamId}" aria-selected="true"> Team ${teamId} </a>
+
+				</li>`;
+
+
+
+				$('#teamTab').append(teamTab);
+
+                $('.teamTabsSection').show(300); // Adjust duration as needed
+                $('#table_showing').append(response.html);
+
+                spanText.text('Upload Order Form');
+
+            },
+            error: function(xhr, status, error) {
+                console.error("Upload failed:", error);
+                alert('Upload failed');
+            }
+        });
+
+    });
+
+
+	function deleteRow(button) {
+
+		const row = button.closest('tr'); // works if button is DOM element
+
+		// Safely get data attributes (works without jQuery)
+		let prod_id = row.getAttribute('data-prod_id');
+		let form_id = row.getAttribute('data-form_id');
+
+		if (row) {
+			row.remove(); // modern cleaner way
+		}
+
+		// Convert to number if needed
+		prod_id = parseInt(prod_id);
+
+		// Make sure split_no exists
+		let split = (typeof split_no !== 'undefined') ? split_no : 1;
+	
+
+		if (prod_id === 1) {
+			calculateQTY(1, 'jersey_qty_' + form_id);
+			calculateQTY(1, 'jersey_qty2_' + form_id);
+			calculateQTY(1, 'sock_qty_' + form_id);
+			calculateQTY(1, 'sock_qty2_' + form_id);
+		} else {
+			if (split === 1) {
+				calculateQTY(prod_id, 'jersey_qty_' + form_id);
+			} else {
+				calculateQTY(prod_id, 'jersey_qty_' + form_id);
+				calculateQTY(prod_id, 'sock_qty_' + form_id);
+			}
+		}
+
+		// Remove row safely
+		
+	}
+
+	   function removeTable(el) {
+
+        // Get current tab-pane
+        var $tabPane = $(el).closest('.tab-pane');
+
+        var tabPaneId = $tabPane.attr('id'); // e.g. fill-tabpanel-1
+
+        // Remove the tab-pane
+        $tabPane.remove();
+
+        // Remove corresponding tab button
+        $('button[data-bs-target="#' + tabPaneId + '"], a[href="#' + tabPaneId + '"]').remove();
+
+        // Activate first available tab
+		 var firstTab = $('.teamDetailsNavitems:first');
+		 firstTab.addClass('active')
+		 var href = firstTab.attr('href'); 
+         $(href).addClass('show active'); 
+		 
+    }
 </script>
 
 
@@ -3244,4 +3725,7 @@ function capitalize($str)
 
 	return $new_str1 . $new_str2;
 }
+
+
+
 ?>

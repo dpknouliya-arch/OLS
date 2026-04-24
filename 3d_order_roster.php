@@ -6,51 +6,68 @@ include 'includes/order_helpers.php';
 $obj_user = json_decode(base64_decode($_SESSION["JOGOLS"]));
 $user_id  = $obj_user->user_id;
 
-if (isset($_GET['order_id'])) {
-    $order_id = customDecode($_GET['order_id']);
-
-    $sql  = "SELECT * FROM design_order WHERE order_id = ?";
-    $stmt = $conn4->prepare($sql);
-    $stmt->bind_param("i", $order_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    if ($result->num_rows > 0) {
-        $order       = $result->fetch_assoc();
-        $designId    = $order['design_id'];
-        $sock_design = $order['sock_design'];
-        $added_date  = $order['added_date'];
-    } else {
-        echo "<p>No design found for this Order ID.</p>";
-        exit;
-    }
-} else {
+if (!isset($_GET['order_id'])) {
     echo "<p>Invalid order ID.</p>";
     exit;
 }
 
-$order_team_data   = [];
-$order_design_data = [];
+$order_id = customDecode($_GET['order_id']);
 
-$sql_designs  = "SELECT * FROM designs WHERE id = ?";
-$stmt_designs = $conn4->prepare($sql_designs);
-$stmt_designs->bind_param("i", $designId);
-$stmt_designs->execute();
-$result_designs = $stmt_designs->get_result();
-while ($row = $result_designs->fetch_assoc()) {
-    $order_design_data[] = $row;
+$data = callAPI("get_roster_details.php?order_id=$order_id");
+
+if (!$data || !$data['status']) {
+    echo "<p>API Error</p>";
+    exit;
 }
 
-$design_name    = !empty($order_design_data[0]['name'])       ? $order_design_data[0]['name']       : '—';
-$jersey_type    = !empty($order_design_data[0]['modal_type']) ? $order_design_data[0]['modal_type'] : '—';
+$order           = $data['order'];
+$api_team_data   = $data['team'];
+$order_design_data = [$data['design']];
+$color_list      = $data['colors'];
+
+$designId   = $order['design_id'];
+$added_date = $order['added_date'];
+$sock_design = $order['sock_design'] ?? '';
+
+$design_name = $order_design_data[0]['name']       ?? '—';
+$jersey_type = $order_design_data[0]['modal_type'] ?? '—';
+
 $order_id_enc   = customEncode($order_id);
 $order_date_fmt = !empty($added_date) ? date('d-m-Y H:i:s', strtotime($added_date)) : '—';
-// Read team name/year from tbl_order_form (writable) if saved; fall back to design_order
+// Build reverse size map: size_id → size_name for display
+$size_id_to_name = [];
+$sz_res = $conn->query("SELECT size_id, size_name FROM tbl_size");
+if ($sz_res) {
+    while ($sz = $sz_res->fetch_assoc()) {
+        $size_id_to_name[(int)$sz['size_id']] = $sz['size_name'];
+    }
+}
+
+// Find or create the OLS order form record (never duplicate)
+$of_id           = 0;
+$is_of_submitted = 0;
+$stmt_find = $conn->prepare(
+    "SELECT of_id, is_submitted FROM tbl_order_form WHERE design_order_id=? ORDER BY is_submitted DESC LIMIT 1"
+);
+$stmt_find->bind_param("i", $order_id);
+$stmt_find->execute();
+$res_find = $stmt_find->get_result();
+if ($res_find->num_rows > 0) {
+    $row_find        = $res_find->fetch_assoc();
+    $of_id           = (int)$row_find['of_id'];
+    $is_of_submitted = (int)$row_find['is_submitted'];
+}
+$stmt_find->close();
+if ($of_id === 0) {
+    $of_id = getOrCreateDraftOrder($conn, $order_id, $user_id);
+}
+
+// Team name/year: prefer saved OLS value, fall back to API
 $of_team_row = null;
 $stmt_tn = $conn->prepare(
-    "SELECT on_team_name, on_year FROM tbl_order_form WHERE design_order_id=? ORDER BY is_submitted DESC LIMIT 1"
+    "SELECT on_team_name, on_year FROM tbl_order_form WHERE of_id=? LIMIT 1"
 );
-$stmt_tn->bind_param("i", $order_id);
+$stmt_tn->bind_param("i", $of_id);
 $stmt_tn->execute();
 $res_tn = $stmt_tn->get_result();
 if ($res_tn->num_rows > 0) { $of_team_row = $res_tn->fetch_assoc(); }
@@ -63,35 +80,7 @@ $team_year_val = htmlspecialchars(
     ($of_team_row['on_year'] ?? '') !== '' ? $of_team_row['on_year'] : ($order['on_year'] ?? '')
 );
 
-// Build reverse size map: size_id (int) → size_name (text) for prefilling the dropdown
-$size_id_to_name = [];
-$sz_res = $conn->query("SELECT size_id, size_name FROM tbl_size");
-if ($sz_res) {
-    while ($sz = $sz_res->fetch_assoc()) {
-        $size_id_to_name[(int)$sz['size_id']] = $sz['size_name'];
-    }
-}
-
-// Get existing order form (submitted or draft); only create a new draft if none exists
-$of_id          = 0;
-$is_of_submitted = 0;
-$stmt_find = $conn->prepare(
-    "SELECT of_id, is_submitted FROM tbl_order_form WHERE design_order_id=? ORDER BY is_submitted DESC LIMIT 1"
-);
-$stmt_find->bind_param("i", $order_id);
-$stmt_find->execute();
-$res_find = $stmt_find->get_result();
-if ($res_find->num_rows > 0) {
-    $row_find       = $res_find->fetch_assoc();
-    $of_id          = (int)$row_find['of_id'];
-    $is_of_submitted = (int)$row_find['is_submitted'];
-}
-$stmt_find->close();
-if ($of_id === 0) {
-    $of_id = getOrCreateDraftOrder($conn, $order_id, $user_id);
-}
-
-// Load roster rows from the appropriate table
+// Load saved roster rows from OLS tables
 $source_table       = ($is_of_submitted === 1) ? 'tbl_order_item' : 'tbl_draft_oi';
 $existing_rows_json = '[]';
 
@@ -101,70 +90,53 @@ if ($oi_res && $oi_res->num_rows > 0) {
     while ($dr = $oi_res->fetch_assoc()) {
         $size_text     = $size_id_to_name[(int)($dr['product_size_id'] ?? 0)] ?? '';
         $loaded_rows[] = [
-            'item_id'         => (int)$dr['oi_id'],
-            'player_name'     => $dr['player_name']      ?? '',
-            'pattern_cut'     => $dr['sex']              ?? '',
-            'player_or_goalie'=> $dr['p_or_g']           ?? '',
-            'jersey_size'     => $size_text,
-            'jersey_no'       => $dr['jersey_number']    ?? '',
-            'jersey_color'    => $dr['color_top1']       ?? '',
-            'jersey_qty'      => $dr['qty_top1']         ?? '',
-            'jersey_color2'   => $dr['color_top2']       ?? '',
-            'jersey_qty2'     => $dr['qty_top2']         ?? '',
-            'sock_size'       => $dr['bottom_size']      ?? '',
-            'sock_color'      => $dr['color_bottom1']    ?? '',
-            'sock_qty'        => $dr['qty_bottom1']      ?? '',
-            'sock_color2'     => $dr['color_bottom2']    ?? '',
-            'sock_qty2'       => $dr['qty_bottom2']      ?? '',
-            'cor_a'           => $dr['c_or_a']           ?? '',
-            'name_for_packing'=> $dr['name_for_packing'] ?? '',
-            'notes'           => $dr['note']             ?? '',
+            'item_id'          => (int)$dr['oi_id'],
+            'player_name'      => $dr['player_name']      ?? '',
+            'pattern_cut'      => $dr['sex']              ?? '',
+            'player_or_goalie' => $dr['p_or_g']           ?? '',
+            'jersey_size'      => $size_text,
+            'jersey_no'        => $dr['jersey_number']    ?? '',
+            'jersey_color'     => $dr['color_top1']       ?? '',
+            'jersey_qty'       => $dr['qty_top1']         ?? '',
+            'jersey_color2'    => $dr['color_top2']       ?? '',
+            'jersey_qty2'      => $dr['qty_top2']         ?? '',
+            'sock_size'        => $dr['bottom_size']      ?? '',
+            'sock_color'       => $dr['color_bottom1']    ?? '',
+            'sock_qty'         => $dr['qty_bottom1']      ?? '',
+            'sock_color2'      => $dr['color_bottom2']    ?? '',
+            'sock_qty2'        => $dr['qty_bottom2']      ?? '',
+            'cor_a'            => $dr['c_or_a']           ?? '',
+            'name_for_packing' => $dr['name_for_packing'] ?? '',
+            'notes'            => $dr['note']             ?? '',
         ];
     }
     $existing_rows_json = json_encode($loaded_rows);
-} else if ($is_of_submitted === 0) {
-    // No saved rows yet — fall back to order_team (read-only 3D DB) with item_id=0
-    $sql_team  = "SELECT * FROM order_team WHERE order_id = ?";
-    $stmt_team = $conn4->prepare($sql_team);
-    $stmt_team->bind_param("i", $order_id);
-    $stmt_team->execute();
-    $result_team = $stmt_team->get_result();
-    $team_rows = [];
-    while ($row = $result_team->fetch_assoc()) {
-        $team_rows[] = [
-            'item_id'         => 0,
-            'player_name'     => $row['player_name']      ?? '',
-            'pattern_cut'     => $row['pattern_cut']      ?? '',
-            'player_or_goalie'=> $row['player_or_goalie'] ?? '',
-            'jersey_size'     => $row['jersey_size']      ?? '',
-            'jersey_no'       => $row['jersey_no']        ?? '',
-            'jersey_color'    => $row['jersey_color']     ?? '',
-            'jersey_qty'      => $row['jersey_qty']       ?? '',
-            'jersey_color2'   => $row['jersey_color2']    ?? '',
-            'jersey_qty2'     => $row['jersey_qty2']      ?? '',
-            'sock_size'       => $row['sock_size']        ?? '',
-            'sock_color'      => $row['sock_color']       ?? '',
-            'sock_qty'        => $row['sock_qty']         ?? '',
-            'sock_color2'     => $row['sock_color2']      ?? '',
-            'sock_qty2'       => $row['sock_qty2']        ?? '',
-            'cor_a'           => $row['cor_a']            ?? '',
-            'name_for_packing'=> $row['name_for_packing'] ?? '',
-            'notes'           => $row['notes']            ?? '',
+} elseif ($is_of_submitted === 0) {
+    // No saved rows yet — seed from API team data (item_id=0 means new INSERT on save)
+    $seeded = [];
+    foreach (($api_team_data ?? []) as $row) {
+        $seeded[] = [
+            'item_id'          => 0,
+            'player_name'      => $row['player_name']      ?? '',
+            'pattern_cut'      => $row['pattern_cut']      ?? '',
+            'player_or_goalie' => $row['player_or_goalie'] ?? '',
+            'jersey_size'      => $row['jersey_size']      ?? '',
+            'jersey_no'        => $row['jersey_no']        ?? '',
+            'jersey_color'     => $row['jersey_color']     ?? '',
+            'jersey_qty'       => $row['jersey_qty']       ?? '',
+            'jersey_color2'    => $row['jersey_color2']    ?? '',
+            'jersey_qty2'      => $row['jersey_qty2']      ?? '',
+            'sock_size'        => $row['sock_size']        ?? '',
+            'sock_color'       => $row['sock_color']       ?? '',
+            'sock_qty'         => $row['sock_qty']         ?? '',
+            'sock_color2'      => $row['sock_color2']      ?? '',
+            'sock_qty2'        => $row['sock_qty2']        ?? '',
+            'cor_a'            => $row['cor_a']            ?? '',
+            'name_for_packing' => $row['name_for_packing'] ?? '',
+            'notes'            => $row['notes']            ?? '',
         ];
     }
-    $existing_rows_json = json_encode($team_rows);
-}
-
-// Fetch color list dynamically from DB
-$color_list = [];
-$color_res  = $conn4->query("SELECT name FROM colors ORDER BY name");
-if ($color_res) {
-    while ($cr = $color_res->fetch_assoc()) {
-        $color_list[] = $cr['name'];
-    }
-}
-if (empty($color_list)) {
-    $color_list = ['Red','Navy','Black','White','Royal Blue','Forest Green','Gold','Maroon'];
+    $existing_rows_json = json_encode($seeded);
 }
 
 $color_list_json = json_encode($color_list);
@@ -419,8 +391,12 @@ $color_list_json = json_encode($color_list);
 
     Array.prototype.forEach.call(tbody.rows, function (tr) {
       var cells = tr.cells;
-      /* col 0 = trash btn; data cols start at 1 */
-      function v(i) { var el = cells[i].querySelector('input,select'); return el ? el.value : ''; }
+
+      function v(i) {
+        var el = cells[i].querySelector('input,select');
+        return el ? el.value : '';
+      }
+
       rows.push({
         item_id:          parseInt(tr.dataset.tid || '0', 10),
         player_name:      v(1),

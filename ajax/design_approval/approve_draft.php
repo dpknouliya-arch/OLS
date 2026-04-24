@@ -29,9 +29,34 @@
 	$obj_user = json_decode(base64_decode($_SESSION["JOGOLS"]));
 
     $user_id = $obj_user->user_id;
-	$sql_update = "UPDATE tbl_design_draft SET approve_status='approved',approve_user_id='".$user_id."',design_name='".$design_note."',main_comment='".$approval_note."',approve_time='".date("Y-m-d H:i:s")."' WHERE dd_id='".$dd_id."'; ";
+	$approve_status = 'approved';
+	$approve_time = date("Y-m-d H:i:s");
+	// $sql_update = "UPDATE tbl_design_draft SET approve_status='approved',approve_user_id='".$user_id."',design_name='".$design_note."',main_comment='".$approval_note."',approve_time='".date("Y-m-d H:i:s")."' WHERE dd_id='".$dd_id."'";
 
-	if($conn->query($sql_update)){
+
+			$sql_update = "UPDATE tbl_design_draft 
+		SET approve_status = ?, 
+			approve_user_id = ?, 
+			design_name = ?, 
+			main_comment = ?, 
+			approve_time = ? 
+		WHERE dd_id = ?";
+
+		$stmt = $conn->prepare($sql_update);
+
+		
+
+		$stmt->bind_param(
+			"sisssi",
+			$approve_status,
+			$user_id,
+			$design_note,
+			$approval_note,
+			$approve_time,
+			$dd_id
+		);
+
+	if($stmt->execute()){
 
 		$sql_select = "SELECT * FROM tbl_design_draft WHERE dd_id='".$dd_id."'; ";
 		$rs_select = $conn->query($sql_select);

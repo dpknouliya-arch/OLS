@@ -20,6 +20,7 @@ $user_id = $obj_user->user_id;
 $customer_id = $obj_user->customer_id;
 
 
+
 $conn3 = new mysqli($serverName, $userName, $userPassword, $dbName3);
 mysqli_set_charset($conn3, "utf8");
 
@@ -59,6 +60,8 @@ if ($num_draft == 0) {
 
 		$draft_no--;
 	}
+
+	$firstDraftData = [] ; 
 ?>
 
 	<style>
@@ -137,81 +140,111 @@ if ($num_draft == 0) {
 			<button title="Back" class="goBackBtn themeBtn2grey  iconBTn" type="button" onclick="return showContentZone();">
 				<figure class="m-0"><img src="images/vector/previousBtn.png" alt=""></figure> Go Back
 			</button>
+		
 			<?php
-
+            
 			foreach ($a_draft as $key => $draft_row) {
+
 				if ($first_dd_id == "") {
 					$first_dd_id = $draft_row["dd_id"];
+					
 				}
+
+				$draft_no = $draft_row["draft_no"] ; 
+
+			
+
 			?>
 				<button type="button" id="tab_id<?php echo $draft_row["draft_no"]; ?>" class="themeBtn  iconBTn tab_btn <?php if ($draft_row["draft_no"] == $num_draft) {
 																															echo 'active_tab';
 																														} ?>" onclick="return showTab(<?php echo $draft_row["draft_no"]; ?>,<?php echo $draft_row["dd_id"]; ?>);">
 					Draft <?php echo $draft_row["draft_no"]; ?>
 				</button>
+
+		
+
+				     
+		  
 			<?php
+
+			    
 			}
 			?>
 		</div>
-		<div id="approval_zone">
-			<?php
-			if ($draft_row["draft_no"] == $num_draft && $order_status == "2") {
-				if ($draft_row["approve_status"] == "new") {
-			?>
-					<div class="btn_panel">
-						<a type="button" href="#add_comment_btn" class="btn btn-primary add_cmt_btn" style="float:left;">Add Comment</a>
-						<button type="button" class="btn btn-success approval_modal" style="width:150px" draft_id="<?php echo $draft_row["dd_id"]; ?>">Approve</button>
-						<button type="button" class="btn btn-danger reject_modal" style="width:150px;" draft_id="<?php echo $draft_row["dd_id"]; ?>">Reject</button>
-						<!--<button type="button" class="btn btn-success" style="width:150px;" onclick="return approveDraft(<?php echo $draft_row["dd_id"]; ?>);">Approve</button>-->
-						<!--<button type="button" class="btn btn-danger" style="width:150px;" onclick="return rejectDraft(<?php echo $draft_row["dd_id"]; ?>);">Reject</button>-->
-						<div style="text-align: left; color: #F00;">* Note: Available to comment only in the latest Draft.</div>
-					</div>
-				<?php
-				} else {
+
+
+
+		<?php 
+            foreach ($a_draft as $key => $draft_row) {
+				$draft_no = $draft_row["draft_no"] ; 
 				?>
-					<div class="btn_panel">
-						<a type="button" href="#add_comment_btn" class="btn btn-primary add_cmt_btn" style="float:left;">Add Comment</a>
-
+					<div id="approval_zone<?= $draft_no ?>"  style="<?=$draft_row["draft_no"] != $num_draft  ? "display:none; " :""?>" class="approval_zone_draft_<?=$draft_no?>  approval_zone_all"> 
 						<?php
+						
+						if ($draft_row["draft_no"] == $num_draft && $order_status == "2") {
+							
+							if ($draft_row["approve_status"] == "new") {
+						?>
+								<div class="btn_panel">
+									<a type="button" href="#add_comment_btn" class="btn btn-primary add_cmt_btn" style="float:left; margin-right:3px; ">Add Comment</a>
+									<button type="button" class="btn btn-success approval_modal" style="width:150px" draft_id="<?php echo $draft_row["dd_id"]; ?>">Approve</button>
+									<button type="button" class="btn btn-danger reject_modal" style="width:150px;" draft_id="<?php echo $draft_row["dd_id"]; ?>">Reject</button>
+								
+									<div style="text-align: left; color: #F00;">* Note: Available to comment only in the latest Draft.</div>
+								</div>
+							<?php
+							} else {
+							?>
+								<div class="btn_panel">
+									<a type="button" href="#add_comment_btn" class="btn btn-primary add_cmt_btn" style="float:left;">Add Comment</a>
 
-						$tmp_app_time = '';
-						if ($draft_row["approve_time"] != "") {
-							$tmp_app_time = '&nbsp;&nbsp;<span class="statusAlertDate">' . $draft_row["approve_time"] . '</span>';
-						}
+									<?php
 
-						if ($draft_row["approve_status"] == "approved") {
-							echo '<div class="status_box"><span class="approve_status">APPROVED</span>' . $tmp_app_time . '</div>';
+									$tmp_app_time = '';
+									if ($draft_row["approve_time"] != "") {
+										$tmp_app_time = '&nbsp;&nbsp;<span class="statusAlertDate">' . $draft_row["approve_time"] . '</span>'; 
+									}
+
+									if ($draft_row["approve_status"] == "approved") {
+										echo '<div class="status_box"><span class="approve_status">APPROVED</span>' . $tmp_app_time . '</div>';
+									} else {
+										echo '<div class="status_box"><span class="reject_status">REJECTED</span>' . $tmp_app_time . '</div>';
+									}
+									?>
+
+									<div style="text-align: left; color: #F00;">* Note: Available to comment only in the latest Draft.</div>
+								</div>
+							<?php
+							}
 						} else {
-							echo '<div class="status_box"><span class="reject_status">REJECTED</span>' . $tmp_app_time . '</div>';
+							
+							?>
+							<div class="btn_panel">
+								<center>
+									<?php
+									$tmp_app_time = '';
+									if ($draft_row["approve_time"] != "") {
+										$tmp_app_time = '&nbsp;&nbsp;<span class="statusAlertDate">' . $draft_row["approve_time"] . '</span>';
+									}
+
+									if ($draft_row["approve_status"] == "approved") {
+										echo '<div class="status_box"><span class="approve_status">APPROVED</span>' . $tmp_app_time . '</div>';
+									} else {
+										echo '<div class="status_box  "><span class="reject_status">REJECTED</span>' . $tmp_app_time . '</div>';
+									}
+									?>
+								</center>
+							</div>
+						<?php
 						}
 						?>
-
-						<div style="text-align: left; color: #F00;">* Note: Available to comment only in the latest Draft.</div>
 					</div>
-				<?php
-				}
-			} else {
-				?>
-				<div class="btn_panel">
-					<center>
-						<?php
-						$tmp_app_time = '';
-						if ($draft_row["approve_time"] != "") {
-							$tmp_app_time = '&nbsp;&nbsp;<span class="statusAlertDate">' . $draft_row["approve_time"] . '</span>';
-						}
-
-						if ($draft_row["approve_status"] == "approved") {
-							echo '<div class="status_box"><span class="approve_status">APPROVED</span>' . $tmp_app_time . '</div>';
-						} else {
-							echo '<div class="status_box"><span class="reject_status">REJECTED</span>' . $tmp_app_time . '</div>';
-						}
-						?>
-					</center>
-				</div>
-			<?php
+				<?
 			}
-			?>
-		</div>
+		?>
+		
+		
+	
 	</div>
 
 	<?php
@@ -245,6 +278,9 @@ if ($num_draft == 0) {
 
 		}*/
 	?>
+		
+
+
 		<div id="d_show_design<?php echo $draft_row["draft_no"]; ?>" style="width: 100%; <?php if ($draft_row["draft_no"] != $num_draft) {
 																								echo 'display:none; ';
 																							} ?>" class="d_show_design">
@@ -294,6 +330,9 @@ if ($num_draft == 0) {
 				}
 
 			?>
+      
+
+
 				<div id="showIMG<?php echo $draft_row["order_file_id"]; ?>">
 
 					<table style="width: 100%; border-spacing: 0px; margin-top: -2px;">
@@ -387,7 +426,7 @@ if ($num_draft == 0) {
 
 							if ($row_tmp["comment_from"] == "LKR") {
 						?>
-								<!--<div class="col-3"></div>-->
+								
 								<div class="col-8 ">
 									<div style="text-align:right;color:white;"><?php echo $a_emp_info[($row_tmp["employee_id"])] . '<span style="color:white;" class="comment_time"> @ ' . date("M d, Y H:i:s", strtotime($row_tmp["date_add"])) . '</span>'; ?></div>
 									<div class="comment_box_LKR"><?php echo $row_tmp["comment"]; ?></div>
@@ -401,7 +440,7 @@ if ($num_draft == 0) {
 									<div style="text-align:left;color:white;"><?php echo $a_user_info[($row_tmp["user_id"])] . '<span style="color:white;" class="comment_time"> @ ' . date("M d, Y H:i:s", strtotime($row_tmp["date_add"])) . '</span>'; ?></div>
 									<div class="comment_box_OLS"><?php echo $row_tmp["comment"]; ?></div>
 								</div>
-								<!--<div class="col-3"></div>-->
+								
 						<?php
 							}
 						}
@@ -439,79 +478,10 @@ if ($num_draft == 0) {
 
 	<iframe name="hidden_frame" style="display: none;"></iframe>
 
-	<script>
-		$(document).on('click', '.approval_modal', function() {
-			var draft_id = $(this).attr('draft_id');
-			$('.approval_btn').attr('dd_id', draft_id);
-			$('#approvalModal').modal('show');
-		})
 
-		$(document).on('click', '.reject_modal', function() {
-			var draft_id = $(this).attr('draft_id');
-			$('#dd_id_reject').val(draft_id);
-			$('#rejectModal').modal('show');
-		})
-	</script>
 
-	<div id="approvalModal" class="modal fade" role="dialog">
-		<div class="modal-dialog modal-lg">
 
-			<!-- Modal content-->
-			<div class="modal-content">
-				<div class="modal-header" style="background-color:black;">
-					<div class="container-fluid">
-						<h4 class="float-left">Approve Design</h4>
-						<button type="button" style="margin-top:-20px;" class="close float-right" data-dismiss="modal">&times;</button>
-					</div>
-				</div>
-				<div class="modal-body" style="background-image: url('https://online.jog-joinourgame.com/assets/images/tutorial-background.jpg');">
-					<div>
-						<div class="form-group">
-							<label for="exampleInputEmail1" style="color:white;">DESIGN NAME</label>
-							<input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Input Design Option">
-						</div>
-						<div class="form-group">
-							<label for="exampleFormControlTextarea1" style="color:white;">Notes(If Any)</label>
-							<textarea name="approval_textarea" class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
-						</div>
-						<button type="button" class="btn btn-warning approval_btn" onclick="approveDraft()">Approve Design</button>
-					</div>
-				</div>
-			</div>
 
-		</div>
-	</div>
-
-	<div id="rejectModal" class="modal fade" role="dialog">
-		<div class="modal-dialog modal-lg">
-
-			<!-- Modal content-->
-			<div class="modal-content">
-				<div class="modal-header" style="background-color:black;">
-					<div class="container-fluid">
-						<h4 class="float-left">Reject Design</h4>
-						<button type="button" style="margin-top:-20px;" class="close float-right" data-dismiss="modal">&times;</button>
-					</div>
-				</div>
-				<div class="modal-body" style="background-image: url('https://online.jog-joinourgame.com/assets/images/tutorial-background.jpg');">
-					<form id="reject_form">
-						<div class="form-group">
-							<label for="exampleInputEmail2" style="color:white;">DESIGN NAME</label>
-							<input type="text" name="design_name" class="form-control" id="exampleInputEmail2" aria-describedby="emailHelp" placeholder="Input Design Option">
-							<input type="hidden" name="dd_id" id="dd_id_reject">
-						</div>
-						<div class="form-group">
-							<label for="exampleFormControlTextarea2" style="color:white;">Reject Reason(Important)</label>
-							<textarea name="reject_textarea" class="form-control" id="exampleFormControlTextarea2" rows="3"></textarea>
-						</div>
-						<button type="submit" class="btn btn-danger">Reject Design</button>
-					</form>
-				</div>
-			</div>
-
-		</div>
-	</div>
-	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 	<script>
 		CKEDITOR.replace('input_comment_detail');
 		CKEDITOR.replace('reject_textarea');
@@ -559,112 +529,14 @@ if ($num_draft == 0) {
 
 		}
 
-		function approveDraft() {
 
-			var dd_id = $('.approval_btn').attr("dd_id");
-			var approval_note = CKEDITOR.instances.exampleFormControlTextarea1.getData();
-			var design_note = $('#exampleInputEmail1').val();
-			if (design_note.length == 0) {
-				alert("Design Option can't be left blank");
-				return;
-			}
 
-			if (confirm("Confirm APPROVE?")) {
 
-				$.ajax({
-					type: "POST",
-					dataType: "json",
-					url: "ajax/design_approval/approve_draft.php",
-					data: {
-						"dd_id": dd_id,
-						"approval_note": approval_note,
-						"design_note": design_note
-					},
-					success: function(resp) {
+	
 
-						if (resp.result == "success") {
-							var inner_approval = '<div class="btn_panel"><a type="button" href="#add_comment_btn" class="btn btn-primary add_cmt_btn" style="float:left;">Add Comment</a>';
-							inner_approval += '<center><div class="approve_status">APPROVED</div></center>';
-							inner_approval += '<div style="text-align: left; color: #F00;">* Note: Available to comment only in the latest Draft.</div>';
-							inner_approval += '</div>';
 
-							$('#approval_zone').html(inner_approval);
-							$('#approvalModal').modal('hide');
-						} else {
-							alert(resp.msg);
-						}
 
-					}
-				});
 
-			}
-
-		}
-
-		$(document).on('submit', '#reject_form', function(e) {
-			e.preventDefault();
-			var form = $(this);
-			var formdata = new FormData(form[0]);
-			if (confirm("Confirm REJECT?")) {
-
-				$.ajax({
-					type: "POST",
-					dataType: "json",
-					url: "ajax/design_approval/reject_draft.php",
-					data: formdata,
-					contentType: false,
-					processData: false,
-					success: function(resp) {
-
-						if (resp.result == "success") {
-							var inner_approval = '<div class="btn_panel"><a type="button" href="#add_comment_btn" class="btn btn-primary add_cmt_btn" style="float:left;">Add Comment</a>';
-							inner_approval += '<center><div class="reject_status">REJECTED</div></center>';
-							inner_approval += '<div style="text-align: left; color: #F00;">* Note: Available to comment only in the latest Draft.</div>';
-							inner_approval += '</div>';
-
-							$('#approval_zone').html(inner_approval);
-							$('#rejectModal').modal('hide');
-						} else {
-							alert(resp.msg);
-						}
-
-					}
-				});
-
-			}
-
-		})
-
-		function rejectDraft(dd_id) {
-
-			if (confirm("Confirm REJECT?")) {
-
-				$.ajax({
-					type: "POST",
-					dataType: "json",
-					url: "ajax/design_approval/reject_draft.php",
-					data: {
-						"dd_id": dd_id
-					},
-					success: function(resp) {
-
-						if (resp.result == "success") {
-							var inner_approval = '<div class="btn_panel"><a type="button" href="#add_comment_btn" class="btn btn-primary add_cmt_btn" style="float:left;">Add Comment</a>';
-							inner_approval += '<center><div class="reject_status">REJECTED</div></center>';
-							inner_approval += '<div style="text-align: left; color: #F00;">* Note: Available to comment only in the latest Draft.</div>';
-							inner_approval += '</div>';
-
-							$('#approval_zone').html(inner_approval);
-						} else {
-							alert(resp.msg);
-						}
-
-					}
-				});
-
-			}
-
-		}
 
 		$(document).on('click', '.add_cmt_btn', function() {
 			$('#cmt_box').show();

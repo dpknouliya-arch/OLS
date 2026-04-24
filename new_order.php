@@ -26,6 +26,10 @@ $sql_select .= " WHERE tbl_order_form.user_id='" . $user_id . "' AND tbl_order_f
 
 //$rs_select = $conn->query($sql_select);
 
+
+
+
+
 $rs_tmp = $conn->query($sql_select);
 
 
@@ -87,6 +91,8 @@ if (sizeof($a_order_main_id) > 0) {
 
     //echo "<hr>".$s_order_main_id."<hr>";
 
+    
+
     $sql_chk_design = "SELECT order_main_id,order_main_code,order_design_file FROM order_main WHERE order_main_id IN (" . $s_order_main_id . "); ";
 
     $rs_chk_design = $conn3->query($sql_chk_design);
@@ -134,6 +140,7 @@ if (sizeof($a_order_main_id) > 0) {
         font-size: 12px;
         font-weight: 500;
     }
+
 </style>
 
 <div class="newOrderPage">
@@ -253,6 +260,10 @@ if (sizeof($a_order_main_id) > 0) {
                             <td class="bg_name_info text-center">
 
                                 <?php
+
+                                // echo '<pre>' ; 
+                                // print_r($design_found); 
+
 
                                 if (isset($design_found[($row_order["re_order_id"])]) && $design_found[($row_order["re_order_id"])]["order_design_file"] != "") {
 
@@ -586,89 +597,6 @@ if (sizeof($a_order_main_id) > 0) {
 
 <!-- Modal -->
 
-<!-- <div id="orderFormModal" class="modal fade" role="dialog">
-
-  <div id="d_dialog_box" class="modal-dialog modal-lg" style="margin-top:15px;">
-
-    
-
-    <div class="modal-content" >
-
-      <div class="modal-header" style="padding:15px 26px 1px 26px;">
-
-        <button type="button" class="close" style="float: right;" data-dismiss="modal">&times;</button>
-
-        
-
-      </div>
-
-      <div class="modal-body" style="padding: 0px 26px;">
-
-        <div id="order_form_content" style="border: 1px solid #000;" class="table-responsive">
-
-        </div>
-
-        <div class="text-center" style="padding: 5px;">
-
-        	<button id="btn_mini" class="btn btn-info" onclick="$('#order_form_content').css('max-height','220px').css('overflow-y','scroll'); $(this).hide(); $('#btn_maxi').show();">Minimize</button>
-
-        	<button id="btn_maxi" style="display: none;" class="btn btn-info" onclick="$('#order_form_content').css('max-height','').css('overflow-y',''); $(this).hide(); $('#btn_mini').show();">Maximize</button>
-
-        	<input type="hidden" id="download_of_id" >
-
-        	<input type="hidden" id="sending_msg" value="no">
-
-        </div>
-
-	   	<div id="d_chat_panel_outter" > 
-
-	        <div id="d_chat_panel" class="row" >
-
-	        	
-
-	        </div>
-
-	        <span id="sp_bottom"></span>
-
-	    </div>
-
-        <input type="hidden" id="max_chat_id" value="0">
-
-      </div>
-
-      <div class="modal-footer">
-
-        <center style="width: 100%; display: none;" id="input_msg_zone" >
-
-        	<div class="row">
-
-        		<div class="col-md-9" style="margin-bottom: 20px;">
-
-			      	<textarea style="width:100%;" id="msg_input"></textarea>
-
-			    </div>
-
-			    <div class="col-md-3 text-center" style="margin-top: -15px; padding-left: 0px;">
-
-			    	<div style="padding: 0px; color:#F00; font-size: 14px; font-weight: bold;">* English only.</div>
-
-			        <div><button type="button" class="btn btn-dark" style="width: 80%;" onclick="return sendMessage();">Send</button></div>
-
-			    </div>
-
-		    </div>
-
-	    </center>
-
-      </div>
-
-    </div>
-
-
-
-  </div>
-
-</div> -->
 
 <input type="hidden" id="modal_is_close" value="yes">
 
@@ -730,30 +658,20 @@ if (sizeof($a_order_main_id) > 0) {
 
     <div class="modal-dialog modal-lg">
 
-
+   <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Final Design</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
 
         <!-- Modal content-->
 
         <div class="modal-content">
-
-            <div class="modal-header" style="padding:15px 26px 1px 26px; cursor: move;">
-
-                <button type="button" class="close" style="float: right;" data-dismiss="modal">&times;</button>
-
-            </div>
-
             <div class="modal-body" style="padding: 0px 26px;" id="show_tracking_list">
 
                 <iframe id="show_design_frame" src="" type=frame&vlink=xx&link=xx&css=xxx&bg=xx&bgcolor=xx marginwidth=0 marginheight=0 hspace=0 vspace=0 frameborder=0 scorlling=yes width=100% height=600></iframe>
 
             </div>
-
-            <div class="modal-footer">
-
-
-
-            </div>
-
         </div>
 
 
@@ -1491,6 +1409,7 @@ if (sizeof($a_order_main_id) > 0) {
 
             <?php
 
+
             if ($_SERVER["HTTP_HOST"] == "localhost" || $_SERVER["HTTP_HOST"] == "192.168.88.190") {
 
             ?>
@@ -1499,6 +1418,10 @@ if (sizeof($a_order_main_id) > 0) {
 
             <?php
 
+            } elseif($_SERVER["HTTP_HOST"] == "ols-test.jog-joinourgame.com" || $_SERVER["HTTP_HOST"] == "ols-test.jog-joinourgame.com"){ 
+                 ?>
+                     inner_src = 'https://locker-test.jog-joinourgame.com/files/' + order_main_code + '/' + order_design_file;
+              <?
             } else {
 
             ?>
@@ -1514,6 +1437,8 @@ if (sizeof($a_order_main_id) > 0) {
         }
 
 
+ 
+        $('#showDesignModal').modal('show'); 
 
         $('#show_design_frame').attr("src", inner_src);
 
