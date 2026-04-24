@@ -178,7 +178,7 @@ if ($num_row == 0) {
                                         <input type="text" name="tel" id="bi_tel" maxlength="30" value="<?php echo $a_data[0]["tel"]; ?>">
                                     </div>
                                     <div class="form-group column2">
-                                        <label for="" class="w-100 text-start  c-label">TAX ID <span class="required">*</span> </label>
+                                        <label for="" class="w-100 text-start  c-label">TAX ID  </label>
                                         <input type="text" name="tax_id" id="bi_tax_id" maxlength="30" value="<?php echo $a_data[0]["tax_id"]; ?>">
                                         <input type="hidden" name="bill_addr_id" id="bi_addr_id" value="<?php echo $a_data[0]["addr_id"]; ?>">
                                     </div>
@@ -408,19 +408,7 @@ if ($num_row == 0) {
 
                                             <span class="themeBtn iconBTn teamAndRosterDetails" id="showTeamTabsSection">Save and Continue <figure class="m-0"><img src="images/vector/nextBtn.png" alt=""></figure></span>
 
-                                            <!-- <button class="btn themeBtn2 d-flex gap-3">
-                                                <figure class="m-0"><img src="images/vector/upload.png"alt=""></figure>                                                 
-                                                Upload Order Form
-                                            </button>
-                                            <input type="file" name="myFile" /> !-->
-
-
-
-                                            <!-- <span class="btn themeBtn2 iconBTn" onclick="return chooseUploadProcess(this);">
-                                                <figure class="m-0">
-                                                    <img src="images/vector/upload.png" alt=""> &nbsp; Upload Order Form
-                                            </span> -->
-
+                                         
 
                                             <span class="" style="height: 55px; width: 151px; overflow: hidden; position: relative ;top: 10px;">
                                                 <input type="file" class="form-control " accept=".xlsx" name="order_form_file" id="order_form_file">
@@ -720,7 +708,7 @@ addNewTeam Member Modal
 
 ==================-->
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> -->
 <script>
     function getReorder() {
         const selectedValue = document.getElementById('reorder_num').value;
@@ -799,9 +787,9 @@ addNewTeam Member Modal
         }
     });
 
-    function toggleDropdown() {
-        $('.dropdown-menu').toggleClass('show');
-    }
+    // function toggleDropdown() {
+    //     $('.dropdown-menu').toggleClass('show');
+    // }
 </script>
 
 <script src="js/main.js"></script>
@@ -828,10 +816,7 @@ addNewTeam Member Modal
 <!-- Toggles  -->
 
 <script>
-    function GetTotalCount() {
-
-    }
-
+    
 
     $(document).ready(function() {
         $('#toggleGuide').click(function() {
@@ -912,22 +897,6 @@ addNewTeam Member Modal
 
 
 
-        $('#teamTab .nav-link').removeClass('active');
-
-        $('#table_showing .tab-pane').removeClass('active');
-
-
-
-        const teamTab = `
-                    <li class="nav-item" role="presentation">
-
-                        <a class="nav-link  active" id="fill-tab-${teamId}" data-bs-toggle="tab" href="#fill-tabpanel-${teamId}" role="tab" aria-controls="fill-tabpanel-${teamId}" aria-selected="true"> Team ${teamId} </a>
-
-                    </li>`;
-
-
-
-        $('#teamTab').append(teamTab);
 
 
 
@@ -954,13 +923,42 @@ addNewTeam Member Modal
                 }
 
 
+                $('#teamTab .nav-link').removeClass('active');
+
+                $('#table_showing .tab-pane').removeClass('active');
+                const teamTab = `
+                        <li class="nav-item" role="presentation">
+
+                            <a class="nav-link  active" id="fill-tab-${teamId}" data-bs-toggle="tab" href="#fill-tabpanel-${teamId}" role="tab" aria-controls="fill-tabpanel-${teamId}" aria-selected="true"> Team ${teamId} </a>
+
+                        </li>`;
+                $('#teamTab').append(teamTab);
+
+
+
+
                 $('.teamTabsSection').show(300); // Adjust duration as needed
                 $('#table_showing').append(response.html);
-
+            
 
                 if (newOrderForm == true) {
                     $('#addNewTeam').modal('hide');
                 }
+
+
+                  form_id = parseInt(form_id);
+
+                  form_id++;
+
+                    $('#form_id_inc').val(form_id);
+
+                    $('#form_id_inc_modal').val(form_id);
+
+                    tmp_num_form = parseInt($('#tmp_num_form').val());
+
+                    tmp_num_form++;
+
+                    $('#tmp_num_form').val(tmp_num_form);
 
                 spanText.text('Upload Order Form');
 
@@ -1502,6 +1500,7 @@ addNewTeam Member Modal
 
 
     function calculateQTY(prod_id, class_name) {
+    
 
         var qty_total = 0;
         $('.' + class_name).each(function() {
@@ -1925,13 +1924,45 @@ addNewTeam Member Modal
 <script>
     // Function to delete a row
 
-    function deleteRow(button) {
+   
+   function deleteRow(button) {
 
-        const row = button.closest('tr'); // Get the row that contains the button
+    const row = button.closest('tr'); // works if button is DOM element
 
-        row.parentNode.removeChild(row); // Remove the row from the table
+    // Safely get data attributes (works without jQuery)
+    let prod_id = row.getAttribute('data-prod_id');
+    let form_id = row.getAttribute('data-form_id');
 
+    if (row) {
+        row.remove(); // modern cleaner way
     }
+
+    // Convert to number if needed
+    prod_id = parseInt(prod_id);
+
+    // Make sure split_no exists
+    let split = (typeof split_no !== 'undefined') ? split_no : 1;
+ 
+
+    if (prod_id === 1) {
+        calculateQTY(1, 'jersey_qty_' + form_id);
+        calculateQTY(1, 'jersey_qty2_' + form_id);
+        calculateQTY(1, 'sock_qty_' + form_id);
+        calculateQTY(1, 'sock_qty2_' + form_id);
+    } else {
+        if (split === 1) {
+            calculateQTY(prod_id, 'jersey_qty_' + form_id);
+        } else {
+            calculateQTY(prod_id, 'jersey_qty_' + form_id);
+            calculateQTY(prod_id, 'sock_qty_' + form_id);
+        }
+    }
+
+    // Remove row safely
+    
+}
+
+
 </script>
 
 
@@ -2143,8 +2174,11 @@ addNewTeam Member Modal
         isValid &= validateField('#bi_city', VALIDATION_PATTERNS.city, 'Only letters and spaces allowed');
         isValid &= validateField('#de_city', VALIDATION_PATTERNS.city, 'Only letters and spaces allowed');
 
-        isValid &= validateField('#bi_address', VALIDATION_PATTERNS.text, 'Only letters and spaces allowed');
-        isValid &= validateField('#de_address', VALIDATION_PATTERNS.text, 'Only letters and spaces allowed');
+        // isValid &= validateField('#bi_address', VALIDATION_PATTERNS.text, 'Only letters and spaces allowed');
+        // isValid &= validateField('#de_address', VALIDATION_PATTERNS.text, 'Only letters and spaces allowed');
+
+        isValid &= ValidateOnlyEmpty('#bi_address',  'Address is required');
+        isValid &= ValidateOnlyEmpty('#de_address',  'Address is required');
 
         isValid &= validateField('#bi_zip_code', VALIDATION_PATTERNS.zipcode, 'Invalid zipcode');
         isValid &= validateField('#de_zip_code', VALIDATION_PATTERNS.zipcode, 'Invalid zipcode');

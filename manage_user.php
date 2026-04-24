@@ -9,10 +9,17 @@ $obj_user = json_decode(base64_decode($_SESSION["JOGOLS"]));
 $user_id = $obj_user->user_id;
 
 
+$sql_select = "SELECT * FROM tbl_sub_user 
+               WHERE parent_user_id = ? 
+               ORDER BY date_add ASC";
 
-$sql_select = "SELECT * FROM tbl_sub_user WHERE parent_user_id='" . $user_id . "' ORDER BY date_add ASC;";
+$stmt = $conn->prepare($sql_select);
+$stmt->bind_param("i", $user_id); // assuming user_id is integer
+$stmt->execute();
 
-$rs_select = $conn->query($sql_select);
+$rs_select = $stmt->get_result();
+
+
 $maximum_sub_user = 20;
 
 ?>
@@ -81,106 +88,9 @@ $maximum_sub_user = 20;
 
 
             <div class=" row p-0" id="manage_su_main_panel">
-
-                <!-- <div class="singleUserBox">
-
-                        <div class="userProfile grid2">
-
-                            <figure class="text-start"><img src="images/vector/userProfile1.png" alt=""></figure>
-
-                            <div class="select" class="border-none activeUser">
-
-                                <select name="format" id=" ">
-
-                                    <option value="Active">Active</option>
-
-                                    <option value="Inactive">Inactive</option>
-
-                                </select>
-
-                            </div>
-
-                        </div>
-
-                        <div class="userdata">
-
-                            <table class="table border-none overflow-hidden m-0 ">
-
-                                <tbody id="tableBody  ">
-
-                                    <tr>
-
-                                        <th>Name </th>
-
-                                        <td>: &nbsp; &nbsp; Nae</td>
-
-                                    </tr>
-
-                                    <tr>
-
-                                        <th>User </th>
-
-                                        <td>: &nbsp; &nbsp; Nae</td>
-
-                                    <tr>
-
-                                        <th>Password </th>
-
-                                        <td>: &nbsp; &nbsp; 123645</td>
-
-                                    </tr>
-
-                                    <tr>
-
-                                        <th>Email </th>
-
-                                        <td>: &nbsp; &nbsp; naegbox@gmail.com</td>
-
-                                    </tr>
-
-                                </tbody>
-
-                            </table>
-
-                        </div>
-
-                        <div class="userContact">
-
-                            <div class="d-flex gap-3 justify-content-end">
-
-                                <div class="goBackBtn   ">
-
-                                    <a href="#" class="goback d-flex gap-3 justify-content-between">
-
-                                        <figure class="m-0"><img src="images/vector/edit.svg" alt=""></figure> Edit
-
-                                    </a>
-
-                                </div>
-
-                                <div class="goBackBtn   ">
-
-                                    <a href="mailto:mailm@ail.com"
-
-                                        class="goback d-flex  gap-3 justify-content-between">
-
-                                        <figure class="m-0"><img src="images/vector/mail.png" alt=""></figure> Mail
-
-                                    </a>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    </div> -->
-
                 <?php
 
                 while ($row_s_user = $rs_select->fetch_assoc()) {
-
-
 
                     $use_class = "";
 
@@ -218,22 +128,6 @@ $maximum_sub_user = 20;
                             <div class="userProfile grid2">
 
                                 <figure class="text-start"><img src="images/vector/userProfile1.png" alt=""></figure>
-
-                                <!-- <div class="inactive select">
-
-                                <select name="format" id=" " onchange="inactiveSU(<?php echo $row_s_user["sub_user_id"]; ?>)">
-
-                                    <option value="Inactive" <?php if ($row_s_user["enable"] == "1") {
-                                                                    echo "selected";
-                                                                } ?>>Active</option>
-
-                                    <option value="active" <?php if ($row_s_user["enable"] == "0") {
-                                                                echo "selected";
-                                                            } ?>>Inactive</option>
-
-                                </select>
-
-                            </div> -->
 
                                 <div class="inactive select">
 
@@ -377,7 +271,7 @@ $maximum_sub_user = 20;
 
                                     </div>
 
-                                    <div class="form-group   ">
+                                    <div class="form-group">
 
                                         <input type="text" name="Username" id="new_s_user_name" onkeypress="$('#sp_check_result').html('');" placeholder="Username">
 
@@ -387,13 +281,13 @@ $maximum_sub_user = 20;
 
                                     <div class="form-group column2">
 
-                                        <input type="email" name="Email" id="new_sub_email" placeholder=" ">
+                                        <input type="email" name="Email" id="new_sub_email" placeholder="Email">
 
                                     </div>
 
                                     <div class="form-group column2">
 
-                                        <input type="password" name="Password" id="new_s_password" placeholder=" ">
+                                        <input type="password" name="Password" id="new_s_password" placeholder="Password">
 
                                     </div>
 
@@ -473,7 +367,7 @@ $maximum_sub_user = 20;
 
         edit_td_s_user_name += '<input type="hidden" id="old_s_user_name' + sub_user_id + '" value="' + $('#td_s_user_name' + sub_user_id).html() + '">';
 
-        edit_td_s_user_name += '<span id="sp_check_result' + sub_user_id + '" style="font-size: 16px; padding-left: 5px;"></span>';
+        edit_td_s_user_name += '<span id="sp_check_result' + sub_user_id + '" style="font-size: 16px; padding-left: 5px; display:block; "></span>';
 
         $('#td_s_user_name' + sub_user_id).html(edit_td_s_user_name);
 
@@ -507,6 +401,13 @@ $maximum_sub_user = 20;
 
     function saveEditSU(sub_user_id) {
 
+      let isValid = CheckFormValidation(true , sub_user_id); 
+
+      if(!isValid){
+          return false ; 
+      }
+
+      $('.duplicate_span').remove(); 
 
 
         var s_nick_name = $('#edit_s_nick_name' + sub_user_id).val();
@@ -516,30 +417,6 @@ $maximum_sub_user = 20;
         var s_user_pwd = $('#edit_s_user_pwd' + sub_user_id).val();
 
         var sub_email = $('#edit_sub_email' + sub_user_id).val();
-
-
-
-        if (s_nick_name == "" || s_user_name == "" || s_user_pwd == "" || sub_email == "") {
-
-
-
-            alert("Please input all info.");
-
-            return false;
-
-        }
-
-
-
-        if (!isEmail(sub_email)) {
-
-            alert("Please input correct email.");
-
-            return false;
-
-        }
-
-
 
         $.ajax({
 
@@ -553,7 +430,8 @@ $maximum_sub_user = 20;
 
                 "s_user_name": window.btoa(s_user_name),
 
-                "sub_user_id": sub_user_id
+                "sub_user_id": sub_user_id , 
+                email : sub_email , 
 
             },
 
@@ -564,6 +442,7 @@ $maximum_sub_user = 20;
 
 
                     $('#sp_check_result').html('');
+                    $('#sp_check_result' + sub_user_id ).html('');
 
 
 
@@ -645,7 +524,15 @@ $maximum_sub_user = 20;
 
                     alert("Duplicate user");
 
-                    $('#sp_check_result' + sub_user_id).html('<font color=red><i class="fa fa-times"></i></font>');
+                
+                        if(resp2.username =='Fail'){
+                         $('#sp_check_result' + sub_user_id).html('<font color=red><i class="fa fa-times"></i></font>');
+                    }
+
+                    if(resp2.email =='Fail'){
+            
+                        $('#edit_sub_email' + sub_user_id).after('<p class="duplicate_span"><font color=red><i class="fa fa-times"></i></font></p>');
+                    }
 
                 }
 
@@ -736,10 +623,19 @@ $maximum_sub_user = 20;
     }
 
 
+        function base64EncodeUnicode(str) {
+                return btoa(
+                    new TextEncoder().encode(str)
+                    .reduce((data, byte) => data + String.fromCharCode(byte), '')
+                );
+        }
+
+
+
 
     function newSubUser() {
 
-
+       let isValid = CheckFormValidation(); 
 
         var s_nick_name = $('#new_s_nick_name').val();
 
@@ -749,30 +645,13 @@ $maximum_sub_user = 20;
 
         var sub_email = $('#new_sub_email').val();
 
-
-
-        if (s_nick_name == "" || s_user_name == "" || s_password == "" || sub_email == "") {
-
-
-
-            alert("Please input all info.");
-
-            return false;
-
+        
+   
+       
+        if(!isValid){
+             return false ; 
         }
-
-
-
-        if (!isEmail(sub_email)) {
-
-            alert("Please input correct email.");
-
-            return false;
-
-        }
-
-
-
+ 
         $.ajax({
 
             type: "POST",
@@ -783,19 +662,15 @@ $maximum_sub_user = 20;
 
             data: {
 
-                "s_user_name": window.btoa(s_user_name),
+                "s_user_name":base64EncodeUnicode(s_user_name),
+                email :sub_email , 
 
             },
 
             success: function(resp2) {
-
+               $('.duplicate_span').remove(); 
                 if (resp2.result == "success") {
-
-
-
                     $('#sp_check_result').html('');
-
-
 
                     $.ajax({
 
@@ -858,8 +733,16 @@ $maximum_sub_user = 20;
                 } else {
 
                     alert("Duplicate user");
+                  
+                    if(resp2.username =='Fail'){
+                        $('#sp_check_result').html('<font color=red><i class="fa fa-times"></i></font>');
+                    }
 
-                    $('#sp_check_result').html('<font color=red><i class="fa fa-times"></i></font>');
+                    if(resp2.email =='Fail'){
+               
+                        $('#new_sub_email').after('<span class="duplicate_span"><font color=red><i class="fa fa-times"></i></font></span>');
+                    }
+
 
                 }
 
@@ -873,6 +756,75 @@ $maximum_sub_user = 20;
 
     }
 
+    
+
+    
+        const VALIDATION_PATTERNS = {
+        text: /^[a-zA-Z\s]{2,80}$/, // Letters and spaces only
+        tel: /^[0-9+\-\s\(\)]{3,30}$/, // Numbers, +, -, spaces, parentheses
+        email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/ // Standard email format
+    };
+
+
+   function clearValidationErrors() {
+         $('.error_msg').remove(); 
+
+    }
+
+      function showFieldError(fieldId, message) {
+        let errorMsg = `<p class="error_msg" style="color:red; margin:5px 0 0;"> ${message} </p>` ; 
+        fieldId.after(errorMsg) ; 
+
+      }
+
+
+            function validateField(fieldId, pattern, msg) {
+                        let value = fieldId.val().trim();
+
+                        if (value === "" || value === null || value === undefined) {
+                            showFieldError(fieldId, msg);
+                            return false;
+                        }
+
+                        if (pattern && !pattern.test(value)) {
+                            showFieldError(fieldId, msg);
+                            return false;
+                        }
+
+                        return true; // ✅ IMPORTANT FIX
+            }
+
+            function CheckFormValidation(edit = false , sub_user_id = 0 ) {
+                clearValidationErrors();
+
+                let isValid = true;
+
+                let name = $('#new_s_nick_name');
+                let username = $('#new_s_user_name');
+                let email = $('#new_sub_email');
+                let password = $('#new_s_password');
+
+                if(edit==true){
+                    name  = $('#edit_s_nick_name' + sub_user_id);
+                    s_user_name = $('#edit_s_user_name' + sub_user_id) ; 
+                    password = $('#edit_s_user_pwd' + sub_user_id);
+                    email = $('#edit_sub_email' + sub_user_id);
+                }
+
+                isValid = validateField(name, VALIDATION_PATTERNS.text, 'Invalid Name') && isValid;
+
+                isValid = validateField(username, null , 'Invalid Username') && isValid;
+
+                isValid = validateField(email, VALIDATION_PATTERNS.email, 'Invalid Email') && isValid;
+
+                // skip password validation in edit mode if empty
+                if (!edit || $.trim(password.val()) !== '') {
+                    isValid = validateField(password, null ,  'Invalid Password') && isValid;
+                }
+
+                return isValid;
+            }
+    
 
 
     function cancelEditSU(sub_user_id) {

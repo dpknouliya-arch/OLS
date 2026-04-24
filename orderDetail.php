@@ -216,7 +216,7 @@ $year = !empty($_GET['year']) ? base64_decode($_GET['year'] ,true) : NULL
                                    $selected = $val['year'] == $year 
                                    ?>
                                        <option value="<?= $val['year'] ?>" $selected><?= $val['year'] ?></option>
-                                   <?
+                                   <?php 
                                }
                             ?>
                         </select>
@@ -227,7 +227,7 @@ $year = !empty($_GET['year']) ? base64_decode($_GET['year'] ,true) : NULL
                                   $selected = $key==$status ? 'selected' : '' ; 
                                    ?>
                                        <option value="<?= $key ?>" <?= $selected ?>  ><?= $val ?></option>
-                                   <?
+                                   <?php
                                }
                             ?>
                         </select>
@@ -299,7 +299,7 @@ $year = !empty($_GET['year']) ? base64_decode($_GET['year'] ,true) : NULL
         let invoice_status = $('.invoice_status').val(); 
         let search = $('.searchBar input').val(); 
         $.ajax({
-            url : "/ajax/dashboard/get_recent_order_list.php" , 
+            url : "./ajax/dashboard/get_recent_order_list.php" , 
             method : "POST" , 
             dataType : "JSON" , 
             data:{

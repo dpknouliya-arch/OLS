@@ -21,10 +21,23 @@ $obj_user = json_decode(base64_decode($_SESSION["JOGOLS"]));
 $user_id = $obj_user->user_id;
 
 $add_date = date("Y-m-d H:i:s");
-$draft_id = $_POST["edit_draft_id"] ?? 0;
+$draft_id = isset($_POST["edit_draft_id"]) ?  $_POST['edit_draft_id']  : 0;
+
 if(isset($_POST['oi_id_delete']) && $_POST["oi_id_delete"]!=""){
-	$sql_delete_oi = "DELETE FROM tbl_draft_oi WHERE oi_id IN (".$_POST["oi_id_delete"]."); ";
-	$conn->query($sql_delete_oi);
+		$ids = $_POST['oi_id_delete'] ?? '';
+
+		$idArray = array_filter(array_map('intval', explode(',', $ids)));
+
+		if (!empty($idArray)) {
+		$placeholders = implode(',', array_fill(0, count($idArray), '?'));
+
+		$sql = "DELETE FROM tbl_draft_oi WHERE oi_id IN ($placeholders)";
+		$stmt = $conn->prepare($sql);
+
+		$stmt->bind_param(str_repeat('i', count($idArray)), ...$idArray);
+		$stmt->execute();
+		}
+
 }
 
 if(isset($_POST['oi_id_delete'])  && $_POST["of_id_delete"]!=""){
@@ -96,7 +109,9 @@ foreach($_POST["edit_of_id"] as $form_id => $of_id){
 		}else{
 			if($of_id!="new" && $of_id!=""){
 
-				$s_update = "UPDATE tbl_draft_of SET order_date='".$_POST["order_date"]."',req_due_date='".$_POST["req_due_date"]."',game_event_date='".$_POST["game_event_date"]."',customer_po='".addslashes($_POST["customer_po"])."',project_name='".addslashes($_POST["project_name"])."',payment_opt='".$_POST["payment_opt"]."',reorder_num='".$_POST["reorder_num"]."',sales_rep_id='".$_POST["sales_rep"]."'";
+                $sales_rep_id = isset($_POST["sales_rep"]) ? $_POST["sales_rep"] : 0; 
+
+ 				$s_update = "UPDATE tbl_draft_of SET order_date='".$_POST["order_date"]."',req_due_date='".$_POST["req_due_date"]."',game_event_date='".$_POST["game_event_date"]."',customer_po='".addslashes($_POST["customer_po"])."',project_name='".addslashes($_POST["project_name"])."',payment_opt='".$_POST["payment_opt"]."',reorder_num='".$_POST["reorder_num"]."',sales_rep_id='". $sales_rep_id ."'";
 				$s_update .= ",user_id='".$user_id."',bill_comp_name='".addslashes($_POST["company_name"])."',bill_contact_name='".addslashes($_POST["contact"])."',bill_address='".addslashes($_POST["address_info"])."'";
 				$s_update .= ",bill_city='".addslashes($_POST["city"])."',bill_country='".addslashes($_POST["country"])."',bill_zip_code='".addslashes($_POST["zip_code"])."',bill_tel='".addslashes($_POST["tel"])."'";
 				$s_update .= ",bill_email='".addslashes($_POST["email"])."',bill_tax_id='".addslashes($_POST["tax_id"])."',deli_comp_name='".addslashes($_POST["d_company_name"])."',deli_contact_name='".addslashes($_POST["d_contact"])."'";
@@ -191,6 +206,8 @@ foreach($_POST["edit_of_id"] as $form_id => $of_id){
 }
 
 $strDate = date('Y-m-d H:i:s');
+$sales_rep_id = isset($_POST["sales_rep"]) ? $_POST['sales_rep'] : 0 ;
+  
 $sql_add_noti = 'INSERT INTO notification (
 								order_id,
 								noti_detail,
@@ -201,7 +218,7 @@ $sql_add_noti = 'INSERT INTO notification (
 								"0",
 								"ORDER FROM OLS",
 								"'.$strDate.'",
-								"'.$_POST["sales_rep"].'",
+								"'.$sales_rep_id.'",
 								"0"
 								)';
 				$query = $conn3->query($sql_add_noti);
