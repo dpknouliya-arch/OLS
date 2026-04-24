@@ -587,6 +587,20 @@
                         $('#err_msg').hide();
                        
                         //alert("success");
+                        // apiLoginJS(user_email, user_password)
+                        //     .then(apiResp => {
+
+                        //         console.log(apiResp);
+
+                        //         if (apiResp.token) {
+                        //             localStorage.setItem("API_TOKEN", apiResp.token); // store in browser
+                        //         }
+
+                        //         window.location.href = "./?vp=ZGFzaGJvcmFkTWFpbg==";
+                        //     });
+
+
+
                         if (resp.first_login != 0) {
                             window.location.href = "./?vp=ZGFzaGJvcmFkTWFpbg==";
                         } else {
@@ -600,6 +614,20 @@
             });
 
         }
+
+        // function apiLoginJS(email, password) {
+        //     return fetch("api/login.php", {
+        //         method: "POST",
+        //         headers: {
+        //             "Content-Type": "application/json"
+        //         },
+        //         body: JSON.stringify({
+        //             email: email,
+        //             password: password
+        //         })
+        //     })
+        //     .then(res => res.json());
+        // }
 
 
 

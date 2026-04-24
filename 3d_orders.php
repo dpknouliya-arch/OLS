@@ -4,34 +4,13 @@ include('db.php');
 include 'encryption_helper.php';
 $obj_user = json_decode(base64_decode($_SESSION["JOGOLS"]));
 $user_id = $obj_user->user_id;
+
+print_r($_SESSION);
 ?>
 
 <?php
-$apiUrl = "http://localhost:9090/jog_3d/api/CategorySub/get_order_details.php";
 
-$token = "413d893dbf3f4ffd4619712fd15ba501ed5acaf687253ab8961baf0482aaee78"; // replace with actual token
-
-$ch = curl_init();
-
-curl_setopt($ch, CURLOPT_URL, $apiUrl);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_HTTPHEADER, [
-    "Authorization: $token",
-    "Content-Type: application/json"
-]);
-
-$response = curl_exec($ch);
-
-if (curl_errno($ch)) {
-    echo 'Curl Error: ' . curl_error($ch);
-    exit;
-}
-
-curl_close($ch);
-
-// JSON → Array
-$data = json_decode($response, true);
-
+$data = callAPI("get_order_details.php");
 
 ?>
 

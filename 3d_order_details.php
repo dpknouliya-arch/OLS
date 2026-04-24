@@ -9,29 +9,7 @@ if (isset($_GET['order_id'])) {
 
   $order_id = customDecode($_GET['order_id']);    
 
-  $apiUrl = "http://localhost:9090/jog_3d/api/CategorySub/get_order.php?order_id=$order_id";
-
-  $token = "413d893dbf3f4ffd4619712fd15ba501ed5acaf687253ab8961baf0482aaee78"; // replace with actual token
-
-  $ch = curl_init();
-
-  curl_setopt($ch, CURLOPT_URL, $apiUrl);
-  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-  curl_setopt($ch, CURLOPT_HTTPHEADER, [
-      "Authorization: $token",
-      "Content-Type: application/json"
-  ]);
-
-    $response = curl_exec($ch);
-
-    if (curl_errno($ch)) {
-        echo "API Error: " . curl_error($ch);
-        exit;
-    }
-
-    curl_close($ch);
-
-    $result = json_decode($response, true);
+    $result = callAPI("get_order.php?order_id=$order_id");
     $data = $result['data'] ?? null;
     if (!$data || empty($data)) {
         echo "<p>No data found.</p>";
@@ -53,52 +31,26 @@ if (isset($_GET['order_id'])) {
     $logos = json_decode($order['imagedecals'] ?? '[]', true);
     $texts = json_decode($order['textdecals'] ?? '[]', true);     
     
-    function getFabricName($fabId, $token) {
-      if (empty($fabId)) return '';
-      $url = "http://localhost:9090/jog_3d/api/CategorySub/get_fabric_byid.php?fab=" . $fabId;
-      $ch = curl_init();
-      curl_setopt($ch, CURLOPT_URL, $url);
-      curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-      curl_setopt($ch, CURLOPT_HTTPHEADER, [
-          "Authorization: $token",
-          "Content-Type: application/json"
-      ]);
-      $response = curl_exec($ch);
-      if (curl_errno($ch)) {
-          return ''; // fail silently (or log)
-      }
-      curl_close($ch);
-      $res = json_decode($response, true);
-      return $res['data']['title'] ?? '';
+    function getFabricName($fabId) {
+      if (empty($fabId)) return '';    
+      $result = callAPI("get_fabric_byid.php?fab=$fabId");
+      return $result['data']['title'] ?? '';
     }
-    function getCollarName($colId, $token) {
+    function getCollarName($colId) {
       if (empty($colId)) return '';
-      $url = "http://localhost:9090/jog_3d/api/CategorySub/get_collar_byid.php?coller=" . $colId;
-      $ch = curl_init();
-      curl_setopt($ch, CURLOPT_URL, $url);
-      curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-      curl_setopt($ch, CURLOPT_HTTPHEADER, [
-          "Authorization: $token",
-          "Content-Type: application/json"
-      ]);
-      $response = curl_exec($ch);
-      if (curl_errno($ch)) {
-          return ''; // fail silently (or log)
-      }
-      curl_close($ch);
-      $res = json_decode($response, true);      
-      return $res['data']['title'] ?? '';
+      $result = callAPI("get_collar_byid.php?coller=$colId");
+      return $result['data']['title'] ?? '';
     }
 
     // Fabric
     $fab_ary = [
-        'Base'     => getFabricName($order['fabric_base'], $token),
-        'Neck'     => getFabricName($order['fabric_neck'], $token),
-        'Mesh'     => getFabricName($order['fabric_mesh'], $token),
-        'Shoulder' => getFabricName($order['fabric_shoulder'], $token),
+        'Base'     => getFabricName($order['fabric_base']),
+        'Neck'     => getFabricName($order['fabric_neck']),
+        'Mesh'     => getFabricName($order['fabric_mesh']),
+        'Shoulder' => getFabricName($order['fabric_shoulder']),
     ];
 
-    $jersey_coller = getCollarName($order['coller_id'], $token);
+    $jersey_coller = getCollarName($order['coller_id']);
     $jsname        = '';
     $stripes_name  = '';
 
@@ -120,69 +72,96 @@ if (isset($_GET['order_id'])) {
     exit;
 }
 
-$order_team_data   = [];
-$order_design_data = [];
 
-$order_id = customDecode($_GET['order_id']);
-if (isset($order_id)) {
-    $sql_team  = "SELECT * FROM order_team WHERE order_id = ?";
-    $stmt_team = $conn4->prepare($sql_team);
-    $stmt_team->bind_param("i", $order_id);
-    $stmt_team->execute();
-    $result_team = $stmt_team->get_result();
-    while ($row = $result_team->fetch_assoc()) {
-        $order_team_data[] = $row;
+// function getPantonName($conn4, $zone, $designId, $type = 'pantonName') {
+//     $sql  = "SELECT panton_name, name FROM colors WHERE name = ?";
+//     $stmt = $conn4->prepare($sql);
+//     $stmt->bind_param("s", $zone);
+//     $stmt->execute();
+//     $result = $stmt->get_result();
+//     if ($row = $result->fetch_assoc()) {
+//         return $type === 'pantonName' ? $row['panton_name'] : $row['name'];
+//     }
+
+//     $sql  = "SELECT color_group FROM design_zones WHERE design_id = ? AND zone_name = ? OR sub_zone_name = ? LIMIT 1";
+//     $stmt = $conn4->prepare($sql);
+//     $stmt->bind_param("iss", $designId, $zone, $zone);
+//     $stmt->execute();
+//     $result = $stmt->get_result();
+//     if (!($row = $result->fetch_assoc())) { return $zone; }
+
+//     $colorGroup = $row['color_group'];
+//     $map = ['primary' => 'primary_color', 'secondary' => 'secondary_color', 'tertiary' => 'tertiary_color'];
+//     if (!isset($map[$colorGroup])) { return $colorGroup; }
+
+//     $sql  = "SELECT {$map[$colorGroup]} AS color FROM designs WHERE id = ? LIMIT 1";
+//     $stmt = $conn4->prepare($sql);
+//     $stmt->bind_param("i", $designId);
+//     $stmt->execute();
+//     $result = $stmt->get_result();
+//     if (!($row = $result->fetch_assoc())) { return $colorGroup; }
+//     $colorName = $row['color'];
+
+//     $sql  = "SELECT panton_name, name FROM colors WHERE name = ?";
+//     $stmt = $conn4->prepare($sql);
+//     $stmt->bind_param("s", $colorName);
+//     $stmt->execute();
+//     $result = $stmt->get_result();
+//     if ($row = $result->fetch_assoc()) {
+//         return $type === 'pantonName' ? $row['panton_name'] : $row['name'];
+//     }
+//     return $colorName;
+// }
+
+function getPantonNameAPI($zone, $designId, $type = 'pantonName') {
+
+    if (empty($zone)) return '';
+    /* ───── STEP 1: CHECK DIRECT COLOR ───── */
+    $res = callAPI("get_color_by_name.php?name=" . urlencode($zone));
+
+    if (!empty($res['data'])) {
+        return ($type === 'pantonName')
+            ? $res['data']['panton_name']
+            : $res['data']['name'];
     }
-}
 
-if (isset($designId)) {
-    $sql_designs  = "SELECT * FROM designs WHERE id = ?";
-    $stmt_designs = $conn4->prepare($sql_designs);
-    $stmt_designs->bind_param("i", $designId);
-    $stmt_designs->execute();
-    $result_designs = $stmt_designs->get_result();
-    while ($row = $result_designs->fetch_assoc()) {
-        $order_design_data[] = $row;
-    }
-}
+    /* ───── STEP 2: GET COLOR GROUP ───── */
+    $res = callAPI("get_design_zone.php?design_id=$designId&zone=" . urlencode($zone));
 
-function getPantonName($conn4, $zone, $designId, $type = 'pantonName') {
-    $sql  = "SELECT panton_name, name FROM colors WHERE name = ?";
-    $stmt = $conn4->prepare($sql);
-    $stmt->bind_param("s", $zone);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    if ($row = $result->fetch_assoc()) {
-        return $type === 'pantonName' ? $row['panton_name'] : $row['name'];
+    if (empty($res['data'])) {
+        return $zone;
     }
 
-    $sql  = "SELECT color_group FROM design_zones WHERE design_id = ? AND zone_name = ? OR sub_zone_name = ? LIMIT 1";
-    $stmt = $conn4->prepare($sql);
-    $stmt->bind_param("iss", $designId, $zone, $zone);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    if (!($row = $result->fetch_assoc())) { return $zone; }
+    $colorGroup = $res['data']['color_group'];
 
-    $colorGroup = $row['color_group'];
-    $map = ['primary' => 'primary_color', 'secondary' => 'secondary_color', 'tertiary' => 'tertiary_color'];
-    if (!isset($map[$colorGroup])) { return $colorGroup; }
+    $map = [
+        'primary'   => 'primary_color',
+        'secondary' => 'secondary_color',
+        'tertiary'  => 'tertiary_color'
+    ];
 
-    $sql  = "SELECT {$map[$colorGroup]} AS color FROM designs WHERE id = ? LIMIT 1";
-    $stmt = $conn4->prepare($sql);
-    $stmt->bind_param("i", $designId);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    if (!($row = $result->fetch_assoc())) { return $colorGroup; }
-    $colorName = $row['color'];
-
-    $sql  = "SELECT panton_name, name FROM colors WHERE name = ?";
-    $stmt = $conn4->prepare($sql);
-    $stmt->bind_param("s", $colorName);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    if ($row = $result->fetch_assoc()) {
-        return $type === 'pantonName' ? $row['panton_name'] : $row['name'];
+    if (!isset($map[$colorGroup])) {
+        return $colorGroup;
     }
+
+    /* ───── STEP 3: GET DESIGN COLOR ───── */
+    $res = callAPI("get_design_by_id.php?id=$designId");
+
+    if (empty($res['data'])) {
+        return $colorGroup;
+    }
+
+    $colorName = $res['data'][$map[$colorGroup]] ?? '';
+
+    /* ───── STEP 4: GET FINAL COLOR NAME ───── */
+    $res = callAPI("get_color_by_name.php?name=" . urlencode($colorName));
+
+    if (!empty($res['data'])) {
+        return ($type === 'pantonName')
+            ? $res['data']['panton_name']
+            : $res['data']['name'];
+    }
+
     return $colorName;
 }
 ?>
@@ -382,8 +361,8 @@ function getPantonName($conn4, $zone, $designId, $type = 'pantonName') {
             foreach ($zones as $zkey => $zval) {
                 if (is_array($zval)) {
                     foreach ($zval as $subKey => $subValue) {
-                        $colorName  = getPantonName($conn4, $subValue, $designId, 'colorName');
-                        $pantonName = getPantonName($conn4, $subValue, $designId, 'pantonName');
+                        $colorName  = getPantonNameAPI($subValue, $designId, 'colorName');
+                        $pantonName = getPantonNameAPI($subValue, $designId, 'pantonName');
             ?>
             <div class="ols3d-color-row">
               <span class="ols3d-color-row-key"><?= htmlspecialchars($subKey) ?></span>
@@ -395,8 +374,8 @@ function getPantonName($conn4, $zone, $designId, $type = 'pantonName') {
             <?php
                     }
                 } else {
-                    $colorName  = getPantonName($conn4, $zval, $designId, 'colorName');
-                    $pantonName = getPantonName($conn4, $zval, $designId, 'pantonName');
+                    $colorName  = getPantonNameAPI($zval, $designId, 'colorName');
+                    $pantonName = getPantonNameAPI($zval, $designId, 'pantonName');
             ?>
             <div class="ols3d-color-row">
               <span class="ols3d-color-row-key"><?= htmlspecialchars($zkey) ?></span>
@@ -436,17 +415,20 @@ function getPantonName($conn4, $zone, $designId, $type = 'pantonName') {
               $has_numbers = false;
               if (!empty($texts)) {
                   foreach ($texts as $text) {
+                    // echo "<pre>";
+                    // print_r($text);
+                    // echo "</pre>";
                       if (!isset($text['displayType']) || trim($text['displayType']) === '') continue;
                       $has_numbers  = true;
                       $displayName  = $text['displayName']  ?? 'Unknown';
-                      $Text         = $text['Text']         ?? '';
-                      $FontFamily   = $text['FontFamily']   ?? 'Default Font';
-                      $FontColor    = $text['FontColor']    ?? '#000000';
-                      $OutlineColor = $text['OutlineColor'] ?? '#FFFFFF';
-                      $height       = isset($text['height']) ? number_format(floatval($text['height']) * 39.3701, 2) : '0.00';
-                      $width        = isset($text['width'])  ? number_format(floatval($text['width'])  * 39.3701, 2) : '0.00';
-                      $fillPanton   = getPantonName($conn4, $FontColor,    $designId, 'pantonName');
-                      $outPanton    = getPantonName($conn4, $OutlineColor, $designId, 'pantonName');
+                      $Text         = $text['text']         ?? '';
+                      $FontFamily   = $text['fontFamily']   ?? 'Default Font';
+                      $FontColor    = $text['color']    ?? '#000000';
+                      $OutlineColor = $text['outlineColor'] ?? '#FFFFFF';
+                      $height       = isset($text['bounds']['height']) ? number_format(floatval($text['bounds']['height']) * 39.3701, 2) : '0.00';
+                      $width        = isset($text['bounds']['width'])  ? number_format(floatval($text['bounds']['width'])  * 39.3701, 2) : '0.00';
+                      $fillPanton   = getPantonNameAPI($FontColor,    $designId, 'pantonName');
+                      $outPanton    = getPantonNameAPI($OutlineColor, $designId, 'pantonName');
               ?>
               <tr>
                 <td class="fw"><?= htmlspecialchars($displayName) ?>: <?= htmlspecialchars($Text) ?></td>
@@ -499,14 +481,14 @@ function getPantonName($conn4, $zone, $designId, $type = 'pantonName') {
                       if (!isset($text['displayType']) || $text['displayType'] === 'text') continue;
                       $has_names    = true;
                       $displayName  = $text['displayName']  ?? 'Unknown';
-                      $Text         = $text['Text']         ?? '';
-                      $FontFamily   = $text['FontFamily']   ?? 'Default Font';
-                      $FontColor    = $text['FontColor']    ?? '#000000';
-                      $OutlineColor = $text['OutlineColor'] ?? '#FFFFFF';
-                      $height       = isset($text['height']) ? number_format(floatval($text['height']) * 39.3701, 2) : '0.00';
-                      $width        = isset($text['width'])  ? number_format(floatval($text['width'])  * 39.3701, 2) : '0.00';
-                      $fillPanton   = getPantonName($conn4, $FontColor,    $designId, 'pantonName');
-                      $outPanton    = getPantonName($conn4, $OutlineColor, $designId, 'pantonName');
+                      $Text         = $text['text']         ?? '';
+                      $FontFamily   = $text['fontFamily']   ?? 'Default Font';
+                      $FontColor    = $text['color']    ?? '#000000';
+                      $OutlineColor = $text['outlineColor'] ?? '#FFFFFF';
+                      $height       = isset($text['bounds']['height']) ? number_format(floatval($text['bounds']['height']) * 39.3701, 2) : '0.00';
+                      $width        = isset($text['bounds']['width'])  ? number_format(floatval($text['bounds']['width'])  * 39.3701, 2) : '0.00';
+                      $fillPanton   = getPantonNameAPI($FontColor,    $designId, 'pantonName');
+                      $outPanton    = getPantonNameAPI($OutlineColor, $designId, 'pantonName');
               ?>
               <tr>
                 <td class="fw"><?= htmlspecialchars($displayName) ?>: <?= htmlspecialchars($Text) ?></td>
