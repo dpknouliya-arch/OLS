@@ -53,7 +53,41 @@
 
 		$_SESSION['JOGOLS'] = $s_obj;
 
+		function apiLogin($user, $password) {
 
+			$url = OLS_BASE_URL . "api/login.php";
+
+			$postData = json_encode([
+				"email" => base64_decode($user), // ✅ decode email
+				"password" => base64_decode($password)          // ✅ plain password
+			]);
+
+			$ch = curl_init();
+			curl_setopt($ch, CURLOPT_URL, $url);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+			curl_setopt($ch, CURLOPT_POST, true);
+			curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
+			curl_setopt($ch, CURLOPT_HTTPHEADER, [
+				"Content-Type: application/json"
+			]);
+
+			$res = curl_exec($ch);
+
+			if (curl_errno($ch)) {
+				print_r($url); // ✅ debug: show what was sent
+				echo "Curl Error: " . curl_error($ch);
+				curl_close($ch);
+				return null;
+			}
+
+			curl_close($ch);
+
+			$data = json_decode($res, true);
+
+			return $data['token'] ?? null;
+		}
+
+		$_SESSION['API_TOKEN'] = apiLogin($_POST["user"], $_POST["password"]);
 
 		echo json_encode(array(
 			"result" => "success",

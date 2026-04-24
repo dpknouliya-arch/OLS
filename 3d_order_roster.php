@@ -12,29 +12,7 @@ if (!isset($_GET['order_id'])) {
 
 $order_id = customDecode($_GET['order_id']);
 
-/* ✅ API CALL */
-$apiUrl = "http://localhost:9090/jog_3d/api/CategorySub/get_roster_details.php?order_id=$order_id";
-
-$token = "413d893dbf3f4ffd4619712fd15ba501ed5acaf687253ab8961baf0482aaee78"; // replace with actual token
-
-$ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, $apiUrl);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_HTTPHEADER, [
-    "Authorization: $token",
-    "Content-Type: application/json"
-]);
-
-$response = curl_exec($ch);
-
-if (curl_errno($ch)) {
-    echo curl_error($ch);
-    exit;
-}
-
-curl_close($ch);
-
-$data = json_decode($response, true);
+$data = callAPI("get_roster_details.php?order_id=$order_id");
 
 if (!$data || !$data['status']) {
     echo "<p>API Error</p>";
