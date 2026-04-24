@@ -309,6 +309,8 @@ $row_product = $rs_prod->fetch_assoc();
 								$row_count = $m + 1;
 								$edit_item = $a_item[$m];
 
+								
+
 								$sum_qty_top1 += $edit_item["qty_top1"];
 								$sum_qty_top2 += $edit_item["qty_top2"];
 								$sum_qty_bottom1 += $edit_item["qty_bottom1"];

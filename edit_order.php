@@ -956,7 +956,7 @@ $s_of_id_list = implode(",", $a_of_id);
 											$ttl_top = 0;
 											$ttl_bottom = 0;
 
-											$num_item = sizeof($a_item[$of_id]);
+											$num_item = isset($a_item[$of_id]) ?  sizeof($a_item[$of_id]) : 0 ;
 
 											if ($prod_id == "1") {
 											?>
@@ -2883,7 +2883,7 @@ $s_of_id_list = implode(",", $a_of_id);
 	}
  
 	function movetoteam() {
-        let isValid = CheckOrderInformationValidation(); 
+        let isValid = CheckBillingFormValidation(); 
 		if(!isValid){
 			 return false ; 
 		}
@@ -2900,8 +2900,10 @@ $s_of_id_list = implode(",", $a_of_id);
 
 	$(document).on('click', '.movetoOrderItem', function() {
 
-	  let isValid = CheckOrderInformationValidation(); 
-		if(!isValid){
+	  let isValid = CheckBillingFormValidation(); 
+	
+	 
+	  if(!isValid){
 			 return false ; 
 		}
 
@@ -3265,6 +3267,7 @@ $s_of_id_list = implode(",", $a_of_id);
 				isValid = CheckOrderInformationValidation();
 			}
 
+			 
 			
 
 			if (!isValid) {
@@ -3349,34 +3352,7 @@ $s_of_id_list = implode(",", $a_of_id);
 
 
 	
-    // $(document).on('click', '.nav-link', function(event) {
-		// 	let isValid = true 
-		// 	console.log("id " , event_id); 
-		
-		// 	let event_id = $(this).attr('id'); 
-	// 	if(event_id == 'order-tab'){
-	// 		 isValid = CheckBillingFormValidation();
-	//       	console.log("is Valid" , isValid); 
 
-	// 	}else if(event_id == 'team-tab'){
-    //            isValid = CheckOrderInformationValidation();
-	// 	}
-
-	// 	console.log("is Valid" , isValid); 
-
-	// 	if(!isValid){
-			
-	// 		 event.preventDefault(); 
-	// 		 return false ;
-	// 	}
-
-    //     if (!isValid) {
-    //         event.preventDefault(); // THIS actually blocks tab switching
-    //         console.log("Validation failed - tab blocked");
-    //     } else {
-    //         console.log("Valid - allow tab switch");
-    //     }
-    // });
 
 
 
@@ -3678,6 +3654,65 @@ $s_of_id_list = implode(",", $a_of_id);
         });
 
     });
+
+
+	function deleteRow(button) {
+
+		const row = button.closest('tr'); // works if button is DOM element
+
+		// Safely get data attributes (works without jQuery)
+		let prod_id = row.getAttribute('data-prod_id');
+		let form_id = row.getAttribute('data-form_id');
+
+		if (row) {
+			row.remove(); // modern cleaner way
+		}
+
+		// Convert to number if needed
+		prod_id = parseInt(prod_id);
+
+		// Make sure split_no exists
+		let split = (typeof split_no !== 'undefined') ? split_no : 1;
+	
+
+		if (prod_id === 1) {
+			calculateQTY(1, 'jersey_qty_' + form_id);
+			calculateQTY(1, 'jersey_qty2_' + form_id);
+			calculateQTY(1, 'sock_qty_' + form_id);
+			calculateQTY(1, 'sock_qty2_' + form_id);
+		} else {
+			if (split === 1) {
+				calculateQTY(prod_id, 'jersey_qty_' + form_id);
+			} else {
+				calculateQTY(prod_id, 'jersey_qty_' + form_id);
+				calculateQTY(prod_id, 'sock_qty_' + form_id);
+			}
+		}
+
+		// Remove row safely
+		
+	}
+
+	   function removeTable(el) {
+
+        // Get current tab-pane
+        var $tabPane = $(el).closest('.tab-pane');
+
+        var tabPaneId = $tabPane.attr('id'); // e.g. fill-tabpanel-1
+
+        // Remove the tab-pane
+        $tabPane.remove();
+
+        // Remove corresponding tab button
+        $('button[data-bs-target="#' + tabPaneId + '"], a[href="#' + tabPaneId + '"]').remove();
+
+        // Activate first available tab
+		 var firstTab = $('.teamDetailsNavitems:first');
+		 firstTab.addClass('active')
+		 var href = firstTab.attr('href'); 
+         $(href).addClass('show active'); 
+		 
+    }
 </script>
 
 

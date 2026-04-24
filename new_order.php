@@ -26,6 +26,10 @@ $sql_select .= " WHERE tbl_order_form.user_id='" . $user_id . "' AND tbl_order_f
 
 //$rs_select = $conn->query($sql_select);
 
+
+
+
+
 $rs_tmp = $conn->query($sql_select);
 
 
@@ -87,6 +91,8 @@ if (sizeof($a_order_main_id) > 0) {
 
     //echo "<hr>".$s_order_main_id."<hr>";
 
+    
+
     $sql_chk_design = "SELECT order_main_id,order_main_code,order_design_file FROM order_main WHERE order_main_id IN (" . $s_order_main_id . "); ";
 
     $rs_chk_design = $conn3->query($sql_chk_design);
@@ -134,6 +140,7 @@ if (sizeof($a_order_main_id) > 0) {
         font-size: 12px;
         font-weight: 500;
     }
+
 </style>
 
 <div class="newOrderPage">
@@ -253,6 +260,10 @@ if (sizeof($a_order_main_id) > 0) {
                             <td class="bg_name_info text-center">
 
                                 <?php
+
+                                // echo '<pre>' ; 
+                                // print_r($design_found); 
+
 
                                 if (isset($design_found[($row_order["re_order_id"])]) && $design_found[($row_order["re_order_id"])]["order_design_file"] != "") {
 

@@ -210,8 +210,8 @@ if ((isset($_SESSION['JOGOLS']) && ($_SESSION['JOGOLS'] != "")) || (isset($_SESS
                                 <span class="menu-title">Add Order
                                 </span>
                             </a>
-                        </li>
-                        <li class="nav-item  <?php if ($_GET['vp'] == base64_encode('manage_order')) {
+                        </li>  
+                        <li class="nav-item  <?php if ($_GET['vp'] == base64_encode('manage_order')  ||  strpos(base64_decode($_GET['vp']), 'edit_order') !== false) {
                                                     echo 'active';
                                                 } ?> ">
                             <a class="nav-link" href="?vp=<?php echo base64_encode('manage_order'); ?>">
@@ -290,6 +290,14 @@ if ((isset($_SESSION['JOGOLS']) && ($_SESSION['JOGOLS'] != "")) || (isset($_SESS
                                 <span class="menu-title">Manage Users</span>
                             </a>
                         </li>
+
+
+                    <li class="nav-item <?php if($_GET['vp'] == base64_encode('archived')){echo 'active' ;}?>">
+                            <a class="nav-link" href="?vp=<?php echo base64_encode('archived');?>">
+                            <i class="menu-icon fa fa-archive"></i>
+                            <span class="menu-title">Archived Orders</span>
+                            </a>
+                    </li>
 
 
                         <!-- <li class="nav-item ">
