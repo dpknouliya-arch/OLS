@@ -317,7 +317,7 @@ $maximum_sub_user = 20;
 
                                         <div class="goBackBtn">
 
-                                            <a href="#" class="goback iconBTn d-flex gap-3 justify-content-between" onclick="return newSubUser();">
+                                            <a href="#" class="goback iconBTn d-flex gap-3 justify-content-between" onclick="return newSubUser(this);">
 
                                                 Save <figure class="m-0"><img src="images/vector/saveGreen.png" alt="">
 
@@ -633,7 +633,7 @@ $maximum_sub_user = 20;
 
 
 
-    function newSubUser() {
+    function newSubUser(element) {
 
        let isValid = CheckFormValidation(); 
 
@@ -706,6 +706,7 @@ $maximum_sub_user = 20;
 
 
 
+
                                 //---Remove add panel when reach to maximum limit of sub user
 
                                 if (resp.num_row_su >= <?php echo $maximum_sub_user; ?>) {
@@ -715,8 +716,11 @@ $maximum_sub_user = 20;
                                 }
 
 
+                               
 
-                                $('#manage_su_main_panel').append(resp.inner_new_card);
+
+
+                               $('#manage_su_main_panel').append(resp.inner_new_card);
 
 
 
