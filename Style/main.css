@@ -1,3 +1,71 @@
+/* ── Custom jersey fonts ─────────────────────────────────────────── */
+@font-face {
+    font-family: "HaettenschweilerJog4";
+    src: url("../Fonts/HaettenschweilerJog4.ttf") format("truetype");
+    font-display: swap;
+}
+@font-face {
+    font-family: "JerseyM54Jog3";
+    src: url("../Fonts/JerseyM54Jog3.ttf") format("truetype");
+    font-display: swap;
+}
+@font-face {
+    font-family: "NHLEdgeNewYorkIslandersJOG";
+    src: url("../Fonts/NHLEdgeNewYorkIslandersJOG.ttf") format("truetype");
+    font-display: swap;
+}
+@font-face {
+    font-family: "SuperstarM54JOG";
+    src: url("../Fonts/SuperstarM54JOG.ttf") format("truetype");
+    font-display: swap;
+}
+@font-face {
+    font-family: "BebasNeueJog2";
+    src: url("../Fonts/BebasNeueJog2.ttf") format("truetype");
+    font-display: swap;
+}
+@font-face {
+    font-family: "Brobane";
+    src: url("../Fonts/Brobane.ttf") format("truetype");
+    font-display: swap;
+}
+@font-face {
+    font-family: "NHLChicago";
+    src: url("../Fonts/NHLChicago.ttf") format("truetype");
+    font-display: swap;
+}
+@font-face {
+    font-family: "NHLENYR_";
+    src: url("../Fonts/NHLENYR_.ttf") format("truetype");
+    font-display: swap;
+}
+@font-face {
+    font-family: "NHLMA__";
+    src: url("../Fonts/NHLMA__.ttf") format("truetype");
+    font-display: swap;
+}
+@font-face {
+    font-family: "PROBLOCK";
+    src: url("../Fonts/PROBLOCK.ttf") format("truetype");
+    font-display: swap;
+}
+@font-face {
+    font-family: "BrushScriptStd";
+    src: url("../Fonts/BrushScriptStd.ttf") format("truetype");
+    font-display: swap;
+}
+@font-face {
+    font-family: "ThirstyScriptExtraBoldDemo";
+    src: url("../Fonts/ThirstyScriptExtraBoldDemo.ttf") format("truetype");
+    font-display: swap;
+}
+@font-face {
+    font-family: "AngletonScript";
+    src: url("../Fonts/AngletonScript.otf") format("opentype");
+    font-display: swap;
+}
+/* ──────────────────────────────────────────────────────────────── */
+
 .main-content {
 
     transition: margin-left 0.3s;
