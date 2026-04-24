@@ -95,11 +95,16 @@ if ($num_row == 0) {
     th {
         text-align: center !important;
     }
+
+    
+    .w-45{
+         width: 45px ;
+    }
 </style>
 
 <div class="addOrderPage">
 
-    <div class="  pageHeader">
+    <div class="pageHeader">
 
         <h2>Add Order</h2>
 
@@ -638,30 +643,22 @@ addNewTeam Member Modal
 
                     <span class="themeBtn text-center" id="AddNewTeamModal">Save and Continue</span>
 
-                    <!-- <div class="upload-btn-wrapper"> -->
+                   <div class="d-flex gap-2">
 
-                    <!-- <button class="btn themeBtn2 d-flex gap-3" type="button" onclick="return chooseUploadProcess(this);">
+                            <span class="" style="height: 55px; width: 151px; overflow: hidden; position: relative ;top: 10px;">
+                                <input type="file" class="form-control " accept=".xlsx" name="new_order_form_file" id="new_order_form_file">
+                            </span>
 
-                            <figure class="m-0"><img src="images/vector/upload.png" alt=""></figure> Upload Order
+                            <button class="UploadOrderFormNew btn btn-sm themeBtn2 iconBTn" type="button">
+                                <figure class="m-0">
+                                    <img src="images/vector/upload.png" alt="">
+                                </figure>
+                                &nbsp; <span>Upload Order Form </span>
+                            </button>
 
-                            Form
+                   </div>
 
-                        </button> -->
-
-                    <span class="" style="height: 55px; width: 151px; overflow: hidden; position: relative ;top: 10px;">
-                        <input type="file" class="form-control " accept=".xlsx" name="new_order_form_file" id="new_order_form_file">
-                    </span>
-
-                    <button class="UploadOrderFormNew btn btn-sm themeBtn2 iconBTn" type="button">
-                        <figure class="m-0">
-                            <img src="images/vector/upload.png" alt="">
-                        </figure>
-                        &nbsp; <span>Upload Order Form </span>
-                    </button>
-
-                    <!-- <input type="file" name="myFile"> -->
-
-                    <!-- </div> -->
+                    
 
                 </div>
 
@@ -929,7 +926,7 @@ addNewTeam Member Modal
                 const teamTab = `
                         <li class="nav-item" role="presentation">
 
-                            <a class="nav-link  active" id="fill-tab-${teamId}" data-bs-toggle="tab" href="#fill-tabpanel-${teamId}" role="tab" aria-controls="fill-tabpanel-${teamId}" aria-selected="true"> Team ${teamId} </a>
+                            <a class="nav-link  active  add_order_nav_link" id="fill-tab-${teamId}" data-bs-toggle="tab" href="#fill-tabpanel-${teamId}" role="tab" aria-controls="fill-tabpanel-${teamId}" aria-selected="true"> Team ${teamId} </a>
 
                         </li>`;
                 $('#teamTab').append(teamTab);
@@ -1004,7 +1001,7 @@ addNewTeam Member Modal
 
                     <li class="nav-item" role="presentation">
 
-                        <a class="nav-link  active" id="fill-tab-${teamId}" data-bs-toggle="tab" href="#fill-tabpanel-${teamId}" role="tab" aria-controls="fill-tabpanel-${teamId}" aria-selected="true"> Team ${teamId} </a>
+                        <a class="nav-link  active  add_order_nav_link" id="fill-tab-${teamId}" data-bs-toggle="tab" href="#fill-tabpanel-${teamId}" role="tab" aria-controls="fill-tabpanel-${teamId}" aria-selected="true"> Team ${teamId} </a>
 
                     </li>`;
 
@@ -1130,7 +1127,7 @@ addNewTeam Member Modal
 
                     <li class="nav-item" role="presentation">
 
-                        <a class="nav-link  active" id="fill-tab-${teamId}" data-bs-toggle="tab" href="#fill-tabpanel-${teamId}" role="tab" aria-controls="fill-tabpanel-${teamId}" aria-selected="true"> Team ${teamId} </a>
+                        <a class="nav-link  active  add_order_nav_link" id="fill-tab-${teamId}" data-bs-toggle="tab" href="#fill-tabpanel-${teamId}" role="tab" aria-controls="fill-tabpanel-${teamId}" aria-selected="true"> Team ${teamId} </a>
 
                     </li>`;
 
@@ -1307,55 +1304,7 @@ addNewTeam Member Modal
 
 
 <script>
-    // document.addEventListener('DOMContentLoaded', function() {
 
-    // const tabLinks = document.querySelectorAll('.switch-tab');
-
-    // tabLinks.forEach(link => {
-
-    //     link.addEventListener('click', function(event) {
-
-    //         event.preventDefault();
-
-    //         const target = this.getAttribute('data-target');
-
-    //         // Activate the new tab
-
-    //         const newTab = document.querySelector(target);
-
-    //         const currentTab = document.querySelector('.tab-pane.show');
-
-    //         if (currentTab) {
-
-    //             currentTab.classList.remove('show', 'active');
-
-    //         }
-
-    //         newTab.classList.add('show', 'active');
-
-
-
-    //         // Update the active class for nav links
-
-    //         const navLinks = document.querySelectorAll('.nav-link');
-
-    //         navLinks.forEach(navLink => {
-
-    //             navLink.classList.remove('active');
-
-    //             if (navLink.getAttribute('href') === target) {
-
-    //                 navLink.classList.add('active');
-
-    //             }
-
-    //         });
-
-    //     });
-
-    // });
-
-    // });
 
 
 
@@ -1418,35 +1367,25 @@ addNewTeam Member Modal
 </script>
 
 <script>
- 
- function removeTable(el) {
+    function removeTable(el) {
 
-    // Get current tab-pane
-    var $tabPane = $(el).closest('.tab-pane');
-    var tabPaneId = $tabPane.attr('id');
+        // Get current tab-pane
+        var $tabPane = $(el).closest('.tab-pane');
 
-    // Find corresponding tab button BEFORE removing pane
-    var $tabBtn = $('button[data-bs-target="#' + tabPaneId + '"], a[href="#' + tabPaneId + '"]');
-    var $li = $tabBtn.closest('li');
+        var tabPaneId = $tabPane.attr('id'); // e.g. fill-tabpanel-1
 
-    // Remove tab-pane
-    $tabPane.remove();
+        // Remove the tab-pane
+        $tabPane.remove();
 
-    // Remove tab button + li
-    // $li.remove();
+        // Remove corresponding tab button
+        $('button[data-bs-target="#' + tabPaneId + '"], a[href="#' + tabPaneId + '"]').remove();
 
-    // Activate first available tab
-    var $firstTab = $('.nav-tabs button:first, .nav-tabs a:first');
-
-    if ($firstTab.length) {
-        $firstTab.addClass('active');
-
-        var target = $firstTab.attr('data-bs-target') || $firstTab.attr('href');
-        $(target).addClass('show active');
+        // Activate first available tab
+        let first_tab = $('.add_order_nav_link:first'); 
+        let href  = first_tab.attr('href'); 
+        first_tab.addClass('active'); 
+        $(href).addClass('show active'); 
     }
-}
-
-
 
     function addItemRow(form_id, prod_id) {
 

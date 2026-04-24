@@ -874,7 +874,7 @@ $s_of_id_list = implode(",", $a_of_id);
 										if ($a_data[$k]["xls_name"] != "") {
 									?>
 											<center id="sameteam<?php echo $of_id; ?>">
-												   <div class="tab-content" id="tab-content">
+												   <div class="tab-content  xls-name-blank" id="tab-content">
 													<div class="tab-pane <?php if ($fisrtid == $of_id) {
 																				echo "active";
 																			} ?>" id="fill-tabpanel-<?php echo $of_id; ?>" role="tabpanel" aria-labelledby="fill-tab-<?php echo $of_id; ?>"  data-first_id = "<?= $fisrtid ?>">
@@ -961,7 +961,7 @@ $s_of_id_list = implode(",", $a_of_id);
 											if ($prod_id == "1") {
 											?>
 												<center id="sameteam<?php echo $of_id; ?>">
-													<div class="tab-content" id="tab-content">
+													<div class="tab-content   production_id-1" id="tab-content">
 														<div class="tab-pane <?php if ($fisrtid == $of_id) {
 																					echo "active";
 																				} ?>" id="fill-tabpanel-<?php echo $of_id; ?>" role="tabpanel" aria-labelledby="fill-tab-<?php echo $of_id; ?>"   data-first_id = "<?= $fisrtid ?>">
@@ -1239,7 +1239,7 @@ $s_of_id_list = implode(",", $a_of_id);
 												$split_name2 = $tmp_split[1];
 											?>
 												<center id="sameteam<?php echo $of_id; ?>">
-													<div class="tab-content" id="tab-content">
+													<div class="tab-content   splittype 2" id="tab-content">
 														<div class="tab-pane <?php if ($fisrtid == $of_id) {
 																					echo "active";
 																				} ?>" id="fill-tabpanel-<?php echo $of_id; ?>" role="tabpanel" aria-labelledby="fill-tab-<?php echo $of_id; ?>">
@@ -1494,7 +1494,7 @@ $s_of_id_list = implode(",", $a_of_id);
 												$split_name = $row_product["split_name"];
 											?>
 												<center id="sameteam<?php echo $of_id; ?>">
-													<div class="tab-content" id="tab-content">
+													<div class="tab-content  split-name " id="tab-content">
 														<div class="tab-pane <?php if ($fisrtid == $of_id) {
 																					echo "active";
 																				} ?>" id="fill-tabpanel-<?php echo $of_id; ?>" role="tabpanel" aria-labelledby="fill-tab-<?php echo $of_id; ?>">
@@ -1982,6 +1982,8 @@ $s_of_id_list = implode(",", $a_of_id);
 											$a_item_show = array();
 											while ($row_oi = $rs_oi->fetch_assoc()) {
 												$a_item_show[] = $row_oi;
+
+												
 											}
 
 											$num_item = sizeof($a_item_show);
@@ -1999,8 +2001,11 @@ $s_of_id_list = implode(",", $a_of_id);
 
 											if ($prod_id == "1") {
 											?>
+											<input type="hidden" name="assigned_edit_of_id"  value="<?=$of_id?>">
+
 												<center id="sameteam<?php echo $of_id; ?>">
-													<div class="tab-content" id="tab-content">
+													<div class="tab-content  prod-id-1" id="tab-content">
+                                                       
 														<div class="tab-pane <?php if ($fisrtid == $of_id) {
 																					echo "active";
 																				} ?>" id="fill-tabpanel-<?php echo $of_id; ?>" role="tabpanel" aria-labelledby="fill-tab-<?php echo $of_id; ?>">
@@ -2111,7 +2116,7 @@ $s_of_id_list = implode(",", $a_of_id);
 												$split_name2 = $tmp_split[1];
 											?>
 												<center id="sameteam<?php echo $of_id; ?>">
-													<div class="tab-content" id="tab-content">
+													<div class="tab-content  split-type2" id="tab-content">
 														<div class="tab-pane <?php if ($fisrtid == $of_id) {
 																					echo "active";
 																				} ?>" id="fill-tabpanel-<?php echo $of_id; ?>" role="tabpanel" aria-labelledby="fill-tab-<?php echo $of_id; ?>">
@@ -2263,7 +2268,7 @@ $s_of_id_list = implode(",", $a_of_id);
 												$split_name = $row_product["split_name"];
 											?>
 												<center id="sameteam<?php echo $of_id; ?>">
-													<div class="tab-content" id="tab-content">
+													<div class="tab-content split-name" id="tab-content">
 														<div class="tab-pane <?php if ($fisrtid == $of_id) {
 																					echo "active";
 																				} ?>" id="fill-tabpanel-<?php echo $of_id; ?>" role="tabpanel" aria-labelledby="fill-tab-<?php echo $of_id; ?>">
@@ -2920,6 +2925,8 @@ $s_of_id_list = implode(",", $a_of_id);
 	function saveDraft(eve) {
 		eve.preventDefault();
 
+	
+
 
 		if ($('#req_due_date').val() == "") {
 			$('.req_errormsg').text('Please input Request Due date.');
@@ -3001,6 +3008,23 @@ $s_of_id_list = implode(",", $a_of_id);
 
 		$('#form_manage_save').attr("action", "ajax/manage_order/submit_draft.php");
 		$('#form_manage_save').submit();
+
+
+				// $('#form_manage_save').on('submit', function(e) {
+				//     e.preventDefault();
+
+				//    console.log("form sunmit "); 
+				// $.ajax({
+				// 		url: "./ajax/manage_order/submit_draft.php",
+				// 		type: "POST",
+				// 		data: $(this).serialize(),
+				// 		success: function(res) {
+				// 		console.log(res);
+				// }
+				// });
+				// });
+
+				// $('#form_manage_save').submit();
 
 	}
 
