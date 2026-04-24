@@ -81,6 +81,22 @@ $design_image = !empty($order_design_data[0]['image'])      ? $order_design_data
 $order_date_fmt = !empty($added_date) ? date('d-m-Y H:i:s', strtotime($added_date)) : '—';
 $order_id_enc   = customEncode($order_id);
 
+// Fetch order status from tbl_order_form if it exists
+$ols_order_status = '';
+$ols_step_done    = false;
+$stmt_st = $conn->prepare(
+    "SELECT order_status, is_submitted FROM tbl_order_form WHERE design_order_id=? ORDER BY is_submitted DESC LIMIT 1"
+);
+$stmt_st->bind_param("i", $order_id);
+$stmt_st->execute();
+$res_st = $stmt_st->get_result();
+if ($res_st->num_rows > 0) {
+    $row_st        = $res_st->fetch_assoc();
+    $ols_order_status = $row_st['order_status'] ?? '';
+    $ols_step_done    = true;
+}
+$stmt_st->close();
+
 function getPantonName($conn4, $zone, $designId, $type = 'pantonName') {
     $sql  = "SELECT panton_name, name FROM colors WHERE name = ?";
     $stmt = $conn4->prepare($sql);
@@ -178,12 +194,16 @@ function getPantonName($conn4, $zone, $designId, $type = 'pantonName') {
         <div class="ols3d-step-num active">1</div>
         <span class="ols3d-step-label active">Order Details</span>
       </div>
-      <div class="ols3d-step-connector"></div>
+      <div class="ols3d-step-connector <?= $ols_step_done ? 'done' : '' ?>"></div>
       <div class="ols3d-step">
-        <div class="ols3d-step-num">2</div>
-        <span class="ols3d-step-label">Add Roster</span>
+        <div class="ols3d-step-num <?= $ols_step_done ? 'done' : '' ?>">
+          <?php if ($ols_step_done): ?>
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+          <?php else: ?>2<?php endif; ?>
+        </div>
+        <span class="ols3d-step-label <?= $ols_step_done ? 'done' : '' ?>">Add Roster</span>
       </div>
-      <div class="ols3d-step-connector"></div>
+      <div class="ols3d-step-connector <?= ($ols_order_status === 'new' || $ols_order_status === 'draft' && false) && $ols_step_done ? 'done' : '' ?>"></div>
       <div class="ols3d-step">
         <div class="ols3d-step-num">3</div>
         <span class="ols3d-step-label">Checkout</span>
@@ -203,7 +223,14 @@ function getPantonName($conn4, $zone, $designId, $type = 'pantonName') {
     <span class="ols3d-info-label">Jersey Type:</span>
     <span class="ols3d-info-value"><?= htmlspecialchars($jersey_type) ?></span>
     <div class="ols3d-info-divider"></div>
-    <span class="ols3d-badge ols3d-badge-new">New</span>
+    <?php
+    $badge_class = 'ols3d-badge-new';
+    $badge_label = 'New';
+    if ($ols_order_status === 'draft')     { $badge_class = 'ols3d-badge-draft'; $badge_label = 'Draft'; }
+    elseif ($ols_order_status === 'new')   { $badge_class = 'ols3d-badge-new';   $badge_label = 'Submitted'; }
+    elseif ($ols_order_status !== '')      { $badge_class = 'ols3d-badge-new';   $badge_label = ucfirst($ols_order_status); }
+    ?>
+    <span class="ols3d-badge <?= $badge_class ?>"><?= htmlspecialchars($badge_label) ?></span>
   </div>
 
   <!-- ── Two-column preview panels ─────────────────────────── -->

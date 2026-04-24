@@ -893,7 +893,7 @@ $s_of_id_list = implode(",", $a_of_id);
 
 
 
-											$num_item = sizeof($a_item[$of_id]);
+											$num_item = isset($a_item[$of_id]) ? sizeof($a_item[$of_id]) : 0;
 
 											if ($prod_id == "1") {
 											?>

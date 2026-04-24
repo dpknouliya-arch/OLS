@@ -123,6 +123,8 @@
 }
 .ols3d-badge-new         { background: #EEF3FF; color: #1B3FB0; border: 1px solid #1B3FB022; }
 .ols3d-badge-new::before { background: #1B3FB0; }
+.ols3d-badge-draft         { background: #F5F5F5; color: #6B7280; border: 1px solid #9CA3AF33; }
+.ols3d-badge-draft::before { background: #9CA3AF; }
 .ols3d-badge-preapproval         { background: #FFF7EC; color: #C05A00; border: 1px solid #F59E0B22; }
 .ols3d-badge-preapproval::before { background: #F59E0B; }
 .ols3d-badge-approved         { background: #ECFDF5; color: #047857; border: 1px solid #10B98122; }
@@ -418,6 +420,24 @@
 .ols3d-roster-table tbody tr:nth-child(even) td { background: #FAFBFD; }
 .ols3d-roster-table td.num { text-align: center; font-weight: 700; color: var(--text-muted); }
 
+/* ── Roster Table View (read-only) ───────────── */
+.ols3d-roster-table-wrap { overflow-x: auto; margin-top: 10px; }
+.ols3d-roster-table-view { width: 100%; border-collapse: collapse; min-width: 800px; }
+.ols3d-roster-table-view thead tr { background: #3D4F7C; }
+.ols3d-roster-table-view th {
+  padding: 10px 12px; font-size: 11px; font-weight: 700;
+  color: white; text-align: left; white-space: nowrap;
+  border-right: 1px solid #4A5A8A;
+}
+.ols3d-roster-table-view th:last-child { border-right: none; }
+.ols3d-roster-table-view td {
+  padding: 9px 12px; font-size: 12px; color: var(--text-dark);
+  border-bottom: 1px solid #F0F2F7; border-right: 1px solid #F0F2F7;
+  white-space: nowrap;
+}
+.ols3d-roster-table-view td:last-child { border-right: none; }
+.ols3d-roster-table-view tbody tr:nth-child(even) td { background: #FAFBFD; }
+
 /* ── Action Buttons ──────────────────────────── */
 .ols3d-actions { display: flex; gap: 12px; padding-bottom: 20px; }
 .ols3d-btn-primary {
@@ -488,6 +508,28 @@
 .ols3d-summary-row:last-child { border-bottom: none; }
 .ols3d-summary-key { font-size: 12px; color: var(--text-muted); }
 .ols3d-summary-val { font-size: 12px; font-weight: 700; color: var(--text-dark); text-align: right; }
+
+.ols3d-submitted-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.ols3d-submitted-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: #047857;
+}
+.ols3d-submitted-copy {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+.ols3d-submitted-grid {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 14px;
+  background: #F8FCFA;
+}
 
 .ols3d-design-thumb {
   display: flex; gap: 12px; padding: 14px;
