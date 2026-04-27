@@ -348,8 +348,9 @@ while ($row_select = $rs_select->fetch_assoc()) {
       line-height: 1.2;
     }
     .draft-card .rep-avatar {
-      width: 28px; height: 28px;
-      border-radius: 50%;
+      height: 28px;
+      border-radius: 15px;
+      padding: 15px;
       background: var(--jog-blue);
       display: flex; align-items: center; justify-content: center;
       font-family: var(--font-head);
@@ -357,7 +358,7 @@ while ($row_select = $rs_select->fetch_assoc()) {
       flex-shrink: 0;
     }
     .draft-card .meta-row {
-      display: flex; gap: 12px; flex-wrap: wrap;
+      display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap;
     }
     .meta-item {
       display: flex; align-items: center; gap: 5px;
@@ -394,8 +395,8 @@ while ($row_select = $rs_select->fetch_assoc()) {
       border-radius: 50%; flex-shrink: 0;
     }
     /* Draft statuses */
-    .sb-draft         { background: #f3f4f6; color: #6b7280; }
-    .sb-draft::before { background: #9ca3af; }
+    .sb-draft         { background: #f3f4f6; color: #005aff; }
+    .sb-draft::before { background: #005dfd; }
     .sb-design-complete         { background: #eff6ff; color: #1d4ed8; }
     .sb-design-complete::before { background: #3b82f6; }
     .sb-roster-progress         { background: #fffbeb; color: #b45309; }
@@ -878,7 +879,7 @@ while ($row_select = $rs_select->fetch_assoc()) {
                 <option value="name">Team Name A–Z</option>
             </select>
             <span class="toolbar-count" id="draft-count">6 drafts</span>
-            <a href="#" class="btn-new"><i class="bi bi-plus-lg"></i>New Design</a>
+            <!-- <a href="#" class="btn-new"><i class="bi bi-plus-lg"></i>New Design</a> -->
         </div>
 
         <!-- Card Grid -->
@@ -1183,18 +1184,11 @@ function renderDraftCards(data) {
       <div class="draft-card">
         <div class="card-thumb">
           <img class="jersey-img" src="http://localhost:9090/jog_3d/admin/uploads/designs/images/${d.image}" />
-          <span class="style-badge">${d.style}</span>
+          <span class="style-badge">New</span>
           <div class="thumb-actions custom-dropdown">
-            <button class="btn-dots" onclick="toggleDropdown(event,'dd-${d.id}')">⋮</button>
-            <div class="custom-dropdown-menu" id="dd-${d.id}">
-              <button class="dropdown-item-custom" data-toast="Opening roster for ${d.name}" onclick="handleToast(this)"><i class="bi bi-list-check"></i>Continue to Roster</button>
-              <button class="dropdown-item-custom" data-toast="${d.name} duplicated!" onclick="handleToast(this)"><i class="bi bi-files"></i>Duplicate</button>
-              <button class="dropdown-item-custom" data-toast="Share link copied!" onclick="handleToast(this)"><i class="bi bi-share"></i>Share Link</button>
-              <button class="dropdown-item-custom" data-toast="Preview PDF generating…" onclick="handleToast(this)"><i class="bi bi-file-earmark-pdf"></i>Download Preview PDF</button>
-              <div class="dropdown-divider"></div>
-              <button class="dropdown-item-custom" data-toast="Rename dialog open" onclick="handleToast(this)"><i class="bi bi-pencil"></i>Rename</button>
-              <button class="dropdown-item-custom" data-toast="${d.name} archived" onclick="handleToast(this)"><i class="bi bi-archive"></i>Archive</button>
-              <div class="dropdown-divider"></div>
+            <button class="btn-dots" onclick="toggleDropdown(event,'dd-${d.draft_id}')">⋮</button>
+            <div class="custom-dropdown-menu" id="dd-${d.draft_id}">
+              <button class="dropdown-item-custom" data-toast="Share link copied!" onclick="handleToast(this)"><i class="bi bi-share"></i>Share Link</button>                            
               <button class="dropdown-item-custom danger" data-toast="Delete confirmed" onclick="handleToast(this)"><i class="bi bi-trash"></i>Delete</button>
             </div>
           </div>
@@ -1202,25 +1196,16 @@ function renderDraftCards(data) {
         <div class="card-body-inner">
           <div class="card-title-row">
             <div class="card-team-name">${d.name}</div>
-            <div class="rep-avatar" title="Created by ${d.rep}">${d.rep}</div>
+            <div class="rep-avatar" title="Created by ${d.rep}"> ${d.insert_date.slice(0, 10)}</div>
           </div>
           <div>
             <span class="status-badge ${s.cls}">${s.label}</span>
           </div>
           <div class="meta-row">
-            <div class="meta-item"><i class="bi bi-calendar3"></i>${d.created}</div>
-            <div class="meta-item"><i class="bi bi-clock"></i>Modified ${d.modified}</div>
+            <div class="meta-item"><i class="bi bi-calendar3"></i><b>Created:</b> ${d.insert_date.slice(0, 10)}</div>
+            <div class="meta-item"><i class="bi bi-clock"></i><b>Modified:</b> ${d.updated_date.slice(0, 10)}</div>
           </div>
-          <div class="roster-progress">
-            <div class="roster-label">
-              <span><i class="bi bi-people me-1"></i>Roster</span>
-              <span>${d.rosterDone}/${d.rosterTotal > 0 ? d.rosterTotal : '—'} players${isComplete ? ' ✓' : ''}</span>
-            </div>
-            ${d.rosterTotal > 0 ? `
-            <div class="progress-bar-track">
-              <div class="progress-bar-fill ${isComplete?'complete':''}" style="width:${pct}%"></div>
-            </div>` : `<div style="font-size:12px;color:var(--text-light)">No roster added yet</div>`}
-          </div>
+          
         </div>
         
         <div class="card-footer-inner">
@@ -1508,6 +1493,23 @@ function switchTab(tab) {
   document.getElementById('topbar-title').textContent = tab === 'draft' ? '3D Draft' : '3D Orders';
 }
 
+let DRAFTS = []; 
+
+document.addEventListener('DOMContentLoaded', () => {
+
+fetch("<?= API_BASE_URL ?>get_drafts.php?user_id=<?= $user_id ?>")
+  .then((res) => res.json())
+  .then((data) => {
+    console.log("Fetched drafts:", data);
+    DRAFTS = data.data || []; 
+    console.log(DRAFTS);
+
+    renderDraftCards(DRAFTS);
+  });
+  //renderDraftCards(DRAFTS);
+  renderOrderCards(ORDERS);
+});
+
 /* ═══════════════════════════════════════════════════════════
    FILTERS
 ═══════════════════════════════════════════════════════════ */
@@ -1562,18 +1564,5 @@ function showToast(msg, icon = 'bi-check-circle-fill') {
 /* ═══════════════════════════════════════════════════════════
    INIT
 ═══════════════════════════════════════════════════════════ */
-document.addEventListener('DOMContentLoaded', () => {
 
-fetch("http://localhost:9090/jog_3d/api/CategorySub/get_drafts.php?user_id=<?= $user_id ?>")
-  .then((res) => res.json())
-  .then((data) => {
-    console.log("Fetched drafts:", data);
-    const DRAFTS = data.data;
-    console.log(DRAFTS);
-
-    renderDraftCards(DRAFTS);
-  });
-  //renderDraftCards(DRAFTS);
-  renderOrderCards(ORDERS);
-});
 </script>

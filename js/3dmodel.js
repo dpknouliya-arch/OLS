@@ -214,79 +214,35 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function loadDefaultModelUSER() {
-
         // Show preloader when starting to load default model
-
         document.getElementById("preloader").style.display = "flex";
-
-
-
-
-
+        const BASE_3D_URL = window.BASE_3D_URL;
         // Get all checked checkboxes inside the form
-
         const collerId = document.querySelector("input[name='coller_id']").value;
-
         const styleId = document.querySelector("input[name='style_id']").value;
-
         const stripesId = document.querySelector("input[name='stripes_id']").value;
-
         const orderId = document.querySelector("input[name='order_id']").value;
-
-
-
         const checkedValues = collerId;
-
         const StyleFValues = styleId;
-
         const StripeValues = stripesId;
-
-
-
         $.ajax({
-
             url: 'ajax/get_design_data.php',
-
             type: 'POST',
-
             dataType: 'json',
-
             data: {
-
                 collar: checkedValues,
-
                 style: StyleFValues,
-
                 stripes: StripeValues
-
             },
-
-            success: function (response) {                
-
-
-
-                const defaultModelUrl = 'http://localhost:9090/jog_3d/admin/uploads/designs/models/' + response.model;
-
+            success: function (response) {                        
+                const defaultModelUrl = BASE_3D_URL + 'admin/uploads/designs/models/' + response.model;
                 const defaultModelType = "halfSleeves";
-
                 const defaultColorMappings = {
-
                     Plane: "primary",
-
                     Plane_1: "secondary"
-
                 };
-
-
-
                 window.loadedModel = response.model;
-
-
-
                 window.COLOR_MAPPING = {};
-
-
-
                 // normalize and set mapping
 
                 window.COLOR_MAPPING[response.primary_color.toUpperCase()] = "primary";
@@ -294,293 +250,17 @@ document.addEventListener("DOMContentLoaded", function () {
                 window.COLOR_MAPPING[response.secondary_color.toUpperCase()] = "secondary";
 
                 window.COLOR_MAPPING[response.tertiary_color.toUpperCase()] = "tertiary";
-
-
-
                 // optional: map "white" also to tertiary
 
                 if (response.tertiary_color.toUpperCase() === "#FFFFFF") {
-
                     window.COLOR_MAPPING["white"] = "tertiary";
-
-                }                
-
-
-
-                // 1. Clear existing colors                
-
-
-
-                // 3. Mark active design item (your existing code)
-
+                }               
                 document.querySelectorAll(".designsItems img").forEach(img => {
-
                     if (img.dataset.modal && img.dataset.modal.includes("Modal2FullSleeves.glb")) {
-
                         img.closest('.designsItems').classList.add("active");
-
                     }
-
                 });
-
-
-
-                if (!window.modelSvgPatterns) window.modelSvgPatterns = {};
-
-                if (!window.modelSvgPatterns[response.model]) {
-
-                    $.ajax({
-
-                        url: 'ajax/get_svg_data.php',
-
-                        type: 'POST',
-
-                        dataType: 'json',
-
-                        data: { design_id: response.id },
-
-                        success: function (svgData) {
-
-                            if (svgData && Array.isArray(svgData)) {
-
-                                window.modelSvgPatterns = window.modelSvgPatterns || {};
-
-                                window.modelSvgPatterns[response.model] = {};
-
-
-
-                                svgData.forEach(item => {
-
-                                    window.modelSvgPatterns[response.model][item.mesh_name] =
-
-                                        'assets/svg/' + item.design_id + '/' + item.url_svg;
-
-                                });                                
-
-                            }
-
-                        },
-
-                        error: function () {
-
-                            console.error('Error fetching design SVG data.');
-
-                        }
-
-                    });
-
-                }
-
-
-
-                $.ajax({
-
-                    url: 'ajax/get_zone_data.php',
-
-                    type: 'POST',
-
-                    dataType: 'json',
-
-                    data: { design_id: response.id },
-
-                    success: function (data) {
-
-                        window.modalZoneConfig = window.modalZoneConfig || {};
-
-                        window.modalZoneConfig[response.model] = data;                        
-
-
-
-                        // Example: render for your jersey config
-
-                        //renderZones(modalZoneConfig[response.model], "myZones");
-
-
-
-                        $.ajax({
-
-                            url: 'ajax/get_placement_data.php',
-
-                            type: 'POST',
-
-                            dataType: 'json',
-
-                            data: { design_id: response.id },
-
-                            success: function (data) {
-
-                                try {
-
-                                    window.modelMeshConfigs = window.modelMeshConfigs || {};
-
-                                    window.meshImageMap = window.meshImageMap || {};
-
-                                    window.modelDisplayNames = window.modelDisplayNames || {};
-
-
-
-                                    // Get category & model
-
-                                    let category = 'halfSleeves';
-
-                                    let modelFile = response.model;
-
-
-
-                                    // Initialize category if not exists
-
-                                    if (!window.modelMeshConfigs[category]) {
-
-                                        window.modelMeshConfigs[category] = {};
-
-                                    }
-
-
-
-                                    // Assign placementMeshes under category → model
-
-                                    window.modelMeshConfigs[category][modelFile] = {
-
-                                        placementMeshes: data.placementMeshes
-
-                                    };
-
-                                    window.modelDisplayNames[modelFile] = data.displayNames;
-
-
-
-                                    Object.assign(window.meshImageMap, data.meshImageMap);
-
-
-
-                                    $.ajax({
-
-                                        url: 'ajax/get_fabric.php',
-
-                                        type: 'POST',
-
-                                        dataType: 'json',
-
-                                        data: { design_id: response.id },
-
-                                        success: function (data) {
-
-                                            try {
-
-                                                const modelName = response.model; // e.g., "triangle_V-neck_without_lace stripe5.glb"
-
-                                                // Initialize the fabricZoneMeshMapByModel object if it doesn't exist
-
-                                                if (typeof fabricZoneMeshMapByModel === "undefined") {
-
-                                                    window.fabricZoneMeshMapByModel = {};
-
-                                                }
-
-                                                // Assign the data to the model's name
-
-                                                window.fabricZoneMeshMapByModel[modelName] = {
-
-                                                    Base: data.Base || data.base || [],
-
-                                                    Shoulder: data.Shoulder || [],
-
-                                                    Mesh: data.Mesh || [],
-
-                                                    Neck: data.Neck || []
-
-                                                };
-
-                                                loadModelUSER(defaultModelUrl, defaultColorMappings, defaultModelType);
-
-                                                // Now you can use fabricZoneMeshMapByModel in your application
-
-                                            } catch (err) {
-
-                                                console.error("Error processing fabric data:", err);
-
-                                            }
-
-                                        },
-
-                                        error: function (xhr, status, error) {
-
-                                            console.error("AJAX error:", error);
-
-                                        }
-
-                                    });
-
-
-
-
-
-
-
-                                    // ✅ After model loads → adjust tabs and steps
-
-                                    // Show all tabs
-
-                                    document.querySelectorAll("#mainTab .nav-item").forEach(item => {
-
-                                        item.style.display = "block";
-
-                                    });
-
-
-
-                                    // Switch sidebarTabs layout to grid
-
-                                    const sidebarTabs = document.querySelector(".configuratorAllControls .sidebarTabs");
-
-                                    if (sidebarTabs) {
-
-                                        sidebarTabs.classList.add("show-all");
-
-                                    }
-
-
-
-                                    // Hide step3 (Stripes) on model load
-
-                                    const step3 = document.querySelector(".stepsPreview .step3");
-
-                                    if (step3) {
-
-                                        step3.style.display = "none";
-
-                                    }
-
-
-
-                                    // Switch active tab to Colors
-
-                                    const colorTab = document.getElementById("main-colors-tab");
-
-                                    if (colorTab) {
-
-                                        const tabTrigger = new bootstrap.Tab(colorTab);
-
-                                        tabTrigger.show();
-
-                                    }
-
-
-
-                                } catch (err) {
-
-                                    console.error("Parse error:", err);
-
-                                }
-
-                            }
-
-                        });                        
-
-                    }
-
-                });
-
+                loadModelUSER(defaultModelUrl, defaultColorMappings, defaultModelType);        
             },
 
             error: function () {

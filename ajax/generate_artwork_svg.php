@@ -1,4 +1,5 @@
 <?php
+include('../db.php');
 require_once 'get-display-map.php';
 
 $data = json_decode(file_get_contents("php://input"), true);
@@ -10,7 +11,7 @@ $textDecals  = $data['textDecals'];
 $imageDecals  = $data['imageDecals'];
 $displayMap = getDisplayMap($designId);
 
-$svgPath = "http://localhost:9090/jog_3d/admin/assets/svg/".$designId."/Calgary.svg";
+$svgPath = D_BASE_URL . "admin/assets/svg/".$designId."/Calgary.svg";
 $svg = file_get_contents($svgPath);
 
 $dom = new DOMDocument();
@@ -105,9 +106,9 @@ foreach ($textDecals as $text) {
     $colortext = $text['color'];
     $size    = $text['fontSize'];
     $font    = $text['fontFamily'];
-    $display = $text['displayName'];
-    $outlineColor = $text['outlineColor'];
-    $outlineWidth = $text['outlineWidth'];
+    $display = $text['displayName']??'';
+    $outlineColor = $text['outlineColor']??'#000000';
+    $outlineWidth = $text['outlineWidth']?? 0;
 
 
 
