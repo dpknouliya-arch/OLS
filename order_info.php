@@ -5,45 +5,19 @@ include 'encryption_helper.php';
 $obj_user = json_decode(base64_decode($_SESSION["JOGOLS"]));
 $user_id  = $obj_user->user_id;
 
-if (isset($_GET['order_id'])) {
-    $order_id = customDecode($_GET['order_id']);
+if (!isset($_GET['order_id'])) { echo "<p>Invalid order ID.</p>"; exit; }
+$order_id = customDecode($_GET['order_id']);
 
-    $res = callAPI("get_order_full.php?order_id=" . $order_id);
-    if (!$res || empty($res['data']['order'])) {
-        echo "<p>No design found.</p>";
-        exit;
-    }
+$api_result = callAPI("get_order.php?order_id=$order_id");
+$data       = $api_result['data'] ?? null;
+if (!$data) { echo "<p>No data found.</p>"; exit; }
 
-    $order = $res['data']['order'];
-    $order_team_data = $res['data']['team'];
-
-    $designId    = $order['design_id'];
-    $sock_design = $order['sock_design'];
-    $added_date  = $order['added_date'];
-
-} else {
-
-    echo "<p>Invalid order ID.</p>";
-    exit;
-}
-
-if (isset($designId)) {  
-    $data = callAPI("get_design_details.php?design_id=$designId");    
-    $order_design_data = [];
-
-    if ($data && !empty($data['data'])) {
-        $order_design_data[] = $data['data']; // keep same structure
-    }
-}
-
-$design_name  = !empty($order_design_data[0]['name'])       ? $order_design_data[0]['name']       : '—';
-$jersey_type  = !empty($order_design_data[0]['modal_type']) ? $order_design_data[0]['modal_type'] : '—';
-$design_price = !empty($order_design_data[0]['price'])      ? $order_design_data[0]['price']      : '0.00';
-$design_image = !empty($order_design_data[0]['jersey_style_image'])      ? $order_design_data[0]['jersey_style_image']      : '';
-$order_id_enc = customEncode($order_id);
-$total_qty    = count($order_team_data);
-$order_date_fmt = !empty($added_date) ? date('d/m/Y', strtotime($added_date)) : date('d/m/Y');
-
+$order             = $data;
+$order_team_data   = $data['team']   ?? [];
+$order_design_data = isset($data['design']) ? [$data['design']] : [];
+$designId          = $order['design_id']   ?? 0;
+$sock_design       = $order['sock_design'] ?? '';
+$added_date        = $order['added_date']  ?? '';
 
 $a_data = [0 => null, 1 => null];
 $sql_select = "SELECT * FROM tbl_address WHERE user_id='" . (int)$user_id . "' AND enable=1 AND (is_billing_addr=1 OR is_deliver_addr=1) ORDER BY is_billing_addr DESC, is_deliver_addr DESC";
@@ -55,6 +29,14 @@ if ($rs_select) {
     }
 }
 
+$design_name  = !empty($order_design_data[0]['name'])       ? $order_design_data[0]['name']       : '—';
+$jersey_type  = !empty($order_design_data[0]['modal_type']) ? $order_design_data[0]['modal_type'] : '—';
+$design_price = !empty($order_design_data[0]['price'])      ? $order_design_data[0]['price']      : '0.00';
+$design_image = !empty($order_design_data[0]['image'])      ? $order_design_data[0]['image']      : '';
+$order_id_enc = customEncode($order_id);
+$total_qty    = count($order_team_data);
+$order_date_fmt = !empty($added_date) ? date('d/m/Y', strtotime($added_date)) : date('d/m/Y');
+
 $unique_sizes = [];
 foreach ($order_team_data as $td) {
     if (!empty($td['jersey_size']) && !in_array($td['jersey_size'], $unique_sizes)) {
@@ -62,6 +44,19 @@ foreach ($order_team_data as $td) {
     }
 }
 $sizes_str = !empty($unique_sizes) ? implode(', ', $unique_sizes) : '—';
+
+// Prefetch saved order form data for this 3D order
+$of_row = null;
+$stmt_of = $conn->prepare(
+    "SELECT * FROM tbl_order_form WHERE design_order_id=? ORDER BY is_submitted DESC LIMIT 1"
+);
+$stmt_of->bind_param("i", $order_id);
+$stmt_of->execute();
+$res_of = $stmt_of->get_result();
+if ($res_of->num_rows > 0) {
+    $of_row = $res_of->fetch_assoc();
+}
+$stmt_of->close();
 
 $TOKEN_KEY = 'jogsports_secure_key_' . session_id();
 function encAddrId($id, $key) {
@@ -171,14 +166,24 @@ $delivery_js = json_encode([
     <!-- LEFT: Order Form -->
     <div class="ols3d-form-card">
 
+      <?php
+      $pf_customer_po     = htmlspecialchars($of_row['customer_po']     ?? '');
+      $pf_req_due_date    = ($of_row['req_due_date']    ?? '' ) !== '0000-00-00' ? htmlspecialchars($of_row['req_due_date']    ?? '') : '';
+      $pf_game_event_date = ($of_row['game_event_date'] ?? '' ) !== '0000-00-00' ? htmlspecialchars($of_row['game_event_date'] ?? '') : '';
+      $pf_project_name    = htmlspecialchars($of_row['project_name']    ?? '');
+      $pf_payment_opt     = $of_row['payment_opt']  ?? '';
+      $pf_reorder_num     = htmlspecialchars($of_row['reorder_num']     ?? '');
+      $pf_sales_rep_id    = (int)($of_row['sales_rep_id'] ?? 0);
+      ?>
+
       <div class="ols3d-field">
         <label for="customer_po">Customer PO</label>
-        <input type="text" id="customer_po" name="customer_po" placeholder="Customer PO number">
+        <input type="text" id="customer_po" name="customer_po" placeholder="Customer PO number" value="<?= $pf_customer_po ?>">
       </div>
 
       <div class="ols3d-field">
         <label for="req_due_date">Request Due Date</label>
-        <input type="date" id="req_due_date" name="req_due_date">
+        <input type="date" id="req_due_date" name="req_due_date" value="<?= $pf_req_due_date ?>">
       </div>
 
       <div class="ols3d-field">
@@ -190,7 +195,8 @@ $delivery_js = json_encode([
           $emps    = $conn3->query($sql_emp);
           if ($emps && $emps->num_rows > 0) {
               while ($emp = $emps->fetch_assoc()) {
-                  echo '<option value="' . htmlspecialchars($emp['employee_id']) . '">'
+                  $sel = ($pf_sales_rep_id === (int)$emp['employee_id']) ? ' selected' : '';
+                  echo '<option value="' . htmlspecialchars($emp['employee_id']) . '"' . $sel . '>'
                       . htmlspecialchars($emp['employee_name']) . '</option>';
               }
           }
@@ -200,34 +206,35 @@ $delivery_js = json_encode([
 
       <div class="ols3d-field">
         <label for="project_name">Project Name</label>
-        <input type="text" id="project_name" name="project_name" placeholder="Enter project name">
+        <input type="text" id="project_name" name="project_name" placeholder="Enter project name" value="<?= $pf_project_name ?>">
       </div>
 
       <div class="ols3d-field">
         <label for="game_event_date">Game / Event Date</label>
-        <input type="date" id="game_event_date" name="game_event_date">
+        <input type="date" id="game_event_date" name="game_event_date" value="<?= $pf_game_event_date ?>">
       </div>
 
       <div class="ols3d-field">
         <label for="payment_opt">Payment Options</label>
         <select id="payment_opt" name="payment_opt">
           <option value="">Select</option>
-          <option value="Credit Card">Credit Card</option>
-          <option value="Net 30">Invoice / Net 30</option>
-          <option value="Net 15">Net 15</option>
-          <option value="Net 7">Net 7</option>
-          <option value="Due on receipt">Due on receipt</option>
-          <option value="Bank Transfer">Bank Transfer</option>
+          <?php
+          $pay_opts = ['Credit Card'=>'Credit Card','Net 30'=>'Invoice / Net 30','Net 15'=>'Net 15','Net 7'=>'Net 7','Due on receipt'=>'Due on receipt','Bank Transfer'=>'Bank Transfer'];
+          foreach ($pay_opts as $val => $label) {
+              $sel = ($pf_payment_opt === $val) ? ' selected' : '';
+              echo '<option value="' . htmlspecialchars($val) . '"' . $sel . '>' . htmlspecialchars($label) . '</option>';
+          }
+          ?>
         </select>
       </div>
 
       <div class="ols3d-field">
         <label for="reorder_num">Reorder? Type the EX here</label>
-        <input type="text" id="reorder_num" name="reorder_num" placeholder="Re Order">
+        <input type="text" id="reorder_num" name="reorder_num" placeholder="Re Order" value="<?= $pf_reorder_num ?>">
       </div>
 
       <div style="margin-top:8px;">
-        <button id="printBtn" class="ols3d-btn-primary" type="button">
+        <button id="printBtn" class="ols3d-btn-primary" type="button" onclick="submitOrder()">
           Submit Order
         </button>
       </div>
@@ -243,7 +250,7 @@ $delivery_js = json_encode([
         <div class="ols3d-design-thumb">
           <div class="ols3d-design-thumb-img">
             <?php if (!empty($design_image)): ?>
-            <img src="<?= htmlspecialchars($design_image) ?>" alt="<?= htmlspecialchars($design_name) ?>">
+            <img src="http://65.1.164.81/jogdigital/admin/uploads/designs/images/<?= htmlspecialchars($design_image) ?>" alt="<?= htmlspecialchars($design_name) ?>">
             <?php else: ?>
             <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#CBD3E8" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             <?php endif; ?>
@@ -469,6 +476,60 @@ function saveAddrInline(type) {
       showToast('Network error. Please try again.');
       btn.disabled = false; btn.textContent = 'Save Address';
     }
+  });
+}
+
+function submitOrder() {
+  var design_order_id = document.getElementById('order_id').value;
+  var customer_po     = document.getElementById('customer_po').value.trim();
+  var req_due_date    = document.getElementById('req_due_date').value.trim();
+  var game_event_date = document.getElementById('game_event_date').value.trim();
+  var project_name    = document.getElementById('project_name').value.trim();
+  var payment_opt     = document.getElementById('payment_opt').value.trim();
+  var sales_rep_id    = document.getElementById('sales_rep').value.trim();
+  var reorder_num     = document.getElementById('reorder_num').value.trim();
+
+  if (!design_order_id) { showToast('Missing order ID. Please refresh the page.'); return; }
+
+  var btn = document.getElementById('printBtn');
+  btn.disabled = true;
+  btn.textContent = 'Submitting…';
+
+  var params = new URLSearchParams();
+  params.append('design_order_id', design_order_id);
+  params.append('customer_po',     customer_po);
+  params.append('req_due_date',    req_due_date);
+  params.append('game_event_date', game_event_date);
+  params.append('project_name',    project_name);
+  params.append('payment_opt',     payment_opt);
+  params.append('sales_rep_id',    sales_rep_id);
+  params.append('reorder_num',     reorder_num);
+
+  fetch('ajax/3d_order/submit_order.php', {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body:    params.toString()
+  })
+  .then(function(r) {
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return r.json();
+  })
+  .then(function(data) {
+    if (data.result === 'success') {
+      showToast('Order submitted successfully!');
+      setTimeout(function() {
+        window.location.href = '?vp=<?= base64_encode('3d_orders') ?>';
+      }, 1200);
+    } else {
+      showToast('Error: ' + (data.msg || 'Submission failed.'));
+      btn.disabled = false;
+      btn.textContent = 'Submit Order';
+    }
+  })
+  .catch(function(e) {
+    showToast('Network error: ' + e.message);
+    btn.disabled = false;
+    btn.textContent = 'Submit Order';
   });
 }
 

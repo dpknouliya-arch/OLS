@@ -15,7 +15,7 @@ $rs_of = $conn->query($sql_of);
 $row_of = $rs_of->fetch_assoc();
 $prod_id = $row_of["prod_id"];
 
-$sql_oi = "SELECT tbl_order_item.*,tbl_top_size.size_name AS top_size,tbl_bottom_size.size_name AS bottom_size FROM tbl_order_item ";
+$sql_oi = "SELECT tbl_order_item.*, tbl_order_item.bottom_size AS sock_size_raw, tbl_top_size.size_name AS top_size, tbl_bottom_size.size_name AS bottom_size FROM tbl_order_item ";
 $sql_oi .= " LEFT JOIN tbl_size AS tbl_top_size ON tbl_order_item.product_size_id=tbl_top_size.size_id ";
 $sql_oi .= " LEFT JOIN tbl_size AS tbl_bottom_size ON tbl_order_item.bottom_size=tbl_bottom_size.size_id WHERE of_id='" . $of_id . "' ;";
 
@@ -275,7 +275,85 @@ $row_product = $rs_prod->fetch_assoc();
 				<?php
 				$num_item = sizeof($a_item);
 
-				if ($prod_id == "1") {
+				if ($row_of['form_name'] === '3D Jersey' || ($row_of['design_order_id'] ?? 0) > 0) {
+				?>
+					<table width="100%" cellspacing="0" cellpadding="2" style="font-size: 14px;" border="1">
+						<tr style="background-color: #EE0;">
+							<th style="width:150px; text-align: center;">Name on Jersey</th>
+							<th style="width:65px; text-align: center;">Pattern Cut</th>
+							<th style="width:65px; text-align: center;">P or G</th>
+							<th style="width:72px; text-align: center;">Jersey Size</th>
+							<th style="text-align: center;">Jersey #</th>
+							<th style="text-align: center;">Jersey Color</th>
+							<th style="width:50px; text-align: center;">QTY</th>
+							<th style="text-align: center;">Jersey Color 2</th>
+							<th style="width:50px; text-align: center;">QTY</th>
+							<th style="width:40px; text-align: center;">Sock Size</th>
+							<th style="text-align: center;">Sock Color</th>
+							<th style="width:50px; text-align: center;">QTY</th>
+							<th style="text-align: center;">Sock Color 2</th>
+							<th style="width:50px; text-align: center;">QTY</th>
+							<th style="width:75px; text-align: center;">C or A</th>
+							<th style="width:75px; text-align: center;">Name For Packing</th>
+							<th>Notes</th>
+						</tr>
+						<tbody>
+							<?php
+							$sum_qty_top1    = 0;
+							$sum_qty_top2    = 0;
+							$sum_qty_bottom1 = 0;
+							$sum_qty_bottom2 = 0;
+							for ($m = 0; $m < $num_item; $m++) {
+								$edit_item = $a_item[$m];
+								$sum_qty_top1    += $edit_item['qty_top1'];
+								$sum_qty_top2    += $edit_item['qty_top2'];
+								$sum_qty_bottom1 += $edit_item['qty_bottom1'];
+								$sum_qty_bottom2 += $edit_item['qty_bottom2'];
+								$show_c_or_a = '';
+								if ($edit_item['c_or_a'] == 'captain')   $show_c_or_a = 'C';
+								elseif ($edit_item['c_or_a'] == 'assistant') $show_c_or_a = 'A';
+								else $show_c_or_a = htmlspecialchars($edit_item['c_or_a'] ?? '');
+							?>
+								<tr>
+									<td><?php echo htmlspecialchars($edit_item['player_name']); ?></td>
+									<td><?php echo htmlspecialchars($edit_item['sex']); ?></td>
+									<td><?php echo htmlspecialchars($edit_item['p_or_g']); ?></td>
+									<td><?php echo htmlspecialchars($edit_item['top_size'] ?? ''); ?></td>
+									<td><?php echo htmlspecialchars($edit_item['jersey_number']); ?></td>
+									<td><?php echo htmlspecialchars($edit_item['color_top1']); ?></td>
+									<td><?php echo (int)$edit_item['qty_top1']; ?></td>
+									<td><?php echo htmlspecialchars($edit_item['color_top2']); ?></td>
+									<td><?php echo (int)$edit_item['qty_top2']; ?></td>
+									<td><?php echo htmlspecialchars($edit_item['sock_size_raw'] ?? ''); ?></td>
+									<td><?php echo htmlspecialchars($edit_item['color_bottom1']); ?></td>
+									<td><?php echo (int)$edit_item['qty_bottom1']; ?></td>
+									<td><?php echo htmlspecialchars($edit_item['color_bottom2']); ?></td>
+									<td><?php echo (int)$edit_item['qty_bottom2']; ?></td>
+									<td><?php echo htmlspecialchars($show_c_or_a); ?></td>
+									<td><?php echo htmlspecialchars($edit_item['name_for_packing']); ?></td>
+									<td><?php echo htmlspecialchars($edit_item['note']); ?></td>
+								</tr>
+							<?php } ?>
+						</tbody>
+						<tr>
+							<th style="text-align:center;font-size:13px;">TOTAL ORDER</th>
+							<th></th><th></th><th></th><th></th><th></th>
+							<th style="text-align:center;"><?php echo $sum_qty_top1; ?></th>
+							<th></th>
+							<th style="text-align:center;"><?php echo $sum_qty_top2; ?></th>
+							<th></th><th></th>
+							<th style="text-align:center;"><?php echo $sum_qty_bottom1; ?></th>
+							<th></th>
+							<th style="text-align:center;"><?php echo $sum_qty_bottom2; ?></th>
+							<th></th><th></th>
+						</tr>
+						<tr>
+							<th>Special Comments<br>(if any)</th>
+							<th colspan="16" style="background-color:#CCF;border-bottom:1px solid #000;"><?php echo htmlspecialchars($row_of['special_comment'] ?? ''); ?></th>
+						</tr>
+					</table>
+				<?php
+				} else if ($prod_id == "1") {
 				?>
 					<table width="100%" cellspacing="0" cellpadding="2" style="font-size: 14px;" border="1">
 						<tr style="background-color: #EE0;">

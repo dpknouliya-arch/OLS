@@ -72,7 +72,7 @@
 			]);
 
 			$res = curl_exec($ch);
-
+		
 			if (curl_errno($ch)) {
 				print_r($url); // ✅ debug: show what was sent
 				echo "Curl Error: " . curl_error($ch);

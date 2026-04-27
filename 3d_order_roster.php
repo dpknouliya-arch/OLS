@@ -2,6 +2,7 @@
 include('check-session.php');
 include('db.php');
 include 'encryption_helper.php';
+include 'includes/order_helpers.php';
 $obj_user = json_decode(base64_decode($_SESSION["JOGOLS"]));
 $user_id  = $obj_user->user_id;
 
@@ -19,28 +20,126 @@ if (!$data || !$data['status']) {
     exit;
 }
 
-//echo "<pre>"; print_r($data); echo "</pre>"; // debug
-/* ✅ MAP DATA */
-$order = $data['order'];
-$order_team_data = $data['team'];
+$order           = $data['order'];
+$api_team_data   = $data['team'];
 $order_design_data = [$data['design']];
-$color_list = $data['colors'];
+$color_list      = $data['colors'];
 
-$designId = $order['design_id'];
+$designId   = $order['design_id'];
 $added_date = $order['added_date'];
+$sock_design = $order['sock_design'] ?? '';
 
-$design_name  = $order_design_data[0]['name'] ?? '—';
-$jersey_type  = $order_design_data[0]['modal_type'] ?? '—';
+$design_name = $order_design_data[0]['name']       ?? '—';
+$jersey_type = $order_design_data[0]['modal_type'] ?? '—';
 
 $order_id_enc   = customEncode($order_id);
 $order_date_fmt = !empty($added_date) ? date('d-m-Y H:i:s', strtotime($added_date)) : '—';
+// Build reverse size map: size_id → size_name for display
+$size_id_to_name = [];
+$sz_res = $conn->query("SELECT size_id, size_name FROM tbl_size");
+if ($sz_res) {
+    while ($sz = $sz_res->fetch_assoc()) {
+        $size_id_to_name[(int)$sz['size_id']] = $sz['size_name'];
+    }
+}
 
-$team_name_val  = htmlspecialchars($order['on_team_name'] ?? '');
-$team_year_val  = htmlspecialchars($order['on_year'] ?? '');
+// Find or create the OLS order form record (never duplicate)
+$of_id           = 0;
+$is_of_submitted = 0;
+$stmt_find = $conn->prepare(
+    "SELECT of_id, is_submitted FROM tbl_order_form WHERE design_order_id=? ORDER BY is_submitted DESC LIMIT 1"
+);
+$stmt_find->bind_param("i", $order_id);
+$stmt_find->execute();
+$res_find = $stmt_find->get_result();
+if ($res_find->num_rows > 0) {
+    $row_find        = $res_find->fetch_assoc();
+    $of_id           = (int)$row_find['of_id'];
+    $is_of_submitted = (int)$row_find['is_submitted'];
+}
+$stmt_find->close();
+if ($of_id === 0) {
+    $of_id = getOrCreateDraftOrder($conn, $order_id, $user_id);
+}
 
-/* 👇 Important for JS */
-$existing_rows_json = json_encode($order_team_data);
-$color_list_json    = json_encode($color_list);
+// Team name/year: prefer saved OLS value, fall back to API
+$of_team_row = null;
+$stmt_tn = $conn->prepare(
+    "SELECT on_team_name, on_year FROM tbl_order_form WHERE of_id=? LIMIT 1"
+);
+$stmt_tn->bind_param("i", $of_id);
+$stmt_tn->execute();
+$res_tn = $stmt_tn->get_result();
+if ($res_tn->num_rows > 0) { $of_team_row = $res_tn->fetch_assoc(); }
+$stmt_tn->close();
+
+$team_name_val = htmlspecialchars(
+    ($of_team_row['on_team_name'] ?? '') !== '' ? $of_team_row['on_team_name'] : ($order['on_team_name'] ?? '')
+);
+$team_year_val = htmlspecialchars(
+    ($of_team_row['on_year'] ?? '') !== '' ? $of_team_row['on_year'] : ($order['on_year'] ?? '')
+);
+
+// Load saved roster rows from OLS tables
+$source_table       = ($is_of_submitted === 1) ? 'tbl_order_item' : 'tbl_draft_oi';
+$existing_rows_json = '[]';
+
+$oi_res = $conn->query("SELECT * FROM $source_table WHERE of_id=" . (int)$of_id);
+if ($oi_res && $oi_res->num_rows > 0) {
+    $loaded_rows = [];
+    while ($dr = $oi_res->fetch_assoc()) {
+        $size_text     = $size_id_to_name[(int)($dr['product_size_id'] ?? 0)] ?? '';
+        $loaded_rows[] = [
+            'item_id'          => (int)$dr['oi_id'],
+            'player_name'      => $dr['player_name']      ?? '',
+            'pattern_cut'      => $dr['sex']              ?? '',
+            'player_or_goalie' => $dr['p_or_g']           ?? '',
+            'jersey_size'      => $size_text,
+            'jersey_no'        => $dr['jersey_number']    ?? '',
+            'jersey_color'     => $dr['color_top1']       ?? '',
+            'jersey_qty'       => $dr['qty_top1']         ?? '',
+            'jersey_color2'    => $dr['color_top2']       ?? '',
+            'jersey_qty2'      => $dr['qty_top2']         ?? '',
+            'sock_size'        => $dr['bottom_size']      ?? '',
+            'sock_color'       => $dr['color_bottom1']    ?? '',
+            'sock_qty'         => $dr['qty_bottom1']      ?? '',
+            'sock_color2'      => $dr['color_bottom2']    ?? '',
+            'sock_qty2'        => $dr['qty_bottom2']      ?? '',
+            'cor_a'            => $dr['c_or_a']           ?? '',
+            'name_for_packing' => $dr['name_for_packing'] ?? '',
+            'notes'            => $dr['note']             ?? '',
+        ];
+    }
+    $existing_rows_json = json_encode($loaded_rows);
+} elseif ($is_of_submitted === 0) {
+    // No saved rows yet — seed from API team data (item_id=0 means new INSERT on save)
+    $seeded = [];
+    foreach (($api_team_data ?? []) as $row) {
+        $seeded[] = [
+            'item_id'          => 0,
+            'player_name'      => $row['player_name']      ?? '',
+            'pattern_cut'      => $row['pattern_cut']      ?? '',
+            'player_or_goalie' => $row['player_or_goalie'] ?? '',
+            'jersey_size'      => $row['jersey_size']      ?? '',
+            'jersey_no'        => $row['jersey_no']        ?? '',
+            'jersey_color'     => $row['jersey_color']     ?? '',
+            'jersey_qty'       => $row['jersey_qty']       ?? '',
+            'jersey_color2'    => $row['jersey_color2']    ?? '',
+            'jersey_qty2'      => $row['jersey_qty2']      ?? '',
+            'sock_size'        => $row['sock_size']        ?? '',
+            'sock_color'       => $row['sock_color']       ?? '',
+            'sock_qty'         => $row['sock_qty']         ?? '',
+            'sock_color2'      => $row['sock_color2']      ?? '',
+            'sock_qty2'        => $row['sock_qty2']        ?? '',
+            'cor_a'            => $row['cor_a']            ?? '',
+            'name_for_packing' => $row['name_for_packing'] ?? '',
+            'notes'            => $row['notes']            ?? '',
+        ];
+    }
+    $existing_rows_json = json_encode($seeded);
+}
+
+$color_list_json = json_encode($color_list);
 ?>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -198,10 +297,11 @@ $color_list_json    = json_encode($color_list);
 <script>
 (function () {
   /* ── Server data ── */
-  var ORDER_ID     = <?= (int)$order_id ?>;
-  var ORDER_ID_ENC = '<?= $order_id_enc ?>';
-  var CHECKOUT_URL = '?vp=<?= base64_encode('order_info') ?>&order_id=' + ORDER_ID_ENC;
-  var existingRows = <?= $existing_rows_json ?>;
+  var DESIGN_ORDER_ID = <?= (int)$order_id ?>;
+  var OF_ID           = <?= (int)$of_id ?>;
+  var ORDER_ID_ENC    = '<?= $order_id_enc ?>';
+  var CHECKOUT_URL    = '?vp=<?= base64_encode('order_info') ?>&order_id=' + ORDER_ID_ENC;
+  var existingRows    = <?= $existing_rows_json ?>;
 
   /* ── Dropdown option lists (colors dynamic from DB) ── */
   var JERSEY_SIZES  = ['AS-46','AS-48','A4XL-50','A4XL-52','A5XL-54','A5XL-56','Youth-S','Youth-M','Youth-L'];
@@ -232,10 +332,10 @@ $color_list_json    = json_encode($color_list);
 
   var TRASH_ICON = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6M10 11v6M14 11v6M9 6V4h6v2"/></svg>';
 
-  /* Each row carries data-tid = DB primary key (0 = new unsaved row) */
+  /* Each row carries data-tid = oi_id from tbl_draft_oi (0 = not yet saved) */
   function makeRow(d, idx) {
     d = d || {};
-    var tid = d.team_id || 0;
+    var tid = d.item_id || 0;
     var tr  = document.createElement('tr');
     tr.dataset.tid = tid;
     tr.innerHTML =
@@ -276,7 +376,7 @@ $color_list_json    = json_encode($color_list);
   /* ── Public API ── */
   window.rosterAddRow = function () {
     var tbody = document.getElementById('rosterBody');
-    tbody.appendChild(makeRow({team_id: 0}, tbody.rows.length));
+    tbody.appendChild(makeRow({item_id: 0}, tbody.rows.length));
     updateCount();
   };
 
@@ -298,7 +398,7 @@ $color_list_json    = json_encode($color_list);
       }
 
       rows.push({
-        team_id:          parseInt(tr.dataset.tid || '0', 10),
+        item_id:          parseInt(tr.dataset.tid || '0', 10),
         player_name:      v(1),
         pattern_cut:      v(2),
         player_or_goalie: v(3),
@@ -326,37 +426,20 @@ $color_list_json    = json_encode($color_list);
     btn.disabled = true;
     btn.textContent = 'Saving…';
 
-    /* ✅ CHANGE ONLY THIS PART */
-    fetch('http://localhost:9090/jog_3d/api/CategorySub/save_roster.php', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        // 'Authorization': 'Bearer YOUR_TOKEN'  // optional
-      },
-      body: JSON.stringify({
-        order_id: ORDER_ID,
-        rows: rows,
-        team_name: teamName,
-        team_year: teamYear
-      })
+    fetch('ajax/roster/save_roster.php', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ design_order_id: DESIGN_ORDER_ID, of_id: OF_ID, rows: rows, team_name: teamName, team_year: teamYear })
     })
     .then(function (r) {
       if (!r.ok) throw new Error('HTTP ' + r.status);
       return r.json();
     })
     .then(function (data) {
-      if (data.status) {   // 👈 API uses "status"
-        showToast(
-          'Roster saved (' +
-          (data.inserted || 0) + ' added, ' +
-          (data.updated || 0) + ' updated, ' +
-          (data.deleted || 0) + ' removed)'
-        );
-
-        setTimeout(function () {
-          window.location.href = CHECKOUT_URL;
-        }, 1000);
-
+      if (data.success) {
+        if (data.of_id) { OF_ID = data.of_id; }
+        showToast('Roster saved (' + (data.inserted||0) + ' added, ' + (data.updated||0) + ' updated, ' + (data.deleted||0) + ' removed)');
+        setTimeout(function () { window.location.href = CHECKOUT_URL; }, 1000);
       } else {
         showToast('Error: ' + (data.message || 'Save failed'));
         btn.disabled = false;
