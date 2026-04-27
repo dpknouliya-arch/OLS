@@ -531,8 +531,11 @@ function getPantonNameAPI($zone, $designId, $type = 'pantonName') {
           <div class="ols3d-logo-grid">
             <?php foreach ($logos as $logo): ?>
             <?php
-                $lh = isset($logo['height']) ? number_format(floatval($logo['height']) * 39.3701, 2) : '0.00';
-                $lw = isset($logo['width'])  ? number_format(floatval($logo['width'])  * 39.3701, 2) : '0.00';
+            // echo "<pre>";
+            // print_r($logo);
+            // echo "</pre>";
+                $lh = isset($logo['bounds']['height']) ? number_format(floatval($logo['bounds']['height']) * 39.3701, 2) : '0.00';
+                $lw = isset($logo['bounds']['width'])  ? number_format(floatval($logo['bounds']['width'])  * 39.3701, 2) : '0.00';
             ?>
             <div class="ols3d-logo-item">
               <?php if (!empty($logo['imageSrc'])): ?>

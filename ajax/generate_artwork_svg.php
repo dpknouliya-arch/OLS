@@ -106,9 +106,9 @@ foreach ($textDecals as $text) {
     $colortext = $text['color'];
     $size    = $text['fontSize'];
     $font    = $text['fontFamily'];
-    $display = $text['displayName'];
-    $outlineColor = $text['outlineColor'];
-    $outlineWidth = $text['outlineWidth'];
+    $display = $text['displayName']??'';
+    $outlineColor = $text['outlineColor']??'#000000';
+    $outlineWidth = $text['outlineWidth']?? 0;
 
 
 
