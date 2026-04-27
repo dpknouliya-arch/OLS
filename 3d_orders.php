@@ -5,11 +5,6 @@ include 'encryption_helper.php';
 $obj_user = json_decode(base64_decode($_SESSION["JOGOLS"]));
 $user_id = $obj_user->user_id;
 
-print_r($_SESSION);
-?>
-
-<?php
-
 $data = callAPI("get_order_details.php");
 
 ?>

@@ -25,17 +25,12 @@ if ($design_order_id <= 0) {
     exit();
 }
 
-// Verify design_order ownership (READ ONLY DB)
-$stmt = $conn4->prepare(
-    "SELECT order_id FROM design_order WHERE order_id=? AND user_id=?"
-);
-$stmt->bind_param("ii", $design_order_id, $user_id);
-$stmt->execute();
-if ($stmt->get_result()->num_rows === 0) {
+// Verify design_order ownership via API (no direct DB access to jogdigital)
+$order_check = callAPI("get_order.php?order_id=$design_order_id");
+if (empty($order_check['data']) || $order_check['status'] !== 200) {
     echo json_encode(['success' => false, 'message' => 'Unauthorized.']);
     exit();
 }
-$stmt->close();
 
 // Get or create the draft order form
 $of_id = getOrCreateDraftOrder($conn, $design_order_id, $user_id);

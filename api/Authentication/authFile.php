@@ -113,15 +113,17 @@ include __DIR__ . '/../../db.php';
                  return ['status'=>404 , 'msg'=> 'Can not found the user']; 
             }
 
-            $user = $data->fetch_assoc(); 
-            // Generate Token
-            $token = bin2hex(random_bytes(32)); // 64 char token
-            $expiry = date("Y-m-d H:i:s", strtotime("+24 hours"));
-            $user_id = $user['user_id'] ?? 0; 
+            $user    = $data->fetch_assoc();
+            $user_id = $user['user_id'] ?? 0;
 
-            $update_sql = "UPDATE tbl_user SET auth_token = '$token' , token_expiry = '$expiry' Where user_id = '$user_id'"; 
-            $update = $conn->query($update_sql); 
-            return ['status' =>200 , 'msg' =>'User loggedin successfully'  , 'user_id' =>$user_id , 'token'=>$token];
+            require_once __DIR__ . '/JWTHelper.php';
+            $token = JWTHelper::generate([
+                'user_id' => $user_id,
+                'email'   => $email,
+                'level'   => $user['user_level'] ?? 0,
+            ]);
+
+            return ['status' => 200, 'msg' => 'User loggedin successfully', 'user_id' => $user_id, 'token' => $token];
      }
  
      function ForgetPassword(){
