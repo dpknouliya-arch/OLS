@@ -5,19 +5,45 @@ include 'encryption_helper.php';
 $obj_user = json_decode(base64_decode($_SESSION["JOGOLS"]));
 $user_id  = $obj_user->user_id;
 
-if (!isset($_GET['order_id'])) { echo "<p>Invalid order ID.</p>"; exit; }
-$order_id = customDecode($_GET['order_id']);
+if (isset($_GET['order_id'])) {
+    $order_id = customDecode($_GET['order_id']);
 
-$api_result = callAPI("get_order.php?order_id=$order_id");
-$data       = $api_result['data'] ?? null;
-if (!$data) { echo "<p>No data found.</p>"; exit; }
+    $res = callAPI("get_order_full.php?order_id=" . $order_id);
+    if (!$res || empty($res['data']['order'])) {
+        echo "<p>No design found.</p>";
+        exit;
+    }
 
-$order             = $data;
-$order_team_data   = $data['team']   ?? [];
-$order_design_data = isset($data['design']) ? [$data['design']] : [];
-$designId          = $order['design_id']   ?? 0;
-$sock_design       = $order['sock_design'] ?? '';
-$added_date        = $order['added_date']  ?? '';
+    $order = $res['data']['order'];
+    $order_team_data = $res['data']['team'];
+
+    $designId    = $order['design_id'];
+    $sock_design = $order['sock_design'];
+    $added_date  = $order['added_date'];
+
+} else {
+
+    echo "<p>Invalid order ID.</p>";
+    exit;
+}
+
+if (isset($designId)) {  
+    $data = callAPI("get_design_details.php?design_id=$designId");    
+    $order_design_data = [];
+
+    if ($data && !empty($data['data'])) {
+        $order_design_data[] = $data['data']; // keep same structure
+    }
+}
+
+
+$design_name  = !empty($order_design_data[0]['name'])       ? $order_design_data[0]['name']       : '—';
+$jersey_type  = !empty($order_design_data[0]['modal_type']) ? $order_design_data[0]['modal_type'] : '—';
+$design_price = !empty($order_design_data[0]['price'])      ? $order_design_data[0]['price']      : '0.00';
+$design_image = !empty($order_design_data[0]['jersey_style_image'])      ? $order_design_data[0]['jersey_style_image']      : '';
+$order_id_enc = customEncode($order_id);
+$total_qty    = count($order_team_data);
+$order_date_fmt = !empty($added_date) ? date('d/m/Y', strtotime($added_date)) : date('d/m/Y');
 
 $a_data = [0 => null, 1 => null];
 $sql_select = "SELECT * FROM tbl_address WHERE user_id='" . (int)$user_id . "' AND enable=1 AND (is_billing_addr=1 OR is_deliver_addr=1) ORDER BY is_billing_addr DESC, is_deliver_addr DESC";
@@ -28,14 +54,6 @@ if ($rs_select) {
         if ($row_select['is_deliver_addr'] == '1' && $a_data[1] === null) { $a_data[1] = $row_select; }
     }
 }
-
-$design_name  = !empty($order_design_data[0]['name'])       ? $order_design_data[0]['name']       : '—';
-$jersey_type  = !empty($order_design_data[0]['modal_type']) ? $order_design_data[0]['modal_type'] : '—';
-$design_price = !empty($order_design_data[0]['price'])      ? $order_design_data[0]['price']      : '0.00';
-$design_image = !empty($order_design_data[0]['image'])      ? $order_design_data[0]['image']      : '';
-$order_id_enc = customEncode($order_id);
-$total_qty    = count($order_team_data);
-$order_date_fmt = !empty($added_date) ? date('d/m/Y', strtotime($added_date)) : date('d/m/Y');
 
 $unique_sizes = [];
 foreach ($order_team_data as $td) {
@@ -250,7 +268,7 @@ $delivery_js = json_encode([
         <div class="ols3d-design-thumb">
           <div class="ols3d-design-thumb-img">
             <?php if (!empty($design_image)): ?>
-            <img src="http://65.1.164.81/jogdigital/admin/uploads/designs/images/<?= htmlspecialchars($design_image) ?>" alt="<?= htmlspecialchars($design_name) ?>">
+            <img src="<?= htmlspecialchars($design_image) ?>" alt="<?= htmlspecialchars($design_name) ?>">
             <?php else: ?>
             <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#CBD3E8" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             <?php endif; ?>
