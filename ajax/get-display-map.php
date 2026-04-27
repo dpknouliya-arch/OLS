@@ -1661,6 +1661,11 @@ function getDisplayMap($designId)
                     "l_shoulsadasder_logo_b" => ["x" => 2.2, "y" => 7.1, "rotate" => 90]
                 ]
             ],
+            "Neck" => [
+                "items" => [
+                    "l_shoulsadasder_logo_b" => ["x" => 2.2, "y" => 7.1, "rotate" => 90]
+                ]
+            ],
             "Logo" => [
                 "items" => [
                     "teamname" => ["x" => 1.7, "y" => 3.0, "rotate" => 0, "height" => 50, "width" => 50]
@@ -1678,7 +1683,7 @@ function getDisplayMap($designId)
             ],
             "Upper Chest" => [
                 "items" => [
-                    "Upper_chest_flag" => ["x" => 1.9, "y" => 3.4, "rotate" => 0, "height" => 30, "width" => 30]
+                    "Upper_chest_flag" => ["x" => 1.87, "y" => 3.4, "rotate" => 0, "height" => 20, "width" => 20]
                 ]
             ],
             "Upper Chest Logo" => [

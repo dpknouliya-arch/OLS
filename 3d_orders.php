@@ -59,7 +59,7 @@ $data = callAPI("get_order_details.php");
             data-status="New">
 
           <div class="ols3d-card-img">
-            <img src="<?= htmlspecialchars($row['image']) ?>"
+            <img src="<?= htmlspecialchars($row['jersey_style_image']) ?>"
                 alt="<?= htmlspecialchars($row['name']) ?>">
           </div>
 

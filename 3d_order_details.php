@@ -547,8 +547,11 @@ function getPantonNameAPI($zone, $designId, $type = 'pantonName') {
           <div class="ols3d-logo-grid">
             <?php foreach ($logos as $logo): ?>
             <?php
-                $lh = isset($logo['height']) ? number_format(floatval($logo['height']) * 39.3701, 2) : '0.00';
-                $lw = isset($logo['width'])  ? number_format(floatval($logo['width'])  * 39.3701, 2) : '0.00';
+            // echo "<pre>";
+            // print_r($logo);
+            // echo "</pre>";
+                $lh = isset($logo['bounds']['height']) ? number_format(floatval($logo['bounds']['height']) * 39.3701, 2) : '0.00';
+                $lw = isset($logo['bounds']['width'])  ? number_format(floatval($logo['bounds']['width'])  * 39.3701, 2) : '0.00';
             ?>
             <div class="ols3d-logo-item">
               <?php if (!empty($logo['imageSrc'])): ?>
@@ -592,6 +595,11 @@ function getPantonNameAPI($zone, $designId, $type = 'pantonName') {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" crossorigin="anonymous"></script>
+
+	<script>
+		window.BASE_3D_URL = "<?php echo D_BASE_URL; ?>";
+    console.log("Base 3D URL:", window.BASE_3D_URL);
+	</script>
 <script type="module" src="js/3dmodel.js?ver=1.0"></script>
 
 <script>
