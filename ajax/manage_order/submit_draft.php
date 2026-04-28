@@ -239,13 +239,7 @@ if(isset($_POST['assigned_edit_of_id']) && !empty($_POST['assigned_edit_of_id'])
 							  $of_id                 
 	 ) ; 
 $stmt->execute(); 
-	//  if($stmt->execute()){
-	// 	  echo json_encode(['status' => 200 , 'msg' => 'success']) ; 
-	//  }else{ 
-	// 	 echo json_encode(['status' => 503 ,   'error' => $stmt->error]) ;
-	//  }
-
-	//  exit ; 
+ 
 }
 
 
@@ -269,6 +263,74 @@ $sql_add_noti = 'INSERT INTO notification (
 				$query = $conn3->query($sql_add_noti);
 
 
+// if($_POST["is_submit_order"]=="yes"){			
+// 	$add_date = date("Y-m-d H:i:s");
+
+// 	$sql_select = "SELECT of_id FROM tbl_draft_of WHERE draft_id='".$draft_id."'; ";
+// 	$rs_select = $conn->query($sql_select);
+// 	$a_of_id = array();
+// 	while($row_of_id = $rs_select->fetch_assoc()){
+// 		$a_of_id[] = $row_of_id["of_id"];
+
+// 	}
+
+   
+// 	if(empty($draft_id)){
+// 		 die("Draft id is empty") ; 
+// 	}
+
+// 	$sql_insert1 = "INSERT INTO tbl_order_form SELECT * , 0 as design_order_id  , 0 as is_submitted ,  NULL AS submitted_date ,   0 as is_reordered  FROM tbl_draft_of WHERE draft_id='".$draft_id."' ORDER BY of_id ASC ";
+// 	$is_insert1 = 0;
+// 	if($conn->query($sql_insert1)){
+// 		$is_insert1 = 1;
+// 	}else {
+//        die("Insert1 Error: " . $conn->error);
+//     }
+
+// 	$s_of_id = implode(",", $a_of_id);
+
+// 	$sql_insert2 = "INSERT INTO tbl_order_item (
+// 			of_id, player_name, p_or_g, sex, product_size_id, jersey_number,
+// 			color_top1, qty_top1, color_top2, qty_top2,
+// 			bottom_size, color_bottom1, qty_bottom1, color_bottom2, qty_bottom2,
+// 			c_or_a, name_for_packing, note
+// 		)
+// 		SELECT 
+// 			of_id, player_name, p_or_g, sex, product_size_id, jersey_number,
+// 			color_top1, qty_top1, color_top2, qty_top2,
+// 			bottom_size, color_bottom1, qty_bottom1, color_bottom2, qty_bottom2,
+// 			c_or_a, name_for_packing, note
+// 		FROM tbl_draft_oi 
+// 		WHERE of_id IN (".$s_of_id.") 
+// 		ORDER BY oi_id ASC
+// 		";
+
+// 	$is_insert2 = 0;
+// 	if($conn->query($sql_insert2)){
+// 		$is_insert2 = 1;
+// 	}else {
+//        die("Insert2 Error: " . $conn->error);
+//     }
+// 	//echo $is_insert2;
+
+// 	if($is_insert1==1){
+// 		$sql_delete1 = "DELETE FROM tbl_draft_of WHERE draft_id='".$draft_id."'; ";
+// 		$conn->query($sql_delete1);
+
+// 		$sql_update1 = "UPDATE tbl_order_form SET date_add='".$add_date."' WHERE draft_id='".$draft_id."';";
+// 		$conn->query($sql_update1);
+// 	}
+
+// 	if($is_insert2==1){
+// 		$sql_delete2 = "DELETE FROM tbl_draft_oi WHERE of_id IN (".$s_of_id."); ";
+// 		$conn->query($sql_delete2);
+// 	}
+// 	echo '<script type="text/javascript">';
+// 		echo 'parent.window.location.href = "/?vp='.base64_encode('new_order').'";';
+// 	echo '</script>';
+// }
+
+
 if($_POST["is_submit_order"]=="yes"){			
 	$add_date = date("Y-m-d H:i:s");
 
@@ -278,22 +340,138 @@ if($_POST["is_submit_order"]=="yes"){
 	while($row_of_id = $rs_select->fetch_assoc()){
 		$a_of_id[] = $row_of_id["of_id"];
 	}
+	
 
-	$sql_insert1 = "INSERT INTO tbl_order_form SELECT * FROM tbl_draft_of WHERE draft_id='".$draft_id."' ORDER BY of_id ASC; ";
+   
+			$sql_insert1 = "INSERT INTO tbl_order_form (
+			of_id,
+			draft_id ,
+			form_name, 
+			special_comment, 
+			on_team_name, 
+			on_year, 
+			xls_name , 
+			order_date, 
+			order_status,
+			order_code,
+		    req_due_date,
+			game_event_date, 
+			customer_po, 
+			project_name, 
+			payment_opt, 
+			sales_rep_id, 
+			reorder_num, 
+			prod_id,
+			user_id,
+			bill_comp_name,
+			bill_contact_name,
+			bill_address,
+			bill_city,
+			bill_country, 
+			bill_zip_code , 
+			bill_tel , 
+			bill_email , 
+			bill_tax_id , 
+			deli_comp_name , 
+			deli_contact_name , 
+			deli_address , 
+			deli_city , 
+			deli_country, 
+			deli_zip_code, 
+			deli_tel, 
+			deli_email , 
+			deli_tax_id , 
+			code_match , 
+			lkr_order_main_id , 
+			re_order_id , 
+			ship_status , 
+		    date_add ,
+			is_assigned,
+			assign_user_id
+		)
+		SELECT 
+			of_id,
+			draft_id ,
+			form_name, 
+			special_comment, 
+			on_team_name, 
+			on_year, 
+			xls_name , 
+			order_date, 
+			order_status,
+			order_code,
+		    req_due_date,
+			game_event_date, 
+			customer_po, 
+			project_name, 
+			payment_opt, 
+			sales_rep_id, 
+			reorder_num, 
+			prod_id,
+			user_id,
+			bill_comp_name,
+			bill_contact_name,
+			bill_address,
+			bill_city,
+			bill_country, 
+			bill_zip_code , 
+			bill_tel , 
+			bill_email , 
+			bill_tax_id , 
+			deli_comp_name , 
+			deli_contact_name , 
+			deli_address , 
+			deli_city , 
+			deli_country, 
+			deli_zip_code, 
+			deli_tel, 
+			deli_email , 
+			deli_tax_id , 
+			code_match , 
+			lkr_order_main_id , 
+			re_order_id , 
+			ship_status , 
+		    date_add ,
+			is_assigned,
+			assign_user_id
+		FROM tbl_draft_of 
+		WHERE draft_id='".$draft_id."'
+		ORDER BY of_id ASC
+		";
+
+
+
 	$is_insert1 = 0;
 	if($conn->query($sql_insert1)){
 		$is_insert1 = 1;
-	}
+	}else {
+       die("Insert1 Error: " . $conn->error);
+    }
 
 	$s_of_id = implode(",", $a_of_id);
 
-	$sql_insert2 = "INSERT INTO tbl_order_item SELECT * FROM tbl_draft_oi WHERE of_id IN (".$s_of_id.") ORDER BY oi_id ASC; ";
+		$sql_insert2 = "INSERT INTO tbl_order_item (
+			of_id, player_name, p_or_g, sex, product_size_id, jersey_number,
+			color_top1, qty_top1, color_top2, qty_top2,
+			bottom_size, color_bottom1, qty_bottom1, color_bottom2, qty_bottom2,
+			c_or_a, name_for_packing, note
+		)
+		SELECT 
+			of_id, player_name, p_or_g, sex, product_size_id, jersey_number,
+			color_top1, qty_top1, color_top2, qty_top2,
+			bottom_size, color_bottom1, qty_bottom1, color_bottom2, qty_bottom2,
+			c_or_a, name_for_packing, note
+		FROM tbl_draft_oi 
+		WHERE of_id IN (".$s_of_id.") 
+		ORDER BY oi_id ASC
+		";
 	$is_insert2 = 0;
 	if($conn->query($sql_insert2)){
 		$is_insert2 = 1;
-	}
-	//echo $is_insert2;
-
+	}else {
+       die("Insert2 Error: " . $conn->error);
+    }
+	
 	if($is_insert1==1){
 		$sql_delete1 = "DELETE FROM tbl_draft_of WHERE draft_id='".$draft_id."'; ";
 		$conn->query($sql_delete1);

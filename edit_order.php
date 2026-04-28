@@ -1055,7 +1055,7 @@ $s_of_id_list = implode(",", $a_of_id);
 																				</td>
 																				<td><input class="white_in" name="player_name[<?php echo $form_id; ?>][]" type="text" maxlength="120" value="<?php echo $edit_item["player_name"]; ?>"></td>
 																				<td>
-																					<select class="white_in" onchange="return changePattern('select_mf_<?php echo $form_id; ?>_<?php echo $row_count; ?>','select_pg_<?php echo $form_id; ?>_<?php echo $row_count; ?>','select_jsize_<?php echo $form_id; ?>_<?php echo $row_count; ?>','select_ssize_<?php echo $form_id; ?>_<?php echo $row_count; ?>','<?php echo $prod_id; ?>');" id="select_mf_<?php echo $form_id; ?>_<?php echo $row_count; ?>" name="select_mf[<?php echo $form_id; ?>][]">
+																					<select class="white_in  w-fit" onchange="return changePattern('select_mf_<?php echo $form_id; ?>_<?php echo $row_count; ?>','select_pg_<?php echo $form_id; ?>_<?php echo $row_count; ?>','select_jsize_<?php echo $form_id; ?>_<?php echo $row_count; ?>','select_ssize_<?php echo $form_id; ?>_<?php echo $row_count; ?>','<?php echo $prod_id; ?>');" id="select_mf_<?php echo $form_id; ?>_<?php echo $row_count; ?>" name="select_mf[<?php echo $form_id; ?>][]">
 																						<option value="youth" <?php if ($edit_item["sex"] == "youth") {
 																													echo "selected";
 																												} ?>>MEN-YOUTH</option>
@@ -1068,7 +1068,7 @@ $s_of_id_list = implode(",", $a_of_id);
 																					</select>
 																				</td>
 																				<td>
-																					<select class="white_in" onchange="return changePattern('select_mf_<?php echo $form_id; ?>_<?php echo $row_count; ?>','select_pg_<?php echo $form_id; ?>_<?php echo $row_count; ?>','select_jsize_<?php echo $form_id; ?>_<?php echo $row_count; ?>','select_ssize_<?php echo $form_id; ?>_<?php echo $row_count; ?>','<?php echo $prod_id; ?>');" id="select_pg_<?php echo $form_id; ?>_<?php echo $row_count; ?>" name="select_pg[<?php echo $form_id; ?>][]" onchange="return changePG(<?php echo $form_id; ?>,<?php echo $row_count; ?>);">
+																					<select class="white_in  w-fit" onchange="return changePattern('select_mf_<?php echo $form_id; ?>_<?php echo $row_count; ?>','select_pg_<?php echo $form_id; ?>_<?php echo $row_count; ?>','select_jsize_<?php echo $form_id; ?>_<?php echo $row_count; ?>','select_ssize_<?php echo $form_id; ?>_<?php echo $row_count; ?>','<?php echo $prod_id; ?>');" id="select_pg_<?php echo $form_id; ?>_<?php echo $row_count; ?>" name="select_pg[<?php echo $form_id; ?>][]" onchange="return changePG(<?php echo $form_id; ?>,<?php echo $row_count; ?>);">
 																						<option value="player" title="Player" <?php if ($edit_item["p_or_g"] == "player") {
 																																	echo "selected";
 																																} ?>>Player</option>
@@ -1148,7 +1148,7 @@ $s_of_id_list = implode(",", $a_of_id);
 																					<input class="white_in sock_qty2_<?php echo $form_id; ?>" name="sock_qty2[<?php echo $form_id; ?>][]" type="number" min="0" max="9999" onchange="calculateQTY(1,'sock_qty2_<?php echo $form_id; ?>');" onkeyup="calculateQTY(1,'sock_qty2_<?php echo $form_id; ?>');" value="<?php echo $edit_item["qty_bottom2"]; ?>">
 																				</td>
 																				<td>
-																					<select class="white_in" name="select_ca[<?php echo $form_id; ?>][]">
+																					<select class="white_in  w-fit" name="select_ca[<?php echo $form_id; ?>][]">
 																						<option value=""></option>
 																						<option value="captain" <?php if ($edit_item["c_or_a"] == "captain") {
 																													echo "selected";
@@ -1232,7 +1232,7 @@ $s_of_id_list = implode(",", $a_of_id);
 													</div>
 												</center>
 											<?php
-											} else if ($row_product["split_type"] == "2") {
+											} else if (!empty($row_product['split_type']) && $row_product["split_type"] == "2") {
 
 												$tmp_split = explode(",", $row_product["split_name"]);
 												$split_name1 = $tmp_split[0];
@@ -1491,7 +1491,8 @@ $s_of_id_list = implode(",", $a_of_id);
 											<?php
 											} else {
 
-												$split_name = $row_product["split_name"];
+												$split_name =  !empty($row_product["split_name"]) ? $row_product["split_name"] : NULL ;
+												
 											?>
 												<center id="sameteam<?php echo $of_id; ?>">
 													<div class="tab-content  split-name " id="tab-content">
@@ -1510,7 +1511,7 @@ $s_of_id_list = implode(",", $a_of_id);
 																			<div class="d-inline">
 																				
 																
-																				<h6 class="my-auto text-center"><?php echo $form_name; ?>(<?php echo $row_product["prod_name"]; ?>)
+																				<h6 class="my-auto text-center"><?php echo $form_name; ?>(<?php echo $row_product["prod_name"] ?? "" ?>)
 																				<button class="delete_form_btn bg-transparent border-none p-0 m-0" type="button">
 																					<figure class="m-0 d-inline iconBTn" >
 																						<img src="images/vector/delter.png" alt="" style="width: 30px; background: #FFF; padding: 6px;margin-left: 20px;">
@@ -1549,43 +1550,43 @@ $s_of_id_list = implode(",", $a_of_id);
 																			<input type="hidden" id="num_item_<?php echo $form_id; ?>" value="<?php echo $num_item; ?>">
 																		</th>
 																		<?php
-																		if ($row_product["have_name"] == "1") {
+																		if (!empty($row_product["have_name"])  &&  $row_product["have_name"] == "1") {
 																		?>
 																			<th style="width:158px;"><?php echo $split_name; ?></th>
 																		<?php
 																		}
 
-																		if ($row_product["choose_pg"] == "1") {
+																		if (!empty($row_product["choose_pg"])  && $row_product["choose_pg"] == "1") {
 																		?>
 																			<th style="width:65px;">P or G</th>
 																		<?php
 																		}
 
-																		if ($row_product["prod_id"] == "2") {
+																		if (!empty($row_product["prod_id"]) && $row_product["prod_id"] == "2") {
 																		?>
 																			<th style="width:100px;">Pattern Cut</th>
 																		<?php
 																		}
 
-																		if ($row_product["choose_mf"] == "1") {
+																		if (!empty($row_product["choose_mf"]) &&  $row_product["choose_mf"] == "1") {
 																		?>
 																			<th style="width:100px;">Pattern Cut</th>
 																		<?php
 																		}
 
-																		if ($row_product["have_size"] == "1" && $prod_id == "4") {
+																		if (!empty($row_product["have_size"]) &&   $row_product["have_size"] == "1" && $prod_id == "4") {
 																		?>
 																			<th style="width:80px;" class="glued_body">Glue</th>
 																		<?php
 																		}
 
-																		if ($row_product["have_size"] == "1") {
+																		if (!empty($row_product["have_size"]) &&   $row_product["have_size"] == "1") {
 																		?>
 																			<th style="width:80px;"><?php echo $split_name; ?> Size</th>
 																		<?php
 																		}
 
-																		if ($row_product["have_number"] == "1") {
+																		if (!empty($row_product["have_number"]) &&  $row_product["have_number"] == "1") {
 																		?>
 																			<th><?php echo $split_name; ?> #</th>
 																		<?php
@@ -1594,7 +1595,7 @@ $s_of_id_list = implode(",", $a_of_id);
 																		<th><?php echo $split_name; ?> Color</th>
 																		<th style="width:50px;">QTY</th>
 																		<?php
-																		if ($row_product["have_size"] == "1" && $prod_id == "4") {
+																		if (!empty($row_product["have_size"]) &&  $row_product["have_size"] == "1" && $prod_id == "4") {
 																		?>
 																			<th style="width:100px;">Name On Namebar</th>
 																		<?php
@@ -1901,6 +1902,7 @@ $s_of_id_list = implode(",", $a_of_id);
 																	<tr>
 																		<th colspan="2" style="text-align: center; font-size: 14px; font-weight: 500;">TOTAL ORDER</th>
 																		<?php
+																	if(!empty($row_product)){
 																		if ($row_product["have_name"] == "1") {
 																		?>
 																			<th></th>
@@ -1941,6 +1943,7 @@ $s_of_id_list = implode(",", $a_of_id);
 																			<th>
 																			<?php
 																		}
+																	}
 																			?>
 																			<th id="total_jersey_qty_<?php echo $form_id; ?>"><?= $TTL_SHELL ?></th>
 																			<th></th>
@@ -2115,6 +2118,9 @@ $s_of_id_list = implode(",", $a_of_id);
 												$split_name1 = $tmp_split[0];
 												$split_name2 = $tmp_split[1];
 											?>
+
+											<input type="hidden" name="assigned_edit_of_id"  value="<?=$of_id?>">
+
 												<center id="sameteam<?php echo $of_id; ?>">
 													<div class="tab-content  split-type2" id="tab-content">
 														<div class="tab-pane <?php if ($fisrtid == $of_id) {
@@ -2267,6 +2273,8 @@ $s_of_id_list = implode(",", $a_of_id);
 
 												$split_name = $row_product["split_name"];
 											?>
+											<input type="hidden" name="assigned_edit_of_id"  value="<?=$of_id?>">
+
 												<center id="sameteam<?php echo $of_id; ?>">
 													<div class="tab-content split-name" id="tab-content">
 														<div class="tab-pane <?php if ($fisrtid == $of_id) {
@@ -3081,8 +3089,26 @@ $s_of_id_list = implode(",", $a_of_id);
 			$('#btn_submit_order').attr("disabled", true).html('<i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i> Submiting...');
 
 			$('#is_submit_order').val("yes");
+			
 			$('#form_manage_save').attr("action", "ajax/manage_order/submit_draft.php");
 			$('#form_manage_save').submit();
+
+
+				// $('#form_manage_save').on('submit', function(e) {
+				//     e.preventDefault();
+
+				//    console.log("form sunmit "); 
+				// $.ajax({
+				// 		url: "./ajax/manage_order/submit_draft.php",
+				// 		type: "POST",
+				// 		data: $(this).serialize(),
+				// 		success: function(res) {
+				// 		console.log(res);
+				// }
+				// });
+				// });
+
+				// $('#form_manage_save').submit();
 		}
 
 	}
@@ -3364,6 +3390,7 @@ $s_of_id_list = implode(",", $a_of_id);
     // Validation patterns
     const VALIDATION_PATTERNS = {
         textNumber: /^(?=.*[a-zA-Z]).{3,50}$/,
+		OrderName: /^(?=.*[a-zA-Z])[a-zA-Z0-9\s&'.,\-()]{3,100}$/ , 
         city: /^[a-zA-Z\s]{2,80}$/, // Letters and spaces only
         text: /^[a-zA-Z\s]{2,50}$/, // Letters and spaces only
         zipcode: /^[a-zA-Z0-9\-\s]{2,20}$/, // Letters, numbers, hyphens
@@ -3516,7 +3543,7 @@ $s_of_id_list = implode(",", $a_of_id);
             }
         }
 
-        isValid &= validateField('#project_name', VALIDATION_PATTERNS.textNumber, 'Invalid order name', true);
+        isValid &= validateField('#project_name', VALIDATION_PATTERNS.OrderName, 'Invalid order name', true);
         isValid &= validateField('#customer_po', VALIDATION_PATTERNS.textNumber, 'Invalid customer PO', true);
 
 
@@ -3560,7 +3587,7 @@ $s_of_id_list = implode(",", $a_of_id);
 
 	function deleteDraft(draft_id ,tab_pane) {
 
-		if (confirm("Confirm to delete draft #" + draft_id + "?")) {
+		if (confirm("Confirm to delete draft")) {
 			$.ajax({
 				type: "POST",
 				dataType: "json",
@@ -3576,6 +3603,13 @@ $s_of_id_list = implode(",", $a_of_id);
 
 						   centerElement.remove(); 
 						   $('#'+active_nav_link).remove(); 
+
+											// Activate first available tab
+						var firstTab = $('.teamDetailsNavitems:first');
+						firstTab.addClass('active')
+						var href = firstTab.attr('href'); 
+						$(href).addClass('show active'); 
+		 
 					}
 
 				}

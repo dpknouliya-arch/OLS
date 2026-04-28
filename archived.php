@@ -349,10 +349,15 @@ if(sizeof($a_order_main_id)>0){
 								
 							</td>
 							<td class="bg_status_info">
-								
-								<div class="tracking_link" onclick="return reOrder(<?php echo $row_order["of_id"]; ?>);">
-									<i class="fa fa-retweet"></i>
-								</div>
+								<?php 
+								   if($row_order['is_reordered'] != 1){
+									?>
+											<div class="tracking_link" onclick="return reOrder(<?php echo $row_order["of_id"]; ?>);">
+												<i class="fa fa-retweet"></i>
+											</div>
+									  <?php     
+								   } 
+								?>
 								
 							</td>
 							<td class="bg_status_info">
@@ -618,7 +623,7 @@ function reOrder(of_id){
             if(resp.result=="success"){
 				
 
-            	// window.location.href = '?vp=<?php echo base64_encode('manage_order'); ?>';
+            	window.location.href = '?vp=<?php echo base64_encode('manage_order'); ?>';
             	
             }else{
                 
