@@ -93,7 +93,6 @@ if ($rs_deli && $rs_deli->num_rows > 0) {
 
 // UPDATE tbl_order_form — mark as submitted
 $sql_update = "UPDATE tbl_order_form SET
-    draft_id        = 0,
     is_submitted    = 1,
     submitted_date  = NOW(),
     order_status    = 'new',
@@ -104,6 +103,7 @@ $sql_update = "UPDATE tbl_order_form SET
     payment_opt     = '$payment_opt',
     sales_rep_id    = '$sales_rep_id',
     reorder_num     = '$reorder_num',
+    prod_id       = 1, -- hardcoded for 3D Jersey
     bill_comp_name    = '{$bill['comp_name']}',
     bill_contact_name = '{$bill['contact_name']}',
     bill_address      = '{$bill['address']}',
