@@ -1053,7 +1053,7 @@ function renderDraftCards(data) {
     const ctaClass = isUsed ? 'btn-roster' : '';
     const ctaIcon = isUsed ? 'bi-arrow-right-circle' : 'bi-pencil';
     return `
-    <div class="col-12 col-md-6 col-xl-4 draft-card-col" data-status="${status}" data-name="${d.name.toLowerCase()}">
+    <div class="col-12 col-md-6 col-xl-2 draft-card-col" data-status="${status}" data-name="${d.name.toLowerCase()}">
       <div class="draft-card">
         <div class="card-thumb">
           <img class="jersey-img" src="${D_BASE_URL}admin/uploads/${d.jersey_style_image}" />
