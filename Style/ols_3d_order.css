@@ -143,6 +143,8 @@
   border-radius: 14px; overflow: hidden;
   border: 1.5px solid var(--border);
   transition: all .2s;
+  display: flex;
+  flex-direction: column;
 }
 .ols3d-card:hover {
   border-color: #C5D0EA;
@@ -155,7 +157,7 @@
   overflow: hidden; border-bottom: 1px solid var(--border);
 }
 .ols3d-card-img img { width: 100%; height: 100%; object-fit: contain; }
-.ols3d-card-body { padding: 14px 16px; }
+.ols3d-card-body { padding: 14px 16px; flex: 1; display: flex; flex-direction: column; }
 .ols3d-card-meta {
   display: flex; align-items: flex-start;
   justify-content: space-between; margin-bottom: 6px;
@@ -165,6 +167,7 @@
 .ols3d-card-name {
   font-size: 12.5px; color: var(--text-muted); margin-bottom: 12px;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  flex: 1;
 }
 .ols3d-btn-view {
   display: block; width: 100%; padding: 8px;
@@ -175,6 +178,7 @@
   text-align: center; text-decoration: none;
   font-family: inherit; cursor: pointer;
   transition: all .15s;
+  margin-top: auto;
 }
 .ols3d-btn-view:hover {
   background: var(--brand); color: white;
