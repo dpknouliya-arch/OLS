@@ -1,21 +1,62 @@
 <?php
-include('../db.php');
 require_once 'get-display-map.php';
 
 $data = json_decode(file_get_contents("php://input"), true);
 
-$designId = $data['design_id'];
-//$artwork  = $data['artwork'];
-$color  = $data['color'];
+$designId    = $data['design_id'];
+$color       = $data['color'];
 $textDecals  = $data['textDecals'];
-$imageDecals  = $data['imageDecals'];
+$imageDecals = $data['imageDecals'];
+
 $displayMap = getDisplayMap($designId);
 
-$svgPath = D_BASE_URL . "admin/assets/svg/".$designId."/Calgary.svg";
-$svg = file_get_contents($svgPath);
+$svgPath = "https://3d.jog-joinourgame.com/jogdigital_test/admin/assets/svg/".$designId."/Calgary.svg";
+
+/**
+ * Fetch remote file using cURL
+ */
+function getRemoteFile($url) {
+    $ch = curl_init();
+
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+
+    // Optional (if SSL issues)
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+
+    $response = curl_exec($ch);
+
+    if (curl_errno($ch)) {
+        error_log('cURL Error: ' . curl_error($ch));
+    }
+
+    curl_close($ch);
+
+    return $response;
+}
+
+$svg = getRemoteFile($svgPath);
+
+/**
+ * Validate SVG before parsing
+ */
+if (empty($svg)) {
+    die("❌ Failed to fetch SVG file from: " . $svgPath);
+}
+
+libxml_use_internal_errors(true);
 
 $dom = new DOMDocument();
-$dom->loadXML($svg);
+
+if (!$dom->loadXML($svg)) {
+    echo "❌ Invalid SVG XML\n";
+    print_r(libxml_get_errors());
+    exit;
+}
+
 $xpath = new DOMXPath($dom);
 
 /* ---------- TEXT UPDATE ---------- */
@@ -106,9 +147,9 @@ foreach ($textDecals as $text) {
     $colortext = $text['color'];
     $size    = $text['fontSize'];
     $font    = $text['fontFamily'];
-    $display = $text['displayName']??'';
-    $outlineColor = $text['outlineColor']??'#000000';
-    $outlineWidth = $text['outlineWidth']?? 0;
+    $display = $text['displayName'];
+    $outlineColor = $text['outlineColor'];
+    $outlineWidth = $text['outlineWidth'];
 
 
 
