@@ -108,7 +108,7 @@
 
                             <tr class="theader">
 
-                                <th class="tablecount">01</th>
+                                <th class="tablecount"></th>
 
                                 <th colspan="17" class="text-center">
 
@@ -122,17 +122,15 @@
 
 
 
-                                                <figure class="m-0 d-inline iconBTn"><img
-
-                                                        src="images/vector/delter.png" alt="" style="width: 30px; background: #FFF; padding: 6px;margin-left: 20px;
-">
+                                                <figure class="m-0 d-inline iconBTn">
+                                                    <img  src="images/vector/delter.png" alt="" style="width: 30px; background: #FFF; padding: 6px;margin-left: 20px;">
 
                                                 </figure>
                                             </span>
                                         </h6>
                                     </div>
 
-                                 </th>
+                                </th>
 
                             </tr>
 
@@ -182,10 +180,10 @@
 
                             <?php
 
-                             $totalqty1 = 0; 
-                             $totalqty2 = 0 ; 
-                             $totalqty3 = 0; 
-                             $totalqty4 = 0; 
+                            $totalqty1 = 0;
+                            $totalqty2 = 0;
+                            $totalqty3 = 0;
+                            $totalqty4 = 0;
 
                             // Calculate number of rows needed - use Excel data count or default to 10
                             $row_count = !empty($excel_data) ? count($excel_data) : 10;
@@ -244,23 +242,23 @@
                                 $ca_val = strtolower(getExcelValue($excel_row, 15));
 
 
-                                         
-                            $excel_val_qty1 = (int)(getExcelValue($excel_row, 6) ?? 0);
-                            $execel_val_qty2 = (int)(getExcelValue($excel_row, 8) ?? 0 ) ; 
-                            $excel_val_qty3 = (int) (getExcelValue($excel_row, 11) ?? 0);
-                            $excel_val_qty4 = (int) (getExcelValue($excel_row, 13) ?? 0);
 
-                            $totalqty1 += $excel_val_qty1;
-                            $totalqty2 += $execel_val_qty2;
-                            $totalqty3 += $excel_val_qty3;
-                            $totalqty4 += $excel_val_qty4;
+                                $excel_val_qty1 = (int)(getExcelValue($excel_row, 6) ?? 0);
+                                $execel_val_qty2 = (int)(getExcelValue($excel_row, 8) ?? 0);
+                                $excel_val_qty3 = (int) (getExcelValue($excel_row, 11) ?? 0);
+                                $excel_val_qty4 = (int) (getExcelValue($excel_row, 13) ?? 0);
+
+                                $totalqty1 += $excel_val_qty1;
+                                $totalqty2 += $execel_val_qty2;
+                                $totalqty3 += $excel_val_qty3;
+                                $totalqty4 += $excel_val_qty4;
 
 
 
 
                             ?>
 
-                                <tr id="prod_item_<?php echo $form_id; ?>_<?= $tet ?>"  data-prod_id="<?= $prod_id ?>"  data-form_id = <?= $form_id ?> >
+                                <tr id="prod_item_<?php echo $form_id; ?>_<?= $tet ?>" data-prod_id="<?= $prod_id ?>" data-form_id=<?= $form_id ?>>
 
                                     <td>
 
@@ -324,11 +322,11 @@
 
                                     <td><input class="white_in" name="jersey_color[<?php echo $form_id; ?>][]" type="text" maxlength="100" value="<?php echo getExcelValue($excel_row, 5); ?>"></td>
 
-                                    <td><input class="white_in jersey_qty_<?php echo $form_id; ?>" name="jersey_qty[<?php echo $form_id; ?>][]" type="number" min="0" max="9999" onchange="calculateQTY(1,'jersey_qty_<?php echo $form_id; ?>');" onkeyup="calculateQTY(1,'jersey_qty_<?php echo $form_id; ?>');" value="<?php echo getExcelValue($excel_row, 6); ?>"></td>
+                                    <td><input class="w-45 white_in jersey_qty_<?php echo $form_id; ?>" name="jersey_qty[<?php echo $form_id; ?>][]" type="number" min="0" max="9999" onchange="calculateQTY(1,'jersey_qty_<?php echo $form_id; ?>');" onkeyup="calculateQTY(1,'jersey_qty_<?php echo $form_id; ?>');" value="<?php echo getExcelValue($excel_row, 6); ?>"></td>
 
                                     <td><input class="white_in" name="jersey_color2[<?php echo $form_id; ?>][]" type="text" maxlength="100" value="<?php echo getExcelValue($excel_row, 7); ?>"></td>
 
-                                    <td><input class="white_in jersey_qty2_<?php echo $form_id; ?>" name="jersey_qty2[<?php echo $form_id; ?>][]" type="number" min="0" max="9999" onchange="calculateQTY(1,'jersey_qty2_<?php echo $form_id; ?>');" onkeyup="calculateQTY(1,'jersey_qty2_<?php echo $form_id; ?>');" value="<?php echo getExcelValue($excel_row, 8); ?>"></td>
+                                    <td><input class="w-45  white_in jersey_qty2_<?php echo $form_id; ?>" name="jersey_qty2[<?php echo $form_id; ?>][]" type="number" min="0" max="9999" onchange="calculateQTY(1,'jersey_qty2_<?php echo $form_id; ?>');" onkeyup="calculateQTY(1,'jersey_qty2_<?php echo $form_id; ?>');" value="<?php echo getExcelValue($excel_row, 8); ?>"></td>
 
                                     <td>
 
@@ -348,11 +346,11 @@
 
                                     <td><input class="white_in" name="sock_color[<?php echo $form_id; ?>][]" type="text" maxlength="100" value="<?php echo getExcelValue($excel_row, 10); ?>"></td>
 
-                                    <td><input class="white_in sock_qty_<?php echo $form_id; ?>" name="sock_qty[<?php echo $form_id; ?>][]" type="number" min="0" max="9999" onchange="calculateQTY(1,'sock_qty_<?php echo $form_id; ?>');" onkeyup="calculateQTY(1,'sock_qty_<?php echo $form_id; ?>');" value="<?php echo getExcelValue($excel_row, 11); ?>"></td>
+                                    <td><input class=" w-45 white_in sock_qty_<?php echo $form_id; ?>" name="sock_qty[<?php echo $form_id; ?>][]" type="number" min="0" max="9999" onchange="calculateQTY(1,'sock_qty_<?php echo $form_id; ?>');" onkeyup="calculateQTY(1,'sock_qty_<?php echo $form_id; ?>');" value="<?php echo getExcelValue($excel_row, 11); ?>"></td>
 
                                     <td><input class="white_in" name="sock_color2[<?php echo $form_id; ?>][]" type="text" maxlength="100" value="<?php echo getExcelValue($excel_row, 11); ?>"></td>
 
-                                    <td><input class="white_in sock_qty2_<?php echo $form_id; ?>" name="sock_qty2[<?php echo $form_id; ?>][]" type="number" min="0" max="9999" onchange="calculateQTY(1,'sock_qty2_<?php echo $form_id; ?>');" onkeyup="calculateQTY(1,'sock_qty2_<?php echo $form_id; ?>');" value="<?php echo getExcelValue($excel_row, 13); ?>"></td>
+                                    <td><input class="w-45  white_in sock_qty2_<?php echo $form_id; ?>" name="sock_qty2[<?php echo $form_id; ?>][]" type="number" min="0" max="9999" onchange="calculateQTY(1,'sock_qty2_<?php echo $form_id; ?>');" onkeyup="calculateQTY(1,'sock_qty2_<?php echo $form_id; ?>');" value="<?php echo getExcelValue($excel_row, 13); ?>"></td>
 
                                     <td>
 
@@ -431,6 +429,23 @@
 
                         </tr>
 
+
+                        <tr>
+
+                                <!-- <th style="border-width: 0px; background-color: #FFA;"></th> -->
+
+                                <th colspan="2" style="background: #F9F9F9 !important;   padding: 10px 0 10px 10px !important;">
+                                    <p class="mb-0" style="background: #222222;  text-align: center;  font-size: 13px;  font-weight: 500;  padding: 10px !important;  border-radius: 15px 0 0 15px;">
+                                        Special Comments (if any)
+                                    </p>
+                                </th>
+
+                                <th colspan="16" style="background-color: #F9F9F9 !important; padding: 10px  10px 10px 0 !important;">
+                                    <input type="text" name="special_comment[<?= $form_id ?>]" placeholder="Enter Special Comment here..." style=" width: 100%; background:#FFF !important; border: 1px solid #eee; padding: 8px; border-radius: 0 20px 20px 0;">
+                                </th>
+
+                        </tr>
+
                     </table>
 
 
@@ -479,28 +494,20 @@
 
                         <tr class="theader">
 
-                            <th class="tablecount">01</th>
+                            <th class="tablecount"></th>
 
                             <th colspan="15" class="text-center">
 
                                 <div class="d-inline">
 
-                                    <!-- <h6><?php echo $form_name; ?>(<?php echo $row_product["prod_name"]; ?>) <i class="fa fa-minus-circle" data-toggle="tooltip" title="Click to delete order form" style="font-size: 16px; color: #F00; cursor: pointer;" onclick="return deleteProductCard(<?php echo $form_id; ?>);"></i></h6> -->
+                                  
                                     <h6 class="my-auto"><?php echo $form_name; ?>(<?php echo $row_product["prod_name"]; ?>) <span href="#" class="d-inline deleteTable" onclick="removeTable(this)">
-                                            <figure class="m-0 d-inline"><img src="images/vector/delter.png" alt="" style="width: 30px; background: #FFF; padding: 6px;margin-left: 20px;
-">
+                                            <figure class="m-0 d-inline">
+                                                <img src="images/vector/delter.png" alt="" style="width: 30px; background: #FFF; padding: 6px;margin-left: 20px;">
                                             </figure>
                                         </span></h6>
 
-                                    <!-- <a href="#" class="d-inline m-2">
-
-                                    <figure class="m-0 d-inline"><img
-
-                                    src="images/vector/edit.png" alt="">
-
-                                    </figure>
-
-                                </a> -->
+                                  
 
 
                                 </div>
@@ -620,7 +627,7 @@
                                 $pg_val = strtolower(getExcelValue($excel_row, $row_product["choose_pg"] == "1" ? ($row_product["have_name"] == "1" ? 2 : 1) : 0));
                             ?>
 
-                                <tr id="prod_item_<?php echo $form_id; ?>_<?= $tet ?>" data-prod_id="<?= $prod_id ?>"  data-form_id = <?= $form_id ?>>
+                                <tr id="prod_item_<?php echo $form_id; ?>_<?= $tet ?>" data-prod_id="<?= $prod_id ?>" data-form_id=<?= $form_id ?>>
 
                                     <td>
 
@@ -722,7 +729,7 @@
 
                                     <td><input class="white_in" name="jersey_color[<?php echo $form_id; ?>][]" type="text" maxlength="100" value="<?php echo getExcelValue($excel_row, $col_index++); ?>"></td>
 
-                                    <td><input class="white_in jersey_qty_<?php echo $form_id; ?>" name="jersey_qty[<?php echo $form_id; ?>][]" type="number" min="0" max="9999" onchange="calculateQTY(<?php echo $prod_id; ?>,'jersey_qty_<?php echo $form_id; ?>');" onkeyup="calculateQTY(<?php echo $prod_id; ?>,'jersey_qty_<?php echo $form_id; ?>');" value="<?php echo getExcelValue($excel_row, $col_index++); ?>"></td>
+                                    <td><input class="w-45 white_in jersey_qty_<?php echo $form_id; ?>" name="jersey_qty[<?php echo $form_id; ?>][]" type="number" min="0" max="9999" onchange="calculateQTY(<?php echo $prod_id; ?>,'jersey_qty_<?php echo $form_id; ?>');" onkeyup="calculateQTY(<?php echo $prod_id; ?>,'jersey_qty_<?php echo $form_id; ?>');" value="<?php echo getExcelValue($excel_row, $col_index++); ?>"></td>
 
                                     <td>
 
@@ -745,7 +752,7 @@
 
                                     <td><input class="white_in" name="sock_color[<?php echo $form_id; ?>][]" type="text" maxlength="100" value="<?php echo getExcelValue($excel_row, $col_index++); ?>"></td>
 
-                                    <td><input class="white_in sock_qty_<?php echo $form_id; ?>" name="sock_qty[<?php echo $form_id; ?>][]" type="number" min="0" max="9999" onchange="calculateQTY(<?php echo $prod_id; ?>,'sock_qty_<?php echo $form_id; ?>');" onkeyup="calculateQTY(<?php echo $prod_id; ?>,'sock_qty_<?php echo $form_id; ?>');" value="<?php echo getExcelValue($excel_row, $col_index++); ?>"></td>
+                                    <td><input class="w-45 white_in sock_qty_<?php echo $form_id; ?>" name="sock_qty[<?php echo $form_id; ?>][]" type="number" min="0" max="9999" onchange="calculateQTY(<?php echo $prod_id; ?>,'sock_qty_<?php echo $form_id; ?>');" onkeyup="calculateQTY(<?php echo $prod_id; ?>,'sock_qty_<?php echo $form_id; ?>');" value="<?php echo getExcelValue($excel_row, $col_index++); ?>"></td>
 
                                     <td><input class="white_in" name="name_for_packing[<?php echo $form_id; ?>][]" type="text" value="<?php echo getExcelValue($excel_row, $col_index++); ?>"></td>
 
@@ -762,119 +769,119 @@
                             ?>
                         </tbody>
 
-                        <tfoot> 
-                                <tr>
+                        <tfoot>
+                            <tr>
 
-                                    <td colspan="2">
-                                        <span id="addRowButton" class="addRowButtoncls bg-none border-none d-flex justify-content-between w-100" onclick="return addItemRow(<?php echo $form_id; ?>,1);">
-                                            <figure class="m-0"><img src="../../images/vector/add.png" alt=""></figure>
-                                        </span>
-                                        <input type="hidden" id="num_item_<?php echo $form_id; ?>" value="<?php echo $tet; ?>">
+                                <td colspan="2">
+                                    <span id="addRowButton" class="addRowButtoncls bg-none border-none d-flex justify-content-between w-100" onclick="return addItemRow(<?php echo $form_id; ?>,<?php echo $prod_id; ?>);">
+                                        <figure class="m-0"><img src="../../images/vector/add.png" alt=""></figure>
+                                    </span>
+                                    <input type="hidden" id="num_item_<?php echo $form_id; ?>" value="<?php echo $tet; ?>">
 
-                                    </td>
+                                </td>
 
-                                    <td colspan="18"></td>
+                                <td colspan="18"></td>
 
-                                </tr>
-
-
-
-                                <tr>
-
-
-                                    <th colspan="2" style="text-align: center; font-size: 14px; font-weight: 500;">TOTAL ORDER</th>
-
-                                    <?php
-
-                                    if ($row_product["have_name"] == "1") {
-
-                                    ?>
-
-                                        <th></th>
-
-                                    <?php
-
-                                    }
+                            </tr>
 
 
 
-                                    if ($row_product["choose_pg"] == "1") {
-
-                                    ?>
-
-                                        <th></th>
-
-                                    <?php
-
-                                    }
+                            <tr>
 
 
+                                <th colspan="2" style="text-align: center; font-size: 14px; font-weight: 500;">TOTAL ORDER</th>
 
-                                    if ($row_product["choose_mf"] == "1") {
+                                <?php
 
-                                    ?>
+                                if ($row_product["have_name"] == "1") {
 
-                                        <th></th>
-
-                                    <?php
-
-                                    }
-
-
-
-                                    if ($row_product["have_size"] == "1") {
-
-                                    ?>
-
-                                        <th></th>
-
-                                    <?php
-
-                                    }
-
-
-
-                                    if ($row_product["have_number"] == "1") {
-
-                                    ?>
-
-                                        <th></th>
-
-                                    <?php
-
-                                    }
-
-                                    ?>
-
-                                    <th id="total_jersey_qty_<?php echo $form_id; ?>">0</th>
+                                ?>
 
                                     <th></th>
 
+                                <?php
+
+                                }
+
+
+
+                                if ($row_product["choose_pg"] == "1") {
+
+                                ?>
+
                                     <th></th>
 
-                                    <th id="total_sock_qty_<?php echo $form_id; ?>">0</th>
+                                <?php
+
+                                }
+
+
+
+                                if ($row_product["choose_mf"] == "1") {
+
+                                ?>
 
                                     <th></th>
 
+                                <?php
+
+                                }
+
+
+
+                                if ($row_product["have_size"] == "1") {
+
+                                ?>
+
                                     <th></th>
 
-                                </tr>
+                                <?php
 
-                                <tr>
+                                }
 
-                                    <!-- <th style="border-width: 0px; background-color: #FFA;"></th> -->
 
-                                    <th colspan="2" style="background: #F9F9F9 !important;   padding: 10px 0 10px 10px !important;">
-                                        <p class="mb-0" style="background: #222222;  text-align: center;  font-size: 13px;  font-weight: 500;  padding: 10px !important;  border-radius: 15px 0 0 15px;">
-                                            Special Comments (if any)
-                                        </p>
-                                    </th>
 
-                                    <th colspan="16" style="background-color: #F9F9F9 !important; padding: 10px  10px 10px 0 !important;">
-                                        <input type="text" name="special_comment[<?= $form_id ?>]" placeholder="Enter Special Comment here..." style=" width: 100%; background:#FFF !important; border: 1px solid #eee; padding: 8px; border-radius: 0 20px 20px 0;">
-                                    </th>
+                                if ($row_product["have_number"] == "1") {
 
-                                </tr>
+                                ?>
+
+                                    <th></th>
+
+                                <?php
+
+                                }
+
+                                ?>
+
+                                <th id="total_jersey_qty_<?php echo $form_id; ?>">0</th>
+
+                                <th></th>
+
+                                <th></th>
+
+                                <th id="total_sock_qty_<?php echo $form_id; ?>">0</th>
+
+                                <th></th>
+
+                                <th></th>
+
+                            </tr>
+
+                            <tr>
+
+                                <!-- <th style="border-width: 0px; background-color: #FFA;"></th> -->
+
+                                <th colspan="2" style="background: #F9F9F9 !important;   padding: 10px 0 10px 10px !important;">
+                                    <p class="mb-0" style="background: #222222;  text-align: center;  font-size: 13px;  font-weight: 500;  padding: 10px !important;  border-radius: 15px 0 0 15px;">
+                                        Special Comments (if any)
+                                    </p>
+                                </th>
+
+                                <th colspan="16" style="background-color: #F9F9F9 !important; padding: 10px  10px 10px 0 !important;">
+                                    <input type="text" name="special_comment[<?= $form_id ?>]" placeholder="Enter Special Comment here..." style=" width: 100%; background:#FFF !important; border: 1px solid #eee; padding: 8px; border-radius: 0 20px 20px 0;">
+                                </th>
+
+                            </tr>
 
                         </tfoot>
                     </table>
@@ -921,7 +928,7 @@
                         <thead>
                             <tr class="theader">
 
-                                <th class="tablecount">01</th>
+                                <th class="tablecount"></th>
 
                                 <th colspan="15" class="text-center">
 
@@ -931,8 +938,7 @@
                                             <span href="#" class="d-inline deleteTable"
                                                 onclick="removeTable(this)">
                                                 <figure class="m-0 d-inline"><img
-                                                        src="images/vector/delter.png" alt="" style="width: 30px; background: #FFF; padding: 6px;margin-left: 20px;
-">
+                                                        src="images/vector/delter.png" alt="" style="width: 30px; background: #FFF; padding: 6px;margin-left: 20px;">
                                                 </figure>
                                             </span>
                                         </h6>
@@ -1122,7 +1128,7 @@
 
                             ?>
 
-                                <tr id="prod_item_<?php echo $form_id; ?>_<?= $tet ?>"  data-prod_id="<?= $prod_id ?>"  data-form_id = <?= $form_id ?> >
+                                <tr id="prod_item_<?php echo $form_id; ?>_<?= $tet ?>" data-prod_id="<?= $prod_id ?>" data-form_id=<?= $form_id ?>>
 
                                     <td>
 
@@ -1359,7 +1365,7 @@
                         </tbody>
                         <tr>
                             <td colspan="2">
-                                <span id="addRowButton" class="addRowButtoncls bg-none border-none d-flex justify-content-between w-100" onclick="return addItemRow(<?php echo $form_id; ?>,1);">
+                                <span id="addRowButton" class="addRowButtoncls bg-none border-none d-flex justify-content-between w-100" onclick="return addItemRow(<?php echo $form_id; ?>,<?php echo $prod_id; ?>);">
                                     <figure class="m-0"><img src="../../images/vector/add.png" alt=""></figure>
                                 </span>
                                 <input type="hidden" id="num_item_<?php echo $form_id; ?>" value="<?php echo $tet; ?>">

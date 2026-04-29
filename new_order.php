@@ -20,7 +20,7 @@ $sql_select .= " FROM tbl_order_form LEFT JOIN tbl_product ON tbl_order_form.pro
 
 $sql_select .= " LEFT JOIN tbl_order_item ON tbl_order_form.of_id=tbl_order_item.of_id";
 
-$sql_select .= " WHERE tbl_order_form.user_id='" . $user_id . "' AND tbl_order_form.enable=1 AND tbl_order_form.order_status<>'archived' GROUP BY tbl_order_form.of_id ORDER BY tbl_order_form.order_date DESC; ";
+$sql_select .= " WHERE tbl_order_form.user_id='" . $user_id . "' AND tbl_order_form.enable=1 AND tbl_order_form.order_status<>'archived'   GROUP BY tbl_order_form.of_id ORDER BY tbl_order_form.order_date DESC; ";
 
 //echo $user_id;
 
@@ -928,7 +928,7 @@ if (sizeof($a_order_main_id) > 0) {
             dataType: "json",
 
             url: "ajax/new_order/save_chat_msg.php",
-
+ 
             data: {
 
                 //"max_chat_id": max_chat_id,

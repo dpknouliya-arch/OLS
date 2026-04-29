@@ -3441,6 +3441,10 @@ newOrderPage   design_approvalPage.php
 }
 
 
+.w-fit{
+     width: fit-content !important;
+}
+
 
 /* +================================================ 
 
