@@ -4,14 +4,9 @@ function getOrCreateDraftOrder($conn, $design_order_id, $user_id) {
     $design_order_id = (int)$design_order_id;
     $user_id         = (int)$user_id;
 
-<<<<<<< HEAD
-    $stmt = $conn->prepare(
-        "SELECT of_id FROM tbl_order_form WHERE design_order_id=? LIMIT 1"
-=======
     // Also fetch draft_id so we can backfill it if missing on an existing row
     $stmt = $conn->prepare(
         "SELECT of_id, draft_id FROM tbl_order_form WHERE design_order_id=? LIMIT 1"
->>>>>>> origin/main
     );
     if (!$stmt) {
         error_log('getOrCreateDraftOrder SELECT prepare failed: ' . $conn->error);
@@ -21,20 +16,6 @@ function getOrCreateDraftOrder($conn, $design_order_id, $user_id) {
     $stmt->execute();
     $res = $stmt->get_result();
     if ($res->num_rows > 0) {
-<<<<<<< HEAD
-        $row = $res->fetch_assoc();
-        $stmt->close();
-        return (int)$row['of_id'];
-    }
-    $stmt->close();
-
-    $draft_id = '3D' . $design_order_id;
-
-    // Include every NOT NULL column that has no DEFAULT value in tbl_order_form
-    $stmt = $conn->prepare(
-        "INSERT INTO tbl_order_form
-            (draft_id, is_submitted, form_name, special_comment,
-=======
         $row            = $res->fetch_assoc();
         $existing_of_id = (int)$row['of_id'];
         $existing_draft = $row['draft_id'] ?? '';
@@ -65,7 +46,6 @@ function getOrCreateDraftOrder($conn, $design_order_id, $user_id) {
     $stmt = $conn->prepare(
         "INSERT INTO tbl_order_form
             (of_id, draft_id, is_submitted, form_name, special_comment,
->>>>>>> origin/main
              order_date, order_status,
              req_due_date, game_event_date, project_name,
              payment_opt, sales_rep_id, reorder_num,
@@ -76,19 +56,11 @@ function getOrCreateDraftOrder($conn, $design_order_id, $user_id) {
              deli_country, deli_zip_code, deli_tel, deli_email,
              date_add)
          VALUES
-<<<<<<< HEAD
-            (?, 0, '3D Jersey', '',
-             CURDATE(), 'draft',
-             CURDATE(), '', '',
-             '', 0, '',
-             0, ?, ?,
-=======
             (0, ?, 0, '3D Jersey', '',
              CURDATE(), 'draft',
              CURDATE(), '', '',
              '', 0, '',
              1, ?, ?,
->>>>>>> origin/main
              '', '', '', '',
              '', '', '', '',
              '', '', '', '',
@@ -105,10 +77,6 @@ function getOrCreateDraftOrder($conn, $design_order_id, $user_id) {
         $stmt->close();
         return 0;
     }
-<<<<<<< HEAD
-    $new_id = (int)$conn->insert_id;
-    $stmt->close();
-=======
     $new_id = (int)$conn->insert_id; // this is the new `id` PK (AUTO_INCREMENT >= 100000)
     $stmt->close();
 
@@ -118,6 +86,5 @@ function getOrCreateDraftOrder($conn, $design_order_id, $user_id) {
     $upd->execute();
     $upd->close();
 
->>>>>>> origin/main
     return $new_id;
 }
