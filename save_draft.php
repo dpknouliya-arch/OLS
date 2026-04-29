@@ -5,35 +5,6 @@ include 'encryption_helper.php';
 $obj_user = json_decode(base64_decode($_SESSION["JOGOLS"]));
 $user_id = $obj_user->user_id;
 
-//$sql_select = "SELECT draft_id,order_date,req_due_date,customer_po,project_name,COUNT(prod_id) AS num_prod,COUNT(re_order_id) AS num_re_order FROM tbl_draft_of WHERE user_id='" . $user_id . "' AND enable=1 GROUP BY draft_id ORDER BY draft_id ASC;";
-$sql_select = "SELECT 
-draft_id,
-MAX(order_date) AS order_date,
-MAX(req_due_date) AS req_due_date,
-MAX(customer_po) AS customer_po,
-MAX(project_name) AS project_name,
-COUNT(prod_id) AS num_prod,
-COUNT(re_order_id) AS num_re_order
-FROM tbl_draft_of
-WHERE user_id='$user_id'
-AND enable=1
-GROUP BY draft_id
-ORDER BY draft_id ASC";
-
-
-$rs_select = $conn->query($sql_select);
-
-if (!$rs_select) {
-    die("SQL Error: " . $conn->error);
-}
-
-$a_row_draft = array();
-
-while ($row_select = $rs_select->fetch_assoc()) {
-    $a_row_draft[($row_select["draft_id"])]["row_normal"] = $row_select;
-    $a_row_draft[($row_select["draft_id"])]["row_file"] = array();
-}
-
 ?>
 
 <style>
@@ -964,107 +935,11 @@ while ($row_select = $rs_select->fetch_assoc()) {
 <!-- ═══════════════════════════════════════════════════════════
      TOAST CONTAINER
 ═══════════════════════════════════════════════════════════ -->
-<!-- <div class="toast-wrap" id="toast-wrap"></div>
-
-<div class=" manageOrder">
-    <div class="innerMainContent">
-        <div class="PageHeader">
-            <h2>3D Save Draft</h2>
-            <p>Review, Edit, and Submit Your 3D Modal </p>
-        </div>
-
-        <div class="boxes">
-            <div class="formTitle d-flex align-items-center flex-row">
-                <h6 class="subHeading mb-4">Drafts</h6>
-            </div>
-        </div>
-        <div class="allOrders">
-            <div class="row">
-                <?php
-                $sql = "
-                  SELECT 
-                      d_d.id AS draft_id,
-                      d_d.design_id,
-                      d_d.text_decals,
-                      d_d.image_decals,
-                      d_d.color_data,
-                      d.id AS design_id,
-                      d.subcategory_id,
-                      d.coller_id,
-                      d.style_id,
-                      d.stripes_id,
-                      d.fabric_id,
-                      d.name,
-                      d.image,
-                      d.model,
-                      d.price,
-                      d.modal_type,
-                      d.primary_color,
-                      d.secondary_color,
-                      d.tertiary_color,
-                      d.insert_date,
-                      d.updated_date
-                  FROM 
-                      design_drafts AS d_d
-                  INNER JOIN 
-                      designs AS d 
-                  ON 
-                      d.id = d_d.design_id
-                  WHERE
-                      d_d.is_used = 0 AND 
-                      d_d.user_id = $user_id";
-
-                $result = $conn4->query($sql);
-                if ($result !== false && $result->num_rows > 0) {
-                    while ($row = $result->fetch_assoc()) {
-                ?>
-                        <div class="col-md-3 mb-xl-0 mb-4 mt-4">
-                            <div class="card card-blog card-plain shadow-xl border-radius-xl">
-                                <div class="card-header p-0 m-2 tetx-center bg-transparent">
-                                    <a class="d-block">
-                                        <img src="http://65.1.164.81/jogdigital/admin/uploads/designs/images/<?= $row['image']; ?>" alt="img-blur-shadow" class="img-fluid border-radius-lg" style="height:250px;width: 100%;object-fit: contain;">
-                                    </a>
-                                </div>
-                                <div class="card-body p-3 text-center">
-                                    <h5 class="mb-2">
-                                        <?= $row['name']; ?>
-                                    </h5>
-                                    <div class="align-items-center mb-2">
-                                        <span class="updated_dateTxt"><?php
-                                                                        $ts = strtotime($row['updated_date']);
-                                                                        echo date("Y-m-d H:i", $ts);
-                                                                        ?>
-                                        </span>
-                                    </div>
-
-                                    <div class="align-items-center Assign_user">
-                                        <?php
-                                        $encodedDraftId = customEncode($row['draft_id']);
-                                        $esubcategory_id = customEncode($row['subcategory_id']);
-                                        $style_id = $row['style_id'];
-                                        $ecategory_id = customEncode(1);
-                                        ?>
-                                        <a href="http://65.1.164.81/jogdigital/customize.php?cat=<?= urlencode($ecategory_id); ?>&subcat=<?= urlencode($esubcategory_id); ?>&style=<?= urlencode($style_id) ?>&draft=<?= urlencode($encodedDraftId); ?>" target="_blank" class="btn iconBTn cursor" style="border: 1px solid #DDDDDD;box-shadow: 0px 0px 6px 0px #0000001A;padding: 0 15px;border-radius: 8px;">
-                                            View Draft <figure class="iconImg m-0"><img src="images/vector/loginBTn.png" alt=""></figure>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                <?php
-                    }
-                } else {
-                    echo "0 results";
-                }
-                $conn->close();
-                ?>
-            </div>
-        </div>
-    </div>
-</div> -->
 
 
 <script>
+const D_BASE_URL = "<?= D_BASE_URL ?>";
+
 /* ═══════════════════════════════════════════════════════════
    DUMMY DATA
 ═══════════════════════════════════════════════════════════ */
@@ -1171,19 +1046,17 @@ function renderDraftCards(data) {
     return;
   }
   grid.innerHTML = data.map(d => {
-    console.log('Rendering draft:', d);
-    const s = DRAFT_STATUS_MAP[d.status] || DRAFT_STATUS_MAP['draft'];
-    const pct = d.rosterTotal > 0 ? Math.round((d.rosterDone / d.rosterTotal) * 100) : 0;
-    const isComplete = pct === 100;
-    const ctaText = d.status === 'design-complete' || d.status === 'roster-progress' || d.is_used === 1
-                    ? 'Continue to Roster' : 'Resume Design';
-    const ctaClass = d.is_used === 1 ? 'btn-roster' : '';
-    const ctaIcon = d.is_used === 1 ? 'bi-arrow-right-circle' : 'bi-pencil';
+    const isUsed = parseInt(d.is_used) === 1;
+    const status = isUsed ? 'design-complete' : 'draft';
+    const s = DRAFT_STATUS_MAP[status];
+    const ctaText = isUsed ? 'Continue to Roster' : 'Resume Design';
+    const ctaClass = isUsed ? 'btn-roster' : '';
+    const ctaIcon = isUsed ? 'bi-arrow-right-circle' : 'bi-pencil';
     return `
-    <div class="col-12 col-md-6 col-xl-4 draft-card-col" data-status="${d.status}" data-name="${d.name.toLowerCase()}">
+    <div class="col-12 col-md-6 col-xl-4 draft-card-col" data-status="${status}" data-name="${d.name.toLowerCase()}">
       <div class="draft-card">
         <div class="card-thumb">
-          <img class="jersey-img" src="http://localhost:9090/jog_3d/admin/uploads/designs/images/${d.image}" />
+          <img class="jersey-img" src="${D_BASE_URL}admin/uploads/designs/images/${d.image}" />
           <span class="style-badge">New</span>
           <div class="thumb-actions custom-dropdown">
             <button class="btn-dots" onclick="toggleDropdown(event,'dd-${d.draft_id}')">⋮</button>
@@ -1196,10 +1069,11 @@ function renderDraftCards(data) {
         <div class="card-body-inner">
           <div class="card-title-row">
             <div class="card-team-name">${d.name}</div>
-            <div class="rep-avatar" title="Created by ${d.rep}"> ${d.insert_date.slice(0, 10)}</div>
+            <div class="rep-avatar">${d.insert_date.slice(0, 10)}</div>
           </div>
           <div>
             <span class="status-badge ${s.cls}">${s.label}</span>
+
           </div>
           <div class="meta-row">
             <div class="meta-item"><i class="bi bi-calendar3"></i><b>Created:</b> ${d.insert_date.slice(0, 10)}</div>
@@ -1210,7 +1084,7 @@ function renderDraftCards(data) {
         
         <div class="card-footer-inner">
           <a 
-          href="http://localhost:9090/jog_3d/customize.php?cat=${d.cat_enc}&subcat=${d.subcat_enc}&style=${d.style_id}&draft=${d.draft_enc}"
+          href="${D_BASE_URL}customize.php?cat=${d.cat_enc}&subcat=${d.subcat_enc}&style=${d.style_id}&draft=${d.draft_enc}"
           target="_blank"
           class="btn-primary-cta ${ctaClass}">
             <i class="bi ${ctaIcon}"></i>${ctaText}
@@ -1497,16 +1371,31 @@ let DRAFTS = [];
 
 document.addEventListener('DOMContentLoaded', () => {
 
-fetch("<?= API_BASE_URL ?>get_drafts.php?user_id=<?= $user_id ?>")
-  .then((res) => res.json())
-  .then((data) => {
-    console.log("Fetched drafts:", data);
-    DRAFTS = data.data || []; 
-    console.log(DRAFTS);
+  const draftsUrl = "<?= OLS_BASE_URL ?>ajax/get_drafts_proxy.php";
+  console.log("[Drafts] DOMContentLoaded fired. Fetching:", draftsUrl);
 
-    renderDraftCards(DRAFTS);
-  });
-  //renderDraftCards(DRAFTS);
+  fetch(draftsUrl)
+    .then((res) => {
+      if (!res.ok) {
+        throw new Error("HTTP " + res.status + " " + res.statusText);
+      }
+      return res.json();
+    })
+    .then((data) => {
+      console.log("Fetched drafts:", data);
+      if (!data || data.status != 1 || !data.data) {
+        console.warn("API returned no drafts:", data);
+        renderDraftCards([]);
+        return;
+      }
+      DRAFTS = data.data;
+      renderDraftCards(DRAFTS);
+    })
+    .catch((err) => {
+      console.error("Failed to load drafts:", err);
+      renderDraftCards([]);
+    });
+
   renderOrderCards(ORDERS);
 });
 
@@ -1516,10 +1405,11 @@ fetch("<?= API_BASE_URL ?>get_drafts.php?user_id=<?= $user_id ?>")
 function filterDrafts() {
   const q = document.getElementById('draft-search').value.toLowerCase();
   const st = document.getElementById('draft-filter-status').value;
-  let data = DRAFTS.filter(d =>
-    (!q || d.name.toLowerCase().includes(q) || d.style.toLowerCase().includes(q) || d.rep.toLowerCase().includes(q)) &&
-    (!st || d.status === st)
-  );
+  let data = DRAFTS.filter(d => {
+    const status = parseInt(d.is_used) === 1 ? 'design-complete' : 'draft';
+    return (!q || d.name.toLowerCase().includes(q)) &&
+           (!st || status === st);
+  });
   const sort = document.getElementById('draft-sort').value;
   if (sort === 'name') data.sort((a,b) => a.name.localeCompare(b.name));
   renderDraftCards(data);
