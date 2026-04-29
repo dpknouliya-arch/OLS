@@ -5,11 +5,6 @@ include 'encryption_helper.php';
 $obj_user = json_decode(base64_decode($_SESSION["JOGOLS"]));
 $user_id = $obj_user->user_id;
 
-print_r($_SESSION);
-?>
-
-<?php
-
 $data = callAPI("get_order_details.php");
 
 ?>
@@ -64,7 +59,7 @@ $data = callAPI("get_order_details.php");
             data-status="New">
 
           <div class="ols3d-card-img">
-            <img src="<?= htmlspecialchars($row['image']) ?>"
+            <img src="<?= htmlspecialchars($row['jersey_style_image']) ?>"
                 alt="<?= htmlspecialchars($row['name']) ?>">
           </div>
 

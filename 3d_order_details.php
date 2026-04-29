@@ -31,26 +31,23 @@ if (isset($_GET['order_id'])) {
     $logos = json_decode($order['imagedecals'] ?? '[]', true);
     $texts = json_decode($order['textdecals'] ?? '[]', true);     
     
-    function getFabricName($fabId) {
-      if (empty($fabId)) return '';    
-      $result = callAPI("get_fabric_byid.php?fab=$fabId");
-      return $result['data']['title'] ?? '';
-    }
-    function getCollarName($colId) {
-      if (empty($colId)) return '';
-      $result = callAPI("get_collar_byid.php?coller=$colId");
-      return $result['data']['title'] ?? '';
-    }
+    // Fetch all fabric and collar names in one parallel batch (was 5 sequential HTTP calls)
+    $batchEndpoints = [];
+    if (!empty($order['fabric_base']))     $batchEndpoints['fab_base']     = "get_fabric_byid.php?fab="    . urlencode($order['fabric_base']);
+    if (!empty($order['fabric_neck']))     $batchEndpoints['fab_neck']     = "get_fabric_byid.php?fab="    . urlencode($order['fabric_neck']);
+    if (!empty($order['fabric_mesh']))     $batchEndpoints['fab_mesh']     = "get_fabric_byid.php?fab="    . urlencode($order['fabric_mesh']);
+    if (!empty($order['fabric_shoulder'])) $batchEndpoints['fab_shoulder'] = "get_fabric_byid.php?fab="    . urlencode($order['fabric_shoulder']);
+    if (!empty($order['coller_id']))       $batchEndpoints['collar']       = "get_collar_byid.php?coller=" . urlencode($order['coller_id']);
+    $batchResults = callAPIMulti($batchEndpoints);
 
-    // Fabric
     $fab_ary = [
-        'Base'     => getFabricName($order['fabric_base']),
-        'Neck'     => getFabricName($order['fabric_neck']),
-        'Mesh'     => getFabricName($order['fabric_mesh']),
-        'Shoulder' => getFabricName($order['fabric_shoulder']),
+        'Base'     => $batchResults['fab_base']['data']['title']     ?? '',
+        'Neck'     => $batchResults['fab_neck']['data']['title']     ?? '',
+        'Mesh'     => $batchResults['fab_mesh']['data']['title']     ?? '',
+        'Shoulder' => $batchResults['fab_shoulder']['data']['title'] ?? '',
     ];
 
-    $jersey_coller = getCollarName($order['coller_id']);
+    $jersey_coller = $batchResults['collar']['data']['title'] ?? '';
     $jsname        = '';
     $stripes_name  = '';
 
@@ -102,72 +99,94 @@ if (isset($_GET['order_id'])) {
 //     if (!($row = $result->fetch_assoc())) { return $colorGroup; }
 //     $colorName = $row['color'];
 
-//     $sql  = "SELECT panton_name, name FROM colors WHERE name = ?";
-//     $stmt = $conn4->prepare($sql);
-//     $stmt->bind_param("s", $colorName);
-//     $stmt->execute();
-//     $result = $stmt->get_result();
-//     if ($row = $result->fetch_assoc()) {
-//         return $type === 'pantonName' ? $row['panton_name'] : $row['name'];
-//     }
-//     return $colorName;
-// }
+// Fetch order status from tbl_order_form if it exists
+$ols_order_status = '';
+$ols_step_done    = false;
+$stmt_st = $conn->prepare(
+    "SELECT order_status, is_submitted FROM tbl_order_form WHERE design_order_id=? ORDER BY is_submitted DESC LIMIT 1"
+);
+$stmt_st->bind_param("i", $order_id);
+$stmt_st->execute();
+$res_st = $stmt_st->get_result();
+if ($res_st->num_rows > 0) {
+    $row_st        = $res_st->fetch_assoc();
+    $ols_order_status = $row_st['order_status'] ?? '';
+    $ols_step_done    = true;
+}
+$stmt_st->close();
 
 function getPantonNameAPI($zone, $designId, $type = 'pantonName') {
+    // Static caches: $cache keyed by "zone||designId", $designDataCache keyed by designId.
+    // Each unique color is resolved once per page load regardless of how many times it appears.
+    static $cache = [];
+    static $designDataCache = [];
 
     if (empty($zone)) return '';
-    /* ───── STEP 1: CHECK DIRECT COLOR ───── */
-    $res = callAPI("get_color_by_name.php?name=" . urlencode($zone));
 
-    if (!empty($res['data'])) {
-        return ($type === 'pantonName')
-            ? $res['data']['panton_name']
-            : $res['data']['name'];
+    $cacheKey = $zone . '||' . $designId;
+
+    if (!isset($cache[$cacheKey])) {
+        /* ───── STEP 1: CHECK DIRECT COLOR ───── */
+        $res = callAPI("get_color_by_name.php?name=" . urlencode($zone));
+
+        if (!empty($res['data'])) {
+            $cache[$cacheKey] = [
+                'pantonName' => $res['data']['panton_name'] ?? $zone,
+                'colorName'  => $res['data']['name']        ?? $zone,
+            ];
+        } else {
+            /* ───── STEP 2: GET COLOR GROUP ───── */
+            $res = callAPI("get_design_zone.php?design_id=$designId&zone=" . urlencode($zone));
+
+            if (empty($res['data'])) {
+                $cache[$cacheKey] = ['pantonName' => $zone, 'colorName' => $zone];
+            } else {
+                $colorGroup = $res['data']['color_group'];
+                $map = [
+                    'primary'   => 'primary_color',
+                    'secondary' => 'secondary_color',
+                    'tertiary'  => 'tertiary_color'
+                ];
+
+                if (!isset($map[$colorGroup])) {
+                    $cache[$cacheKey] = ['pantonName' => $colorGroup, 'colorName' => $colorGroup];
+                } else {
+                    /* ───── STEP 3: GET DESIGN COLOR (cached per designId) ───── */
+                    if (!isset($designDataCache[$designId])) {
+                        $res3 = callAPI("get_design_by_id.php?id=$designId");
+                        $designDataCache[$designId] = $res3['data'] ?? null;
+                    }
+                    $designData = $designDataCache[$designId];
+
+                    if (!$designData) {
+                        $cache[$cacheKey] = ['pantonName' => $colorGroup, 'colorName' => $colorGroup];
+                    } else {
+                        $colorName = $designData[$map[$colorGroup]] ?? '';
+
+                        /* ───── STEP 4: GET FINAL COLOR NAME ───── */
+                        $res4 = callAPI("get_color_by_name.php?name=" . urlencode($colorName));
+                        if (!empty($res4['data'])) {
+                            $cache[$cacheKey] = [
+                                'pantonName' => $res4['data']['panton_name'] ?? $colorName,
+                                'colorName'  => $res4['data']['name']        ?? $colorName,
+                            ];
+                        } else {
+                            $cache[$cacheKey] = ['pantonName' => $colorName, 'colorName' => $colorName];
+                        }
+                    }
+                }
+            }
+        }
     }
 
-    /* ───── STEP 2: GET COLOR GROUP ───── */
-    $res = callAPI("get_design_zone.php?design_id=$designId&zone=" . urlencode($zone));
-
-    if (empty($res['data'])) {
-        return $zone;
-    }
-
-    $colorGroup = $res['data']['color_group'];
-
-    $map = [
-        'primary'   => 'primary_color',
-        'secondary' => 'secondary_color',
-        'tertiary'  => 'tertiary_color'
-    ];
-
-    if (!isset($map[$colorGroup])) {
-        return $colorGroup;
-    }
-
-    /* ───── STEP 3: GET DESIGN COLOR ───── */
-    $res = callAPI("get_design_by_id.php?id=$designId");
-
-    if (empty($res['data'])) {
-        return $colorGroup;
-    }
-
-    $colorName = $res['data'][$map[$colorGroup]] ?? '';
-
-    /* ───── STEP 4: GET FINAL COLOR NAME ───── */
-    $res = callAPI("get_color_by_name.php?name=" . urlencode($colorName));
-
-    if (!empty($res['data'])) {
-        return ($type === 'pantonName')
-            ? $res['data']['panton_name']
-            : $res['data']['name'];
-    }
-
-    return $colorName;
+    return $cache[$cacheKey][$type] ?? $zone;
 }
 ?>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"></noscript>
 <link rel="stylesheet" href="Style/ols_3d_order.css">
 
 <!-- Hidden fields for downstream use -->
@@ -220,12 +239,16 @@ function getPantonNameAPI($zone, $designId, $type = 'pantonName') {
         <div class="ols3d-step-num active">1</div>
         <span class="ols3d-step-label active">Order Details</span>
       </div>
-      <div class="ols3d-step-connector"></div>
+      <div class="ols3d-step-connector <?= $ols_step_done ? 'done' : '' ?>"></div>
       <div class="ols3d-step">
-        <div class="ols3d-step-num">2</div>
-        <span class="ols3d-step-label">Add Roster</span>
+        <div class="ols3d-step-num <?= $ols_step_done ? 'done' : '' ?>">
+          <?php if ($ols_step_done): ?>
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+          <?php else: ?>2<?php endif; ?>
+        </div>
+        <span class="ols3d-step-label <?= $ols_step_done ? 'done' : '' ?>">Add Roster</span>
       </div>
-      <div class="ols3d-step-connector"></div>
+      <div class="ols3d-step-connector <?= ($ols_order_status === 'new' || $ols_order_status === 'draft' && false) && $ols_step_done ? 'done' : '' ?>"></div>
       <div class="ols3d-step">
         <div class="ols3d-step-num">3</div>
         <span class="ols3d-step-label">Checkout</span>
@@ -245,7 +268,14 @@ function getPantonNameAPI($zone, $designId, $type = 'pantonName') {
     <span class="ols3d-info-label">Jersey Type:</span>
     <span class="ols3d-info-value"><?= htmlspecialchars($jersey_type) ?></span>
     <div class="ols3d-info-divider"></div>
-    <span class="ols3d-badge ols3d-badge-new">New</span>
+    <?php
+    $badge_class = 'ols3d-badge-new';
+    $badge_label = 'New';
+    if ($ols_order_status === 'draft')     { $badge_class = 'ols3d-badge-draft'; $badge_label = 'Draft'; }
+    elseif ($ols_order_status === 'new')   { $badge_class = 'ols3d-badge-new';   $badge_label = 'Submitted'; }
+    elseif ($ols_order_status !== '')      { $badge_class = 'ols3d-badge-new';   $badge_label = ucfirst($ols_order_status); }
+    ?>
+    <span class="ols3d-badge <?= $badge_class ?>"><?= htmlspecialchars($badge_label) ?></span>
   </div>
 
   <!-- ── Two-column preview panels ─────────────────────────── -->
@@ -531,8 +561,11 @@ function getPantonNameAPI($zone, $designId, $type = 'pantonName') {
           <div class="ols3d-logo-grid">
             <?php foreach ($logos as $logo): ?>
             <?php
-                $lh = isset($logo['height']) ? number_format(floatval($logo['height']) * 39.3701, 2) : '0.00';
-                $lw = isset($logo['width'])  ? number_format(floatval($logo['width'])  * 39.3701, 2) : '0.00';
+            // echo "<pre>";
+            // print_r($logo);
+            // echo "</pre>";
+                $lh = isset($logo['bounds']['height']) ? number_format(floatval($logo['bounds']['height']) * 39.3701, 2) : '0.00';
+                $lw = isset($logo['bounds']['width'])  ? number_format(floatval($logo['bounds']['width'])  * 39.3701, 2) : '0.00';
             ?>
             <div class="ols3d-logo-item">
               <?php if (!empty($logo['imageSrc'])): ?>
@@ -565,8 +598,8 @@ function getPantonNameAPI($zone, $designId, $type = 'pantonName') {
 </div><!-- /.ols3d-module -->
 
 <!-- Three.js and related scripts -->
+<!-- jQuery and Bootstrap JS are already loaded by the main layout (index.php) -->
 <script src="https://cdn.jsdelivr.net/npm/opentype.js@1.3.4/dist/opentype.min.js"></script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/loaders/GLTFLoader.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.js"></script>
@@ -574,8 +607,11 @@ function getPantonNameAPI($zone, $designId, $type = 'pantonName') {
 <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/renderers/SVGRenderer.js"></script>
 <script src="https://unpkg.com/three@0.160.0/examples/js/utils/BufferGeometryUtils.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" crossorigin="anonymous"></script>
+
+	<script>
+		window.BASE_3D_URL = "<?php echo D_BASE_URL; ?>";
+    console.log("Base 3D URL:", window.BASE_3D_URL);
+	</script>
 <script type="module" src="js/3dmodel.js?ver=1.0"></script>
 
 <script>

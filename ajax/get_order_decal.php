@@ -1,44 +1,33 @@
 <?php
-
 include('../db.php');
-
-
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $orderId = intval($_POST['orderId']);
 
-    $sql = "SELECT * FROM design_order WHERE order_id = ?";
+    // ✅ Call API instead of DB
+    $res = callAPI("get_order.php?order_id=" . $orderId);
 
-    $stmt = $conn4->prepare($sql);
+    if (!$res || empty($res['data'])) {
+        echo json_encode([]);
+        exit;
+    }
 
-    $stmt->bind_param("i", $orderId);
-
-    $stmt->execute();
-
-    $result = $stmt->get_result();
-
-
+    $row = $res['data'];
 
     $decals = [];
 
-    while ($row = $result->fetch_assoc()) {
+    $decals['textdecals']  = $row['textdecals'] ?? '';
+    $decals['imagedecals'] = $row['imagedecals'] ?? '';
 
-        $decals['textdecals']  = $row['textdecals'];        
+    // ✅ Handle color safely (same as your logic)
+    $color = $row['colorDecals'] ?? '{}';
 
-        $decals['imagedecals']  = $row['imagedecals'];        
-
-        //$decals['colorDecals']  = $row['colorDecals'];    
-        $color = $row['colorDecals'];
-        if ($color === null || $color === '' || $color === 'undefined' || $color === 'null') {
-            $color = '{}';
-        }
-        $decals['colorDecals'] = $color;
-
+    if ($color === null || $color === '' || $color === 'undefined' || $color === 'null') {
+        $color = '{}';
     }
 
-
+    $decals['colorDecals'] = $color;
 
     echo json_encode($decals);
-
 }

@@ -8,9 +8,9 @@ Header always set Access-Control-Allow-Credentials "true"
 Header always set Access-Control-Allow-Headers "Content-Type"
 Header always set Access-Control-Allow-Methods "GET, POST, OPTIONS"
 
-# php -- BEGIN cPanel-generated handler, do not edit
-# Set the “ea-php74” package as the default “PHP” programming language.
-<IfModule mime_module>
-  AddHandler application/x-httpd-ea-php74 .php .php7 .phtml
+# php -- BEGIN XAMPP configuration
+# Set PHP handler for local development
+<IfModule mod_php.c>
+  AddType application/x-httpd-php .php .php7 .phtml
 </IfModule>
-# php -- END cPanel-generated handler, do not edit
+# php -- END XAMPP configuration
