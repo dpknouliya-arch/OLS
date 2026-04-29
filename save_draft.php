@@ -1056,7 +1056,7 @@ function renderDraftCards(data) {
     <div class="col-12 col-md-6 col-xl-4 draft-card-col" data-status="${status}" data-name="${d.name.toLowerCase()}">
       <div class="draft-card">
         <div class="card-thumb">
-          <img class="jersey-img" src="${D_BASE_URL}admin/uploads/designs/images/${d.image}" />
+          <img class="jersey-img" src="${D_BASE_URL}admin/uploads/${d.jersey_style_image}" />
           <span class="style-badge">New</span>
           <div class="thumb-actions custom-dropdown">
             <button class="btn-dots" onclick="toggleDropdown(event,'dd-${d.draft_id}')">⋮</button>
