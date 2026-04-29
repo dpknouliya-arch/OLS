@@ -19,6 +19,10 @@ $draft_id = "JOG".date("YmdHis").$user_id;
 $add_date = date("Y-m-d H:i:s");
 $of_id = $_POST["of_id"];
 
+
+
+
+
 // Step 1: Insert into tbl_draft_of (exclude of_id)
 $sql_insert1 = " INSERT INTO tbl_draft_of(
     draft_id , form_name , special_comment , on_team_name , on_year , 
@@ -31,7 +35,7 @@ $sql_insert1 = " INSERT INTO tbl_draft_of(
     is_assigned , assign_user_id , date_add 
 )
 SELECT 
-    draft_id , form_name , special_comment , on_team_name , on_year , 
+    '". $draft_id ."' , form_name , special_comment , on_team_name , on_year , 
     CURDATE() , order_code, req_due_date , game_event_date , customer_po , 
     project_name , payment_opt , sales_rep_id , reorder_num , prod_id , 
     user_id , bill_comp_name , bill_contact_name , bill_address , bill_city , 

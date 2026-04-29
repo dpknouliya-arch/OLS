@@ -429,6 +429,23 @@
 
                         </tr>
 
+
+                        <tr>
+
+                                <!-- <th style="border-width: 0px; background-color: #FFA;"></th> -->
+
+                                <th colspan="2" style="background: #F9F9F9 !important;   padding: 10px 0 10px 10px !important;">
+                                    <p class="mb-0" style="background: #222222;  text-align: center;  font-size: 13px;  font-weight: 500;  padding: 10px !important;  border-radius: 15px 0 0 15px;">
+                                        Special Comments (if any)
+                                    </p>
+                                </th>
+
+                                <th colspan="16" style="background-color: #F9F9F9 !important; padding: 10px  10px 10px 0 !important;">
+                                    <input type="text" name="special_comment[<?= $form_id ?>]" placeholder="Enter Special Comment here..." style=" width: 100%; background:#FFF !important; border: 1px solid #eee; padding: 8px; border-radius: 0 20px 20px 0;">
+                                </th>
+
+                        </tr>
+
                     </table>
 
 
@@ -911,7 +928,7 @@
                         <thead>
                             <tr class="theader">
 
-                                <th class="tablecount">01</th>
+                                <th class="tablecount"></th>
 
                                 <th colspan="15" class="text-center">
 

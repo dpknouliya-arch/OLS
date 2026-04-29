@@ -29,6 +29,7 @@ $a_data = array();
 
 
 
+
 if ($num_row == 1) {
 
     $a_data[0] = $rs_select->fetch_assoc();
@@ -98,7 +99,21 @@ if ($num_row == 0) {
 
     
     .w-45{
-         width: 45px ;
+         width: 45px !important ;
+    }
+
+    .addOrderPage .open_add_new_modal{
+            background: white;
+            color: #333333;
+            display: flex;
+            border: none;
+            box-shadow: 0px 1px 4px 0px #0000001A;
+            border: 1px solid #DDDDDD;
+            height: 39px;
+            border-radius: 6px 6px 1px 1px;
+            align-items: center;
+            width: 124px;
+            justify-content:center ;
     }
 </style>
 
@@ -461,11 +476,15 @@ if ($num_row == 0) {
                         <div class="mt-4">
                             <ul class="nav nav-tabs whiteBg" id="teamTab" role="tablist">
                                 <li class="nav-item" role="presentation">
-                                    <a class="nav-link d-flex  open_add_new_modal" id="addNewTeamButton">
-                                        <figure class="m-0"><img src="images/vector/add.png" alt="" style="width: 16px;">
-                                        </figure>
-                                        Add New
-                                    </a>
+                                    <button class="btn btn-sm btn-primary open_add_new_modal" id="addNewTeamButton" type="button">
+                                         <figure class="m-0"><img src="images/vector/add.png" alt="" style="width: 16px;">
+                                         </figure>
+                                          Add New
+                                    </button>
+                                    <!-- <a class="nav-link d-flex  open_add_new_modal" >
+                                       
+                                       
+                                    </a> -->
                                 </li>
                             </ul>
                             <div class="bg-white tableLower">
@@ -639,7 +658,7 @@ addNewTeam Member Modal
 
             <div class="modal-footer">
 
-                <div class="grid2 column2 formBottom w-100">
+                <div class="d-flex align-items-center w-100 justify-content-between">
 
                     <span class="themeBtn text-center" id="AddNewTeamModal">Save and Continue</span>
 
@@ -1043,9 +1062,10 @@ addNewTeam Member Modal
 
                     $('#table_showing').append(resp);
 
-                    // $('#input_on_team_name').val("");
+                    $('#input_on_team_name_new').val("");
 
-                    // $('#input_on_year').val("");
+                    $('#input_on_year_new').val("");
+                    $('#prod_id_new').val(""); 
 
                     form_id = parseInt(form_id);
 
@@ -1169,9 +1189,10 @@ addNewTeam Member Modal
 
                     $('#table_showing').append(resp);
 
-                    // $('#input_on_team_name').val("");
+                     $('#input_on_team_name').val("");
 
-                    // $('#input_on_year').val("");
+                      $('#input_on_year').val("");
+                      $('#prod_id').val(''); 
 
                     form_id = parseInt(form_id);
 
@@ -1186,6 +1207,8 @@ addNewTeam Member Modal
                     tmp_num_form++;
 
                     $('#tmp_num_form').val(tmp_num_form);
+
+
 
                     // }else{
 
@@ -1219,7 +1242,7 @@ addNewTeam Member Modal
 
             $('.teamTabsSection').show(300); // Adjust duration as needed
 
-            var prod_id = $('#prod_id').val();
+            var prod_id = $('#prod_id_new').val();
 
             var form_id = $('#form_id_inc').val();
 
@@ -1267,9 +1290,10 @@ addNewTeam Member Modal
 
                     $('#sameteam' + teamId + ' #tab-content #fill-tabpanel-' + teamId + '').append(resp);
 
-                    // $('#input_on_team_name').val("");
+                    $('#input_on_team_name').val("");
 
-                    // $('#input_on_year').val("");
+                     $('#input_on_year').val("");
+                      $('#prod_id_new').val(''); 
 
                     form_id = parseInt(form_id);
 
