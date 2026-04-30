@@ -21,11 +21,13 @@ $TTL_SHELL = 0;
 $ttl_top = 0;
 $ttl_bottom = 0;
 
+ 
 
 
-$sql_draft = "SELECT * FROM tbl_draft_of WHERE draft_id = ? AND enable = 1 ORDER BY of_id ASC";
+
+$sql_draft = "SELECT * FROM tbl_draft_of WHERE draft_id = ?  AND user_id = ?  AND enable = 1 ORDER BY of_id ASC";
 $stmt = $conn->prepare($sql_draft);
-$stmt->bind_param("s", $draft_id); // use "s" if draft_id is string
+$stmt->bind_param("si", $draft_id ,$user_id); // use "s" if draft_id is string
 $stmt->execute();
 $rs_draft = $stmt->get_result();
 $num_row = $rs_draft->num_rows;
@@ -64,6 +66,9 @@ if ($rs_sub_user->num_rows > 0) {
 $num_of = $num_row;
 
 $s_of_id_list = implode(",", $a_of_id);
+
+
+
 ?>
 <style>
 	fieldset {
@@ -490,7 +495,7 @@ $s_of_id_list = implode(",", $a_of_id);
 									</div>
 									<div class="form-group column2">
 										<label for="">Country <span class="required">*</span> </label>
-										<input type="text"   name="country" id="bi_country"  maxlength="200" value="<?php echo $a_data[0]["bill_country"]; ?>">
+										<input type="text"   name="country" id="bi_country"  maxlength="100" value="<?php echo $a_data[0]["bill_country"]; ?>">
 									</div>
 									<div class="form-group column2">
 										<label for="">TAX-ID </label>
@@ -498,7 +503,7 @@ $s_of_id_list = implode(",", $a_of_id);
 									</div>
 									<div class="form-group column2">
 										<label for="">Tel <span class="required">*</span> </label>
-										<input type="text" name="tel" id="bi_tel" maxlength="30" value="<?php echo $a_data[0]["bill_tel"]; ?>">
+										<input type="number" name="tel" id="bi_tel" maxlength="30" value="<?php echo $a_data[0]["bill_tel"]; ?>">
 									</div>
 									<div class="form-group column2">
 										<label for="">Email <span class="required">*</span> </label>
@@ -554,7 +559,7 @@ $s_of_id_list = implode(",", $a_of_id);
 									</div>
 									<div class="form-group column2">
 										<label for="">Country <span class="required">*</span> </label>
-										<input type="text" name="d_country" id="de_country" maxlength="50" value="<?php echo $a_data[0]["deli_country"]; ?>">
+										<input type="text" name="d_country" id="de_country" maxlength="100" value="<?php echo $a_data[0]["deli_country"]; ?>">
 									</div>
 									<div class="form-group column2">
 										<label for="">TAX-ID</label>
@@ -562,7 +567,7 @@ $s_of_id_list = implode(",", $a_of_id);
 									</div>
 									<div class="form-group column2">
 										<label for="">Tel <span class="required">*</span> </label>
-										<input type="text" name="d_tel" id="de_tel" maxlength="30" value="<?php echo $a_data[0]["deli_tel"]; ?>">
+										<input type="number" name="d_tel" id="de_tel" maxlength="30" value="<?php echo $a_data[0]["deli_tel"]; ?>">
 									</div>
 									<div class="form-group column2">
 										<label for="">Email <span class="required">*</span> </label>
@@ -730,7 +735,7 @@ $s_of_id_list = implode(",", $a_of_id);
 						</div>
 						<div class="submitBUtton">
 							<span class="themeBtn switch-tab iconBTn" id="movetoteam" onclick="movetoteam()">Save and
-								Continue <figure class="m-0"><img src="images/vector/nextBtn.png" alt=""></figure></span>
+								Continue  <figure class="m-0"><img src="images/vector/nextBtn.png" alt=""></figure></span>
 						</div>
 					</div>
 				</div>
@@ -849,12 +854,13 @@ $s_of_id_list = implode(",", $a_of_id);
 								<?php
 								$sql_draft = "SELECT * FROM tbl_draft_of 
 								WHERE draft_id = ? 
+								AND user_id = ? 
 								AND enable = 1 
 								ORDER BY of_id ASC";
 
 								$stmt = $conn->prepare($sql_draft);
 
-								$stmt->bind_param("s", $draft_id); 
+								$stmt->bind_param("si", $draft_id ,$user_id); 
 
 								$stmt->execute();
 
@@ -880,6 +886,8 @@ $s_of_id_list = implode(",", $a_of_id);
 							<div class="bg-white tableLower">
 								<div id="table_showing" class="table-responsive">
 									<?php
+									
+
 									$sql_item = "SELECT * FROM tbl_draft_oi WHERE of_id IN (" . $s_of_id_list . ") ORDER BY of_id ASC,oi_id ASC;";
 									$rs_item = $conn->query($sql_item);
 
@@ -2544,6 +2552,9 @@ $s_of_id_list = implode(",", $a_of_id);
 	</form>
 </div>
 </div>
+
+
+
 <div class="modal fade bd-example-modal-sm" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
 	<div class="modal-dialog modal-sm">
 		<div class="modal-content">
@@ -3489,8 +3500,8 @@ getReorder();
     const VALIDATION_PATTERNS = {
         textNumber: /^(?=.*[a-zA-Z]).{3,50}$/,
 		OrderName: /^(?=.*[a-zA-Z])[a-zA-Z0-9\s&'.,\-()]{3,100}$/ , 
-        city: /^[a-zA-Z\s]{2,80}$/, // Letters and spaces only
-        text: /^[a-zA-Z\s]{2,50}$/, // Letters and spaces only
+        city: /^[a-zA-Z\s]{2,300}$/, // Letters and spaces only
+        text: /^[a-zA-Z\s]{2,200}$/, // Letters and spaces only
         zipcode: /^[a-zA-Z0-9\-\s]{2,20}$/, // Letters, numbers, hyphens
         tel: /^[0-9+\-\s\(\)]{3,30}$/, // Numbers, +, -, spaces, parentheses
         email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/ // Standard email 
