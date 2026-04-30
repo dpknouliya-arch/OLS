@@ -1,6 +1,6 @@
 <?php
 session_start();
-
+require_once __DIR__ . '/db.php';
 $_SESSION['JOGOLS'] = "";
 unset($_SESSION['JOGOLS']);
 
@@ -19,7 +19,7 @@ if($_SERVER['SERVER_PORT']!='80'){
 
 }else{
 	$pageURL .= $_SERVER['SERVER_NAME'];//.''.$_SERVER['REQUEST_URI'];
-	$loginURL = OLS_BASE_URL . '/login.php';
+	$loginURL = OLS_BASE_URL . 'login.php';
 }
 echo '<meta http-equiv="refresh" content="0; url='.$loginURL.'" />';
 ?>

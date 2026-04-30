@@ -14,7 +14,7 @@ if (!isset($_GET['order_id'])) {
 $order_id = customDecode($_GET['order_id']);
 
 $data = callAPI("get_roster_details.php?order_id=$order_id");
-
+print_r($data);
 if (!$data || !$data['status']) {
     echo "<p>API Error</p>";
     exit;
@@ -212,7 +212,7 @@ $color_list_json = json_encode($color_list);
   <?php if (!empty($sock_design)): ?>
   <div class="ols3d-socks-panel">
     <h5>Socks</h5>
-    <img src="https://jogsports.com/jogdigital/<?= htmlspecialchars($sock_design) ?>" alt="Sock Design">
+      <img src="<?= D_BASE_URL . htmlspecialchars($sock_design) ?>" alt="Sock Design">
   </div>
   <?php endif; ?>
 

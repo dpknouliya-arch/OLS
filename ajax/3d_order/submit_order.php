@@ -93,6 +93,7 @@ if ($rs_deli && $rs_deli->num_rows > 0) {
 
 // UPDATE tbl_order_form — mark as submitted
 $sql_update = "UPDATE tbl_order_form SET
+        of_id          = 0, -- keep the same ID 
     is_submitted    = 1,
     submitted_date  = NOW(),
     order_status    = 'new',
