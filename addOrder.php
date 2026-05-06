@@ -2,7 +2,7 @@
 
 include('check-session.php');
 
-include('db.php');
+
 
 
 

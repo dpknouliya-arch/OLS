@@ -18,7 +18,7 @@ if( !isset($_POST["customer_id"]) || !isset($_POST["email"])  || !isset($_POST["
 }
 
 
-include('db.php');
+
 
 $customer_id = $_POST["customer_id"];
 $email = addslashes(base64_decode($_POST["email"]));

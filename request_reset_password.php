@@ -13,7 +13,7 @@ if (!isset($_POST["email"])) {
 	exit();
 }
 
-include('db.php');
+
 
 $email = base64_decode($_POST["email"]);
 $url_src = $_POST["url_src"] ?? '';

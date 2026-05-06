@@ -2,7 +2,7 @@
 
 include('check-session.php');
 
-include('db.php');
+
 
 $obj_user = json_decode(base64_decode($_SESSION["JOGOLS"]));
 

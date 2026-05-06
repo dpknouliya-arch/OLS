@@ -22,7 +22,7 @@ if (!isset($_POST["sales_user_id"])) {
 
 
 
-include('db.php');
+
 
 
 

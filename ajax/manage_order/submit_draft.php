@@ -485,7 +485,8 @@ if($_POST["is_submit_order"]=="yes"){
 		$conn->query($sql_delete2);
 	}
 	echo '<script type="text/javascript">';
-		echo 'parent.window.location.href = "/?vp='.base64_encode('new_order').'";';
+     	echo 'window.top.location.href = "' . OLS_BASE_URL . '?vp=' . base64_encode('new_order') . '"';
+
 	echo '</script>';
 }
 
@@ -494,7 +495,7 @@ echo '<script type="text/javascript">';
 if($_POST["is_submit_order"]=="yes"){
 	
 }else{
-	echo 'parent.window.location.href = "/?vp='.base64_encode('manage_order').'";';
+	echo 'window.top.location.href = "' . OLS_BASE_URL . '?vp=' . base64_encode('manage_order') . '"';
 }
 
 echo '</script>';

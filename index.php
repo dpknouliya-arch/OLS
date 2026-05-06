@@ -1,6 +1,9 @@
 <?php
 //include('up-session.php');
 session_start();
+    $user_id = 0 ;
+    $customer_id = 0 ; 
+
 if ((isset($_SESSION['JOGOLS']) && ($_SESSION['JOGOLS'] != "")) || (isset($_SESSION['JOGOLSSUB']) && ($_SESSION['JOGOLSSUB'] != "")) || (isset($_SESSION['JOGOLSSALE']) && ($_SESSION['JOGOLSSALE'] != ""))) {
     if (isset($_SERVER["HTTPS"]) && strtolower($_SERVER["HTTPS"]) == "on") {
         $pageURL = 'https';
@@ -15,12 +18,27 @@ if ((isset($_SESSION['JOGOLS']) && ($_SESSION['JOGOLS'] != "")) || (isset($_SESS
     }
     if (isset($_SESSION['JOGOLS'])) {
         $obj_user = json_decode(base64_decode($_SESSION['JOGOLS']));
+        $user_id = $obj_user->user_id ;
+        // $customer_id = $obj_user->customer_id; 
     } elseif (isset($_SESSION['JOGOLSSALE'])) {
         $obj_user = json_decode(base64_decode($_SESSION['JOGOLSSALE']));
     } else {
         $obj_user_sub = json_decode(base64_decode($_SESSION['JOGOLSSUB']));
     }
     $vp = "";
+
+
+ 
+    $savedOrderCount = 0 ; 
+    $designApprovalCount = 0 ; 
+    $TotalOrderCount = 0 ; 
+    $FinalApprovalCount = 0 ; 
+    $totalOrderHistory = 0; 
+    $ManageUserCount = 0 ; 
+    $totalArchivedOrder = 0 ; 
+
+
+
     // if( isset($_GET['vp']) ){ $vp=base64_decode($_GET['vp']); }else{
     // 	if(isset($_SESSION['JOGOLS'])){
     // 		echo '<meta http-equiv="refresh" content="0;URL=login.php">';
@@ -29,6 +47,108 @@ if ((isset($_SESSION['JOGOLS']) && ($_SESSION['JOGOLS'] != "")) || (isset($_SESS
     // 	}
     // 	exit();
     // }  
+
+
+
+    
+    if($user_id || $customer_id){
+         $status = 'archived' ;
+         require_once('db.php');
+        
+
+        //------- Saved order count -----------------
+        $stmt = $conn->prepare("SELECT COUNT(DISTINCT of_id) AS order_count FROM tbl_draft_of WHERE user_id = ?");
+        $stmt->bind_param("i", $user_id);
+        $stmt->execute(); 
+        $result = $stmt->get_result(); 
+        $data = $result->fetch_assoc();
+        $savedOrderCount = $data['order_count'] ?? 0  ; 
+
+
+        // -------------- Design approval count -------------------
+        $stmt = $conn3->prepare("SELECT COUNT(DISTINCT order_id) AS order_count FROM order_head WHERE customer_id = ?");
+        $stmt->bind_param("i", $customer_id);
+        $stmt->execute(); 
+        $result = $stmt->get_result(); 
+        $data = $result->fetch_assoc();
+        $designApprovalCount = $data['order_count'] ?? 0  ; 
+
+
+        //------------------ total order count ------------------
+        $stmt = $conn->prepare("SELECT COUNT(DISTINCT of_id) AS order_count FROM tbl_order_form  WHERE user_id = ? AND enable = 1 AND order_status != ?" );
+        $stmt->bind_param("is", $user_id ,$status);
+        $stmt->execute(); 
+        $result = $stmt->get_result(); 
+        $data = $result->fetch_assoc();
+        $TotalOrderCount = $data['order_count'] ?? 0  ; 
+
+
+       //-------------- Final approval count ----------------------    
+        $stmt = $conn->prepare("SELECT COUNT(DISTINCT final_approval_id) AS order_count FROM tbl_final_approvals  WHERE customer_id = ? ");
+        $stmt->bind_param("i", $customer_id);
+        $stmt->execute(); 
+        $result = $stmt->get_result(); 
+        $data = $result->fetch_assoc();
+        $FinalApprovalCount = $data['order_count'] ?? 0  ; 
+
+
+        //-------------------User count --------------------
+        $stmt = $conn->prepare("SELECT COUNT(DISTINCT sub_user_id) AS userCount FROM tbl_sub_user  WHERE parent_user_id = ?");
+        $stmt->bind_param("i", $user_id);
+        $stmt->execute(); 
+        $result = $stmt->get_result(); 
+        $data = $result->fetch_assoc();
+        $ManageUserCount = $data['userCount'] ?? 0  ;
+
+
+        //---------------------- Archived order ----------------
+        $stmt = $conn->prepare("SELECT COUNT(DISTINCT of_id) AS orderCount FROM tbl_order_form  WHERE user_id = ? AND enable= 1  AND order_status =?" );
+       
+        $stmt->bind_param("is", $user_id ,$status);
+        $stmt->execute(); 
+        $result = $stmt->get_result(); 
+        $data = $result->fetch_assoc();
+        $totalArchivedOrder = $data['orderCount'] ?? 0  ;
+
+
+        // Order history count 
+
+            $sql = "SELECT DISTINCT order_main_code FROM order_main WHERE customer_id = ?";
+            $stmt = $conn3->prepare($sql);
+            if (!$stmt) {
+            throw new Exception('Failed to prepare statement: ' . $conn3->error);
+            }
+            $stmt->bind_param("i", $customer_id);
+            $stmt->execute();
+            $result = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+            $stmt->close();
+
+            $codes = array_column($result, 'order_main_code');
+
+            // No codes found - return safe zero response
+            if(!empty($codes)){
+                  $placeholders = implode(',', array_fill(0, count($codes), '?'));
+                   $types = str_repeat('s', count($codes));
+            }
+
+
+            $sql = "SELECT COUNT(DISTINCT conv_id) AS total_order
+            FROM quotation_data
+            WHERE jog_code IN ($placeholders) AND is_deleted = 0 
+            ";
+
+            $stmt = $conn5->prepare($sql);
+            $stmt->bind_param($types, ...$codes);
+            $stmt->execute();
+            $row = $stmt->get_result()->fetch_assoc();
+
+            $totalOrderHistory = $row['total_order'] ?? 0 ; 
+            $stmt->close();
+        
+
+
+    }
+
 ?>
     <!DOCTYPE html>
     <html lang="en">
@@ -218,6 +338,7 @@ if ((isset($_SESSION['JOGOLS']) && ($_SESSION['JOGOLS'] != "")) || (isset($_SESS
                                 <figure class="whiteIcon"><img src="images/vector/savew.png" alt=""></figure>
                                 <figure class="blueIcon"><img src="images/vector/saveb.png" alt=""></figure>
                                 <span class="menu-title">Saved Orders</span>
+                                 <span class="badge bg-success"><?= $savedOrderCount ?></span>
                             </a>
                         </li>
                         <li class="nav-item <?php if ($_GET['vp'] == base64_encode('design_approval')) {
@@ -227,6 +348,9 @@ if ((isset($_SESSION['JOGOLS']) && ($_SESSION['JOGOLS'] != "")) || (isset($_SESS
                                 <figure class="whiteIcon"><img src="images/vector/addOrder.png" alt=""></figure>
                                 <figure class="blueIcon"><img src="images/vector/addOrderBlue.png" alt=""></figure>
                                 <span class="menu-title">Design Approval</span>
+                                 <span class="badge bg-success"><?= $designApprovalCount ?></span>
+
+                                
                             </a>
                         </li>
 
@@ -238,6 +362,8 @@ if ((isset($_SESSION['JOGOLS']) && ($_SESSION['JOGOLS'] != "")) || (isset($_SESS
                                 </figure>
                                 <figure class="blueIcon"><img src="images/vector/orderStatusBlue.png" alt=""></figure>
                                 <span class="menu-title">Order Status</span>
+                                 <span class="badge bg-success"><?= $TotalOrderCount ?></span>
+
                             </a>
                         </li>
 
@@ -249,6 +375,8 @@ if ((isset($_SESSION['JOGOLS']) && ($_SESSION['JOGOLS'] != "")) || (isset($_SESS
                                 </figure>
                                 <figure class="blueIcon"><img src="images/vector/finalApprovalsBlue.png" alt=""></figure>
                                 <span class="menu-title">Final Approvals</span>
+                                 <span class="badge bg-success"><?= $FinalApprovalCount ?></span>
+
                             </a>
                         </li>
                         <li class="nav-item <?php if ($_GET['vp'] == base64_encode('orderDetail')) {
@@ -259,6 +387,8 @@ if ((isset($_SESSION['JOGOLS']) && ($_SESSION['JOGOLS'] != "")) || (isset($_SESS
                                 </figure>
                                 <figure class="blueIcon"><img src="assets/images/icons/orderDetailBlue.png" alt=""></figure>
                                 <span class="menu-title">Order History</span>
+                                 <!-- <span class="badge bg-success"><?= $totalOrderHistory ?></span> -->
+
                             </a>
                         </li>
                         <?php
@@ -274,6 +404,8 @@ if ((isset($_SESSION['JOGOLS']) && ($_SESSION['JOGOLS'] != "")) || (isset($_SESS
                                     </figure>
                                     <figure class="blueIcon"><img src="images/vector/manageORderBlue.png" alt=""></figure>
                                     <span class="menu-title">Manage Sales</span>
+                                 <span class="badge bg-success"><?= $ManageUserCount ?></span>
+
                                 </a>
                             </li>
                         <?php
@@ -296,6 +428,8 @@ if ((isset($_SESSION['JOGOLS']) && ($_SESSION['JOGOLS'] != "")) || (isset($_SESS
                             <a class="nav-link" href="?vp=<?php echo base64_encode('archived');?>">
                             <i class="menu-icon fa fa-archive"></i>
                             <span class="menu-title">Archived Orders</span>
+                            <span class="badge bg-success"><?= $totalArchivedOrder ?></span>
+
                             </a>
                     </li>
 
@@ -670,7 +804,7 @@ if ((isset($_SESSION['JOGOLS']) && ($_SESSION['JOGOLS'] != "")) || (isset($_SESS
 
                         $vp = base64_decode($_GET['vp']);
 
-                        include($vp . '.php');
+                        require_once($vp . '.php');
                     } else {
 
                         ///include('addOrder.php');
