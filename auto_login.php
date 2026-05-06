@@ -81,10 +81,49 @@ if ($rs && $rs->num_rows === 1) {
     $_SESSION['JOGOLS'] = base64_encode(json_encode($obj));
 
     // IMPORTANT: SAVE SESSION TO DISK NOW
+    
+    
+
+    function apiLogin($user, $password) {
+
+        $url = OLS_BASE_URL . "/api/login.php";
+
+        $postData = json_encode([
+            "email" => base64_decode($user), // ✅ decode email
+            "password" => base64_decode($password)          // ✅ plain password
+        ]);
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            "Content-Type: application/json"
+        ]);
+
+        $res = curl_exec($ch);
+    
+        if (curl_errno($ch)) {
+            print_r($url); // ✅ debug: show what was sent
+            echo "Curl Error: " . curl_error($ch);
+            curl_close($ch);
+            return null;
+        }
+
+        curl_close($ch);
+        print_r($res); // ✅ debug: show API response
+        $data = json_decode($res, true);
+
+        return $data['token'] ?? null;
+    }
+
+    $_SESSION['API_TOKEN'] = apiLogin($_GET['u'], $_GET["p"]);
+
     session_write_close();
 
     ob_clean();
-    echo "ok";
+    echo "success";
     exit;
 }
 

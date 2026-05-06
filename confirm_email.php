@@ -200,6 +200,7 @@ $row_user = $rs_user->fetch_assoc();
 								<input type="password" name="new_password" id="new_password" class="form-control" placeholder="Password">
 								<input type="hidden" name="user_id" value="<?php echo $row_user["user_id"]; ?>">
 								<input type="hidden" name="confirm_key" value="<?php echo $_GET["key"]; ?>">
+								<input type="hidden" name="url_src" id="url_src" value="<?php echo urldecode($_GET["url_src"]); ?>">
 
 								<input type="hidden" name="is_ios"  id="is_ios"  value="0">
 							</div>
@@ -234,6 +235,20 @@ $row_user = $rs_user->fetch_assoc();
 		</div>
 	</div>
 
+
+	<!-- Password Reset Success Modal -->
+	<div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content text-center p-4">
+				<div class="modal-body">
+					<i class="fa fa-check-circle text-success" style="font-size:60px;"></i>
+					<h5 class="mt-3 mb-2">Password Reset Successful!</h5>
+					<p class="text-muted mb-4">Your password has been updated. You can now log in with your new password.</p>
+					<a id="loginBtn" href="#" class="themeBtn btn text-white w-100">Login</a>
+				</div>
+			</div>
+		</div>
+	</div>
 
 	<!-- plugins:js -->
 	<script type="text/javascript" src="ajax/assets/bootstrap-4.4.1/js/bootstrap.js"></script>
@@ -276,6 +291,8 @@ $row_user = $rs_user->fetch_assoc();
 				 $('#is_ios').val('true');
 			}
 
+			let url_src = $('#url_src').val();
+
 			$.ajax({
 				type: "POST",
 				dataType: "html",
@@ -289,7 +306,13 @@ $row_user = $rs_user->fetch_assoc();
 								let response = JSON.stringify(JSON.parse(resp)); 
 								window.webkit.messageHandlers.iosListener.postMessage(response);
 							}else{
-						     	window.location.href = "../?vp=ZGVzaWduX2FwcHJvdmFs";
+
+								if (url_src !== "") {
+									$('#loginBtn').attr('href', url_src);
+									$('#successModal').modal('show');
+								}else{
+									window.location.href = "../OLS?vp=ZGFzaGJvcmFkTWFpbg==";
+								}
 							}
 						} else {
 							if(is_ios){

@@ -293,12 +293,12 @@ function getPantonNameAPI($zone, $designId, $type = 'pantonName') {
         </div>
         <div id="threejs-container-user"></div>
       </div>
-      <div class="ols3d-preview-footer">
+      <!-- <div class="ols3d-preview-footer">
         <button class="ols3d-view-tab active" onclick="setView('front',this)">Front</button>
         <button class="ols3d-view-tab" onclick="setView('back',this)">Back</button>
         <button class="ols3d-view-tab" onclick="setView('left',this)">Left</button>
         <button class="ols3d-view-tab" onclick="setView('right',this)">Right</button>
-      </div>
+      </div> -->
     </div>
 
     <!-- Customer Art Approval -->
@@ -322,8 +322,8 @@ function getPantonNameAPI($zone, $designId, $type = 'pantonName') {
         </div>                          
         <div class="ols3d-art-actions">        
         </div>
-        <button class="ols3d-btn-approve">✓ Approve</button>
-        <button class="ols3d-btn-changes">Request Changes</button>
+        <!-- <button class="ols3d-btn-approve">✓ Approve</button>
+        <button class="ols3d-btn-changes">Request Changes</button> -->
       </div>
       </div>
     </div>

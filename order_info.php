@@ -283,25 +283,6 @@ $delivery_js = json_encode([
         </div>
       </div>
 
-      <!-- Roster summary card -->
-      <div class="ols3d-summary-card">
-        <div class="ols3d-summary-card-head">Roster Summary</div>
-        <div class="ols3d-summary-card-body">
-          <div class="ols3d-summary-row">
-            <span class="ols3d-summary-key">Total QTY</span>
-            <span class="ols3d-summary-val"><?= $total_qty ?></span>
-          </div>
-          <div class="ols3d-summary-row">
-            <span class="ols3d-summary-key">Sizes</span>
-            <span class="ols3d-summary-val"><?= htmlspecialchars($sizes_str) ?></span>
-          </div>
-          <div class="ols3d-summary-row">
-            <span class="ols3d-summary-key">Status</span>
-            <span class="ols3d-summary-val"><span class="ols3d-badge ols3d-badge-new">New</span></span>
-          </div>
-        </div>
-      </div>
-
       <!-- Billing Information card -->
       <div class="ols3d-addr-card" id="billingCard">
         <div class="ols3d-addr-card-head">
