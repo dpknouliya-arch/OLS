@@ -42,6 +42,42 @@ if($conn->query($sql_update)){
 
 	$_SESSION['JOGOLS'] = $s_obj;
 
+	function apiLogin($user, $password) {
+
+		$url = OLS_BASE_URL . "api/login.php";
+
+		$postData = json_encode([
+			"email" => $user, // ✅ decode email
+			"password" => $password          // ✅ plain password
+		]);
+
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL, $url);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_POST, true);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
+		curl_setopt($ch, CURLOPT_HTTPHEADER, [
+			"Content-Type: application/json"
+		]);
+
+		$res = curl_exec($ch);
+	
+		if (curl_errno($ch)) {
+			print_r($url); // ✅ debug: show what was sent
+			echo "Curl Error: " . curl_error($ch);
+			curl_close($ch);
+			return null;
+		}
+
+		curl_close($ch);
+
+		$data = json_decode($res, true);
+
+		return $data['token'] ?? null;
+	}
+
+	$_SESSION['API_TOKEN'] = apiLogin($obj_data["user_email"], $new_password);
+
 
 	$conn3 = new mysqli($serverName,$userName,$userPassword,$dbName3);
 	mysqli_set_charset($conn3, "utf8");

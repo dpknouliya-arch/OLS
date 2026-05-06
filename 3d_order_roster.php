@@ -14,7 +14,6 @@ if (!isset($_GET['order_id'])) {
 $order_id = customDecode($_GET['order_id']);
 
 $data = callAPI("get_roster_details.php?order_id=$order_id");
-print_r($data);
 if (!$data || !$data['status']) {
     echo "<p>API Error</p>";
     exit;
@@ -347,14 +346,14 @@ $color_list_json = json_encode($color_list);
       '<td>' + sel(PG_OPTIONS,    d.player_or_goalie,   'P/G')    + '</td>' +
       '<td>' + sel(JERSEY_SIZES,  d.jersey_size,        'Size')   + '</td>' +
       '<td>' + inp(d.jersey_no,         '#')             + '</td>' +
-      '<td>' + sel(JERSEY_COLORS, d.jersey_color,       'Color')  + '</td>' +
+      '<td>' + inp(d.jersey_color,       'Jersey color')  + '</td>' +
       '<td>' + inp(d.jersey_qty,        '1', 'number')  + '</td>' +
-      '<td>' + sel(JERSEY_COLORS, d.jersey_color2,      'Color')  + '</td>' +
+      '<td>' + inp(d.jersey_color2,      'Jersey color2')  + '</td>' +
       '<td>' + inp(d.jersey_qty2,       '0', 'number')  + '</td>' +
       '<td>' + sel(SOCK_SIZES,    d.sock_size,          'Size')   + '</td>' +
-      '<td>' + sel(JERSEY_COLORS, d.sock_color,         'Color')  + '</td>' +
+      '<td>' + inp(d.sock_color,         'Sock color')  + '</td>' +
       '<td>' + inp(d.sock_qty,          '0', 'number')  + '</td>' +
-      '<td>' + sel(JERSEY_COLORS, d.sock_color2,        'Color')  + '</td>' +
+      '<td>' + inp(d.sock_color2,        'Sock color2')  + '</td>' +
       '<td>' + inp(d.sock_qty2,         '0', 'number')  + '</td>' +
       '<td>' + sel(COR_A_OPTS,    d.cor_a,              '—')      + '</td>' +
       '<td>' + inp(d.name_for_packing,  'Packing name') + '</td>' +

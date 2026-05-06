@@ -15,7 +15,7 @@ $rs_of = $conn->query($sql_of);
 $row_of = $rs_of->fetch_assoc();
 $prod_id = $row_of["prod_id"];
 
-$sql_oi = "SELECT tbl_order_item.*,tbl_top_size.size_name AS top_size,tbl_bottom_size.size_name AS bottom_size FROM tbl_order_item ";
+$sql_oi = "SELECT tbl_order_item.*,tbl_top_size.size_name AS top_size,tbl_bottom_size.size_name AS bottom_sizes FROM tbl_order_item ";
 $sql_oi .= " LEFT JOIN tbl_size AS tbl_top_size ON tbl_order_item.product_size_id=tbl_top_size.size_id ";
 $sql_oi .= " LEFT JOIN tbl_size AS tbl_bottom_size ON tbl_order_item.bottom_size=tbl_bottom_size.size_id WHERE of_id='" . $of_id . "' ;";
 
@@ -323,6 +323,12 @@ $row_product = $rs_prod->fetch_assoc();
 									} else if ($edit_item["c_or_a"] == "assistant") {
 										$show_c_or_a = "A";
 									}
+									else if ($edit_item["c_or_a"] == "C") {
+										$show_c_or_a = "C";
+									}
+									else if ($edit_item["c_or_a"] == "A") {
+										$show_c_or_a = "A";
+									}
 								}
 							?>
 								<tr>
@@ -338,6 +344,12 @@ $row_product = $rs_prod->fetch_assoc();
 											echo "WOMEN-ADULT";
 										} elseif ($edit_item["sex"] == "female_youth") {
 											echo "WOMEN-YOUTH";
+										}
+										elseif ($edit_item["sex"] == "Adult") {
+											echo "Adult";
+										}
+										elseif ($edit_item["sex"] == "Youth") {
+											echo "Youth";
 										}
 										?>
 									</td>

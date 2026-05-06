@@ -15,7 +15,7 @@ $sql_select = "SELECT
     re_order_id AS num_re_order
 FROM tbl_draft_of
 WHERE user_id = ?
-AND enable = 1
+AND enable = 1 AND 	is_3dorder=0
 GROUP BY draft_id
 ORDER BY draft_id DESC
 ";

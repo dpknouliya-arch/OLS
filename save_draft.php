@@ -821,6 +821,8 @@ $user_id = $obj_user->user_id;
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
     ::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+    .deleteDraftsItems img{     width: 13px;   height: 13px;  object-fit: contain; }
+     .deleteDraftsItems .dropdown-item-custom{ padding: 3px 6px; border: 1px solid #f3b1b175;  border-radius: 4px;}
   </style>
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -937,6 +939,7 @@ $user_id = $obj_user->user_id;
 ═══════════════════════════════════════════════════════════ -->
 
 
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 <script>
 const D_BASE_URL = "<?= D_BASE_URL ?>";
 
@@ -1053,17 +1056,15 @@ function renderDraftCards(data) {
     const ctaClass = isUsed ? 'btn-roster' : '';
     const ctaIcon = isUsed ? 'bi-arrow-right-circle' : 'bi-pencil';
     return `
-    <div class="col-12 col-md-6 col-xl-2 draft-card-col" data-status="${status}" data-name="${d.name.toLowerCase()}">
+    <div class="col-12 col-md-6 col-xl-3 draft-card-col" data-status="${status}" data-name="${d.name.toLowerCase()}">
       <div class="draft-card">
         <div class="card-thumb">
           <img class="jersey-img" src="${D_BASE_URL}admin/uploads/${d.jersey_style_image}" />
           <span class="style-badge">New</span>
-          <div class="thumb-actions custom-dropdown">
-            <button class="btn-dots" onclick="toggleDropdown(event,'dd-${d.draft_id}')">⋮</button>
-            <div class="custom-dropdown-menu" id="dd-${d.draft_id}">
-              <button class="dropdown-item-custom" data-toast="Share link copied!" onclick="handleToast(this)"><i class="bi bi-share"></i>Share Link</button>                            
-              <button class="dropdown-item-custom danger" data-toast="Delete confirmed" onclick="handleToast(this)"><i class="bi bi-trash"></i>Delete</button>
-            </div>
+          <div class="thumb-actions deleteDraftsItems">
+              <button class="dropdown-item-custom danger" data-draft-id="${d.draft_id}" onclick="deleteDraft(this)">
+              <figure class="my-0"><img src="images/vector/trashredIcon.png" alt=""></figure>
+              </button>
           </div>
         </div>
         <div class="card-body-inner">
@@ -1449,6 +1450,77 @@ function showToast(msg, icon = 'bi-check-circle-fill') {
   t.innerHTML = `<i class="bi ${icon}"></i>${msg}`;
   wrap.appendChild(t);
   setTimeout(() => { t.style.opacity='0'; t.style.transform='translateY(6px)'; t.style.transition='all .25s'; setTimeout(()=>t.remove(), 280); }, 2600);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   DELETE DRAFT
+═══════════════════════════════════════════════════════════ */
+function deleteDraft(btn) {
+  const draftId = btn.dataset.draftId;
+  if (!draftId) return;
+
+  const card = btn.closest('.draft-card-col');
+
+  swal({
+    title: 'Delete Draft?',
+    text: 'Are you sure you want to delete this draft? This action cannot be undone.',
+    icon: 'warning',
+    buttons: {
+      cancel: {
+        text: 'No',
+        value: null,
+        visible: true,
+        className: 'btn btn-danger'
+      },
+      confirm: {
+        text: 'Yes, Delete',
+        value: true,
+        visible: true,
+        className: 'btn btn-primary'
+      }
+    }
+  }).then(confirmed => {
+    if (!confirmed) return;
+
+    const body = new URLSearchParams();
+    body.append('draft_id', draftId);
+
+    fetch('<?= OLS_BASE_URL ?>ajax/delete_draft_proxy.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: body.toString()
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data && data.status === 200) {
+        if (card) card.remove();
+        DRAFTS = DRAFTS.filter(d => String(d.draft_id) !== String(draftId));
+        document.getElementById('draft-count').textContent =
+          DRAFTS.length + ' draft' + (DRAFTS.length !== 1 ? 's' : '');
+        swal({
+          title: 'Deleted!',
+          text: 'Draft has been deleted successfully.',
+          icon: 'success',
+          button: { text: 'OK', className: 'btn btn-primary' }
+        });
+      } else {
+        swal({
+          title: 'Error',
+          text: (data && data.msg) ? data.msg : 'Failed to delete draft.',
+          icon: 'error',
+          button: { text: 'OK', className: 'btn btn-primary' }
+        });
+      }
+    })
+    .catch(() => {
+      swal({
+        title: 'Error',
+        text: 'Something went wrong. Please try again.',
+        icon: 'error',
+        button: { text: 'OK', className: 'btn btn-primary' }
+      });
+    });
+  });
 }
 
 /* ═══════════════════════════════════════════════════════════
