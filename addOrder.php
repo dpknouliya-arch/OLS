@@ -175,11 +175,11 @@ if ($num_row == 0) {
                                     </div>
                                     <div class="form-group column2">
                                         <label for="" class="w-100 text-start  c-label">Contact <span class="required">*</span> </label>
-                                        <input type="text" name="contact" id="bi_contact" maxlength="200" value="<?php echo $a_data[0]["contact_name"]; ?>">
+                                        <input type="text" name="contact" id="bi_contact" maxlength="30" value="<?php echo $a_data[0]["contact_name"]; ?>">
                                     </div>
                                     <div class="form-group column2">
                                         <label for="" class="w-100 text-start  c-label">Country <span class="required">*</span> </label>
-                                        <input type="text" name="country" id="bi_country" maxlength="50" value="<?php echo $a_data[0]["country"]; ?>">
+                                        <input type="text" name="country" id="bi_country" maxlength="30"  value="<?php echo $a_data[0]["country"]; ?>">
                                     </div>
                                     <div class="form-group">
                                         <label for="" class="w-100 text-start  c-label">City <span class="required">*</span> </label>
@@ -195,7 +195,7 @@ if ($num_row == 0) {
                                     </div>
                                     <div class="form-group  ">
                                         <label for="" class="w-100 text-start  c-label">Tel. <span class="required">*</span> </label>
-                                        <input type="text" name="tel" id="bi_tel" maxlength="30" value="<?php echo $a_data[0]["tel"]; ?>">
+                                        <input type="number" name="tel" id="bi_tel" maxlength="30" value="<?php echo $a_data[0]["tel"]; ?>">
                                     </div>
                                     <div class="form-group column2">
                                         <label for="" class="w-100 text-start  c-label">TAX ID  </label>
@@ -232,11 +232,11 @@ if ($num_row == 0) {
                                     </div>
                                     <div class="form-group column2">
                                         <label for="" class="w-100 text-start  c-label">Contact <span class="required">*</span> </label>
-                                        <input type="text" name="d_contact" id="de_contact" maxlength="200" value="<?php echo $a_data[1]["contact_name"]; ?>">
+                                        <input type="text" name="d_contact" id="de_contact" maxlength="30" value="<?php echo $a_data[1]["contact_name"]; ?>">
                                     </div>
                                     <div class="form-group column2">
                                         <label for="" class="w-100 text-start  c-label">Country <span class="required">*</span> </label>
-                                        <input type="text" name="d_country" id="de_country" maxlength="50" value="<?php echo $a_data[1]["country"]; ?>">
+                                        <input type="text" name="d_country" id="de_country" maxlength="30" value="<?php echo $a_data[1]["country"]; ?>">
                                     </div>
                                     <div class="form-group">
                                         <label for="" class="w-100 text-start  c-label">City <span class="required">*</span> </label>
@@ -252,7 +252,7 @@ if ($num_row == 0) {
                                     </div>
                                     <div class="form-group  ">
                                         <label for="" class="w-100 text-start  c-label">Tel. <span class="required">*</span> </label>
-                                        <input type="text" name="d_tel" id="de_tel" maxlength="30" value="<?php echo $a_data[1]["tel"]; ?>">
+                                        <input type="number" name="d_tel" id="de_tel" maxlength="30" value="<?php echo $a_data[1]["tel"]; ?>">
                                     </div>
                                     <div class="form-group column2">
                                         <label for="" class="w-100 text-start  c-label">TAX ID </label>
@@ -1892,6 +1892,25 @@ addNewTeam Member Modal
 
             $('#is_submit_order').val("yes");
             $('#form1').attr("action", "ajax/manage_order/submit_draft.php");
+
+            // $('#form1').on('submit', function(e) {
+			// 	    e.preventDefault();
+
+			// 	   console.log("form sunmit "); 
+
+             
+
+			// 	$.ajax({
+			// 			url: "./ajax/manage_order/submit_draft.php",
+			// 			type: "POST",
+			// 			data: $(this).serialize(),
+			// 			success: function(res) {
+			// 			console.log(res);
+			// 	}
+			// 	});
+			// });
+
+				
             $('#form1').submit();
         }
 
