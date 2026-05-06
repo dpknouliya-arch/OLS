@@ -1,6 +1,6 @@
 <?php
 include('check-session_sub.php');
-include('db.php');
+
 
 $obj_user = json_decode(base64_decode($_SESSION["JOGOLSSUB"]));
 $sub_user_id = $obj_user->sub_user_id;

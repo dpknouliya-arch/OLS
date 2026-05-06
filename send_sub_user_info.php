@@ -11,7 +11,7 @@ if( !isset($_POST["sub_user_id"]) ){
 	exit();
 }
 
-include('db.php');
+
 
 $sub_user_id = $_POST["sub_user_id"];
 $base_url = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . '/';

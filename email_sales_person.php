@@ -1,7 +1,7 @@
 <?php 
 use PHPMailer\PHPMailer\PHPMailer;
 require 'vendor/autoload.php'; 
-include('db.php');
+
 
 $sales_id = $_POST['sales_id'] ?? 0 ; 
 $base_url = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . '/';

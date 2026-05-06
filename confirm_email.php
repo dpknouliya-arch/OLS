@@ -4,7 +4,7 @@ if (!isset($_GET["key"]) || ($_GET["key"] == "")) {
 	exit();
 }
 
-include('db.php');
+
 
 $sql_select = "SELECT user_id,user_email FROM tbl_user WHERE activate_key='" . $_GET["key"] . "' ; ";
 

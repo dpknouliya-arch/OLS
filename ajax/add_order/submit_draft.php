@@ -298,7 +298,7 @@ foreach($_POST["prod_id_list"] as $form_id => $prod_id){
 
 
 
-$url = "https://ols-test.jog-joinourgame.com/?vp=bWFuYWdlX29yZGVy";
+$url = OLS_BASE_URL."?vp=bWFuYWdlX29yZGVy";
 
 header('Location: '.$url);
 

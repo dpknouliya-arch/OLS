@@ -1,6 +1,6 @@
 <?php
 include('check-session.php');
-include('db.php');
+
 
 $obj_user = json_decode(base64_decode($_SESSION["JOGOLS"]));
 $user_id = $obj_user->user_id;

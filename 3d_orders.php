@@ -1,6 +1,6 @@
 <?php
 include('check-session.php');
-include('db.php');
+
 include 'encryption_helper.php';
 
 $obj_user = json_decode(base64_decode($_SESSION["JOGOLS"]));
