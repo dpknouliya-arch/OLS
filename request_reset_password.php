@@ -3,6 +3,7 @@
 use PHPMailer\PHPMailer\PHPMailer;
 
 require 'vendor/autoload.php';
+require_once 'db.php';
 
 if (!isset($_POST["email"])) {
 
@@ -119,7 +120,7 @@ if ($rs_chk->num_rows == 0) {
 								<table border="0" cellpadding="0" cellspacing="0" width="100%">
 									<tr>
 									<td align="center" style="padding:8px 0 36px;">
-										<a href="https://ols-test.jog-joinourgame.com/OLS/confirm_email.php?key=' . $activate_key . '&url_src=' . urlencode($url_src) . '"
+										<a href="' . OLS_BASE_URL . '/confirm_email.php?key=' . $activate_key . '&url_src=' . urlencode($url_src) . '"
 										style="display:inline-block;background-color:#111111;color:#ffffff;text-decoration:none;font-size:15px;font-weight:600;letter-spacing:0.4px;padding:15px 44px;border-radius:8px;border:2px solid #111111;">
 										Reset My Password
 										</a>
