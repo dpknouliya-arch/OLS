@@ -11,26 +11,48 @@ if (isset($_GET['order_id'])) {
 
     $result = callAPI("get_order.php?order_id=$order_id");
     $data = $result['data'] ?? null;
+  
     if (!$data || empty($data)) {
         echo "<p>No data found.</p>";
         exit;
     }
 
-    // ✅ Map API response    
+    // Map API response
     $order = $data;
-    
-    $order_team_data = $data['team'] ?? [];
+
+    $order_team_data   = $data['team']   ?? [];
     $order_design_data = isset($data['design']) ? [$data['design']] : [];
 
-    $designId = $order['design_id'] ?? 0;
+    $designId   = $order['design_id']  ?? 0;
     $added_date = $order['added_date'] ?? '';
 
-    // ✅ Already arrays (no need json_decode if API is correct)
-    //$zones = json_decode($order['colorDecals'] ?? '[]', true);
-    $zones = json_decode($order['colorDecals'], true);
-    $logos = json_decode($order['imagedecals'] ?? '[]', true);
-    $texts = json_decode($order['textdecals'] ?? '[]', true);     
-    
+    // design_json is loaded from S3 by get_order.php and already decoded as a PHP array.
+    // Old orders stored colorDecals/imagedecals/textdecals as JSON strings in DB columns;
+    // new orders store them inside the S3 JSON blob under the same keys.
+    $design_json = $data['design_json'] ?? [];
+
+    // S3 migration stores keys as: color_data, image_decals, text_decals
+    // Old DB columns were: colorDecals, imagedecals, textdecals
+    // Try S3 keys first (new), fall back to old DB column names for backward compat.
+    $zones = $design_json['color_data']   ?? $design_json['colorDecals'] ?? null;
+    $logos = $design_json['image_decals'] ?? $design_json['imagedecals'] ?? null;
+    $texts = $design_json['text_decals']  ?? $design_json['textdecals']  ?? null;
+
+    // If S3 blob is missing entirely, try old DB columns (JSON strings from pre-migration rows).
+    if ($zones === null) {
+        $zones = !empty($order['colorDecals']) ? json_decode($order['colorDecals'], true) : [];
+    }
+    if ($logos === null) {
+        $logos = !empty($order['imagedecals']) ? json_decode($order['imagedecals'], true) : [];
+    }
+    if ($texts === null) {
+        $texts = !empty($order['textdecals'])  ? json_decode($order['textdecals'],  true) : [];
+    }
+
+    // Ensure we always have arrays, never null.
+    $zones = is_array($zones) ? $zones : [];
+    $logos = is_array($logos) ? $logos : [];
+    $texts = is_array($texts) ? $texts : [];
     // Fetch all fabric and collar names in one parallel batch (was 5 sequential HTTP calls)
     $batchEndpoints = [];
     if (!empty($order['fabric_base']))     $batchEndpoints['fab_base']     = "get_fabric_byid.php?fab="    . urlencode($order['fabric_base']);
@@ -317,7 +339,9 @@ function getPantonNameAPI($zone, $designId, $type = 'pantonName') {
             <div id="backPreview">
             </div>
             <div>
-                <figure class="h-100 my-auto d-flex align-items-center"><img src="../<?= $design['sock_design']; ?>" alt="" class="w-30"></figure>
+                <?php if (!empty($order['sock_design'])): ?>
+                <figure class="h-100 my-auto d-flex align-items-center"><img src="../<?= htmlspecialchars($order['sock_design']) ?>" alt="" class="w-30"></figure>
+                <?php endif; ?>
             </div>
         </div>                          
         <div class="ols3d-art-actions">        

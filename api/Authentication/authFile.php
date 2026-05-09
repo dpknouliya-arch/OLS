@@ -90,40 +90,125 @@ include __DIR__ . '/../../db.php';
      }
 
      function UserLogin(){
-      
+
             global $conn ,$conn3;
             $input = json_decode(file_get_contents("php://input"), true);
 
-            $email =  $input['email'] ?? NULL ; 
-            $password = base64_encode($input['password']) ?? NULL; 
-        
-            $string_pass = md5(base64_decode($password));
-            // echo '<pre>'; 
-            // print_r($string_pass); 
-            
-            if(!$email || !$password){
-                 return ['status'=>503 , 'msg' => 'Please add all data']; 
-            } 
+            $email =  $input['email'] ?? NULL ;
+            $password = base64_encode($input['password']) ?? NULL;
 
-            $check_user_exists = "SELECT * FROM tbl_user Where user_email = '$email' AND user_password='$string_pass'"; 
-      
+            $string_pass = md5(base64_decode($password));
+
+            if(!$email || !$password){
+                 return ['status'=>503 , 'msg' => 'Please add all data'];
+            }
+
+            $check_user_exists = "SELECT * FROM tbl_user Where user_email = '$email' AND user_password='$string_pass'";
+
             $data = $conn->query($check_user_exists);
 
             if($data->num_rows ==0){
-                 return ['status'=>404 , 'msg'=> 'Can not found the user']; 
+                 return ['status'=>404 , 'msg'=> 'Can not found the user'];
             }
 
             $user    = $data->fetch_assoc();
             $user_id = $user['user_id'] ?? 0;
 
             require_once __DIR__ . '/JWTHelper.php';
-            $token = JWTHelper::generate([
+            $access_token = JWTHelper::generate([
                 'user_id' => $user_id,
                 'email'   => $email,
                 'level'   => $user['user_level'] ?? 0,
             ]);
 
-            return ['status' => 200, 'msg' => 'User loggedin successfully', 'user_id' => $user_id, 'token' => $token];
+            $refresh_token = $this->IssueRefreshToken($user_id);
+
+            return [
+                'status'        => 200,
+                'msg'           => 'User loggedin successfully',
+                'user_id'       => $user_id,
+                'token'         => $access_token,
+                'refresh_token' => $refresh_token,
+            ];
+     }
+
+     function IssueRefreshToken($user_id) {
+            global $conn;
+            $token      = bin2hex(random_bytes(32));   // 64-char hex
+            $expires_at = date('Y-m-d H:i:s', strtotime('+30 days'));
+
+            $stmt = $conn->prepare(
+                "INSERT INTO tbl_refresh_tokens (user_id, token, expires_at) VALUES (?, ?, ?)"
+            );
+            $stmt->bind_param('iss', $user_id, $token, $expires_at);
+            $stmt->execute();
+            $stmt->close();
+
+            return $token;
+     }
+
+     function RefreshAccessToken() {
+            global $conn;
+            $input         = json_decode(file_get_contents("php://input"), true);
+            $refresh_token = $input['refresh_token'] ?? null;
+
+            if (!$refresh_token) {
+                return ['status' => 400, 'msg' => 'Refresh token required'];
+            }
+
+            $stmt = $conn->prepare(
+                "SELECT rt.*, u.user_email, u.user_level
+                 FROM tbl_refresh_tokens rt
+                 JOIN tbl_user u ON u.user_id = rt.user_id
+                 WHERE rt.token = ? AND rt.revoked = 0"
+            );
+            $stmt->bind_param('s', $refresh_token);
+            $stmt->execute();
+            $row = $stmt->get_result()->fetch_assoc();
+            $stmt->close();
+
+            if (!$row) {
+                return ['status' => 401, 'msg' => 'Invalid refresh token'];
+            }
+
+            if (strtotime($row['expires_at']) < time()) {
+                return ['status' => 401, 'msg' => 'Refresh token expired'];
+            }
+
+            // Revoke the used token (rotation — one-time use)
+            $stmt = $conn->prepare("UPDATE tbl_refresh_tokens SET revoked = 1 WHERE token = ?");
+            $stmt->bind_param('s', $refresh_token);
+            $stmt->execute();
+            $stmt->close();
+
+            require_once __DIR__ . '/JWTHelper.php';
+            $new_access_token   = JWTHelper::generate([
+                'user_id' => $row['user_id'],
+                'email'   => $row['user_email'],
+                'level'   => $row['user_level'] ?? 0,
+            ]);
+            $new_refresh_token  = $this->IssueRefreshToken($row['user_id']);
+
+            return [
+                'status'        => 200,
+                'token'         => $new_access_token,
+                'refresh_token' => $new_refresh_token,
+            ];
+     }
+
+     function Logout() {
+            global $conn;
+            $input         = json_decode(file_get_contents("php://input"), true);
+            $refresh_token = $input['refresh_token'] ?? null;
+
+            if ($refresh_token) {
+                $stmt = $conn->prepare("UPDATE tbl_refresh_tokens SET revoked = 1 WHERE token = ?");
+                $stmt->bind_param('s', $refresh_token);
+                $stmt->execute();
+                $stmt->close();
+            }
+
+            return ['status' => 200, 'msg' => 'Logged out successfully'];
      }
  
      function ForgetPassword(){
