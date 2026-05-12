@@ -129,21 +129,23 @@ if ((isset($_SESSION['JOGOLS']) && ($_SESSION['JOGOLS'] != "")) || (isset($_SESS
             if(!empty($codes)){
                   $placeholders = implode(',', array_fill(0, count($codes), '?'));
                    $types = str_repeat('s', count($codes));
+
+                   $sql = "SELECT COUNT(DISTINCT conv_id) AS total_order
+                    FROM quotation_data
+                    WHERE jog_code IN ($placeholders) AND is_deleted = 0 
+                    ";
+
+                    $stmt = $conn5->prepare($sql);
+                    $stmt->bind_param($types, ...$codes);
+                    $stmt->execute();
+                    $row = $stmt->get_result()->fetch_assoc();
+
+                    $totalOrderHistory = $row['total_order'] ?? 0 ; 
+                    $stmt->close();
             }
 
 
-            $sql = "SELECT COUNT(DISTINCT conv_id) AS total_order
-            FROM quotation_data
-            WHERE jog_code IN ($placeholders) AND is_deleted = 0 
-            ";
-
-            $stmt = $conn5->prepare($sql);
-            $stmt->bind_param($types, ...$codes);
-            $stmt->execute();
-            $row = $stmt->get_result()->fetch_assoc();
-
-            $totalOrderHistory = $row['total_order'] ?? 0 ; 
-            $stmt->close();
+            
         
 
 

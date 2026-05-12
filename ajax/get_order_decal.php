@@ -14,11 +14,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     $row = $res['data'];
+    $design_json = $row['design_json'] ?? [];
+
 
     $decals = [];
 
-    $decals['textdecals']  = $row['textdecals'] ?? '';
-    $decals['imagedecals'] = $row['imagedecals'] ?? '';
+    
 
     // ✅ Handle color safely (same as your logic)
     $color = $row['colorDecals'] ?? '{}';
@@ -27,7 +28,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $color = '{}';
     }
 
+    $color = $design_json['color_data']   ?? $design_json['colorDecals'] ?? null;
+    $logos = $design_json['image_decals'] ?? $design_json['imagedecals'] ?? null;
+    $texts = $design_json['text_decals']  ?? $design_json['textdecals']  ?? null;
+
     $decals['colorDecals'] = $color;
+    $decals['textdecals']  = $texts;
+    $decals['imagedecals'] = $logos;
 
     echo json_encode($decals);
 }
