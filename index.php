@@ -140,20 +140,24 @@ if ((isset($_SESSION['JOGOLS']) && ($_SESSION['JOGOLS'] != "")) || (isset($_SESS
                     ";
 
                     $stmt = $conn5->prepare($sql);
-                    $stmt->bind_param($types, ...$codes);
-                    $stmt->execute();
-                    $row = $stmt->get_result()->fetch_assoc();
-
-                    $totalOrderHistory = $row['total_order'] ?? 0 ; 
-                    $stmt->close();
+                    if ($stmt) {
+                        $stmt->bind_param($types, ...$codes);
+                        $stmt->execute();
+                        $row = $stmt->get_result()->fetch_assoc();
+                        $totalOrderHistory = $row['total_order'] ?? 0;
+                        $stmt->close();
+                    }
             }
         
             $stmt = $conn->prepare("SELECT brand_id FROM tbl_user WHERE user_id = ?");
-            $stmt->bind_param("i", $user_id);
-            $stmt->execute(); 
-            $result = $stmt->get_result(); 
-            $data = $result->fetch_assoc();
-            $brand_id = $data['brand_id'] ?? 1  ; 
+            if ($stmt) {
+                $stmt->bind_param("i", $user_id);
+                $stmt->execute();
+                $result = $stmt->get_result();
+                $data = $result->fetch_assoc();
+                $brand_id = $data['brand_id'] ?? 1;
+                $stmt->close();
+            }
 
 
             
