@@ -1,4 +1,46 @@
 <?php
+
+require_once '../db.php';
+require_once '../includes/S3DesignStorage.php';
+
+header('Content-Type: application/json');
+
+$data = json_decode(file_get_contents("php://input"), true);
+
+$order_id = $data['order_id'];
+
+$s3Folder = "artwork_svg/";
+$fileName = "design_" . $order_id . ".svg";
+
+$s3Key = $s3Folder . $fileName;
+
+$s3Url = S3_Buckets . $s3Key;
+
+/*
+|--------------------------------------------------------------------------
+| CHECK IF SVG ALREADY EXISTS
+|--------------------------------------------------------------------------
+*/
+
+$headers = @get_headers($s3Url);
+
+if ($headers && strpos($headers[0], '200')) {
+
+    echo json_encode([
+        'status' => true,
+        'svg_url' => $s3Url,
+        'cached' => true
+    ]);
+
+    exit;
+}
+
+/*
+|--------------------------------------------------------------------------
+| GENERATE SVG
+|--------------------------------------------------------------------------
+*/
+
 require_once 'get-display-map.php';
 
 $data = json_decode(file_get_contents("php://input"), true);
@@ -351,3 +393,52 @@ echo json_encode([
     "status" => "success",
     "svg"    => $svgOutput
 ]);
+
+/*
+|--------------------------------------------------------------------------
+| YOUR SVG GENERATION LOGIC
+|--------------------------------------------------------------------------
+*/
+
+ob_start();
+
+/*
+    Your existing SVG generation code here
+*/
+
+$svg = generateSVG(
+    $data['artwork'],
+    $data['color'],
+    $data['textDecals'],
+    $data['imageDecals']
+);
+
+ob_end_clean();
+
+/*
+|--------------------------------------------------------------------------
+| UPLOAD TO S3
+|--------------------------------------------------------------------------
+*/
+
+try {
+
+    $upload = S3DesignStorage::uploadRawContent(
+        $svg,
+        $s3Key,
+        'image/svg+xml'
+    );
+
+    echo json_encode([
+        'status' => true,
+        'svg_url' => $s3Url,
+        'cached' => false
+    ]);
+
+} catch (Exception $e) {
+
+    echo json_encode([
+        'status' => false,
+        'message' => $e->getMessage()
+    ]);
+}

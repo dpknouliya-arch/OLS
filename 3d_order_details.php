@@ -11,7 +11,7 @@ if (isset($_GET['order_id'])) {
 
     $result = callAPI("get_order.php?order_id=$order_id");
     $data = $result['data'] ?? null;
-  
+    
     if (!$data || empty($data)) {
         echo "<p>No data found.</p>";
         exit;
@@ -31,12 +31,10 @@ if (isset($_GET['order_id'])) {
     // new orders store them inside the S3 JSON blob under the same keys.
     $design_json = $data['design_json'] ?? [];
 
-    // S3 migration stores keys as: color_data, image_decals, text_decals
-    // Old DB columns were: colorDecals, imagedecals, textdecals
-    // Try S3 keys first (new), fall back to old DB column names for backward compat.
-    $zones = $design_json['color_data']   ?? $design_json['colorDecals'] ?? null;
-    $logos = $design_json['image_decals'] ?? $design_json['imagedecals'] ?? null;
-    $texts = $design_json['text_decals']  ?? $design_json['textdecals']  ?? null;
+    // API returns only the 3 decal keys from the S3 blob (trimmed for response size).
+    $zones = $design_json['color_data']   ?? null;
+    $logos = $design_json['image_decals'] ?? null;
+    $texts = $design_json['text_decals']  ?? null;
 
     // If S3 blob is missing entirely, try old DB columns (JSON strings from pre-migration rows).
     if ($zones === null) {
@@ -472,7 +470,7 @@ function getPantonNameAPI($zone, $designId, $type = 'pantonName') {
                     // echo "<pre>";
                     // print_r($text);
                     // echo "</pre>";
-                      if (!isset($text['displayType']) || trim($text['displayType']) === '') continue;
+                      if (($text['displayType'] ?? '') !== 'number') continue;
                       $has_numbers  = true;
                       $displayName  = $text['displayName']  ?? 'Unknown';
                       $Text         = $text['text']         ?? '';
@@ -532,7 +530,7 @@ function getPantonNameAPI($zone, $designId, $type = 'pantonName') {
               $has_names = false;
               if (!empty($texts)) {
                   foreach ($texts as $text) {
-                      if (!isset($text['displayType']) || $text['displayType'] === 'text') continue;
+                      if (($text['displayType'] ?? '') !== 'text') continue;
                       $has_names    = true;
                       $displayName  = $text['displayName']  ?? 'Unknown';
                       $Text         = $text['text']         ?? '';
@@ -633,8 +631,8 @@ function getPantonNameAPI($zone, $designId, $type = 'pantonName') {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
 	<script>
-		window.BASE_3D_URL = "<?php echo D_BASE_URL; ?>";
-    console.log("Base 3D URL:", window.BASE_3D_URL);
+		window.S3_BRAND_BUCKET = "<?php echo S3_BRAND_BUCKET; ?>";
+    console.log("Base 3D URL:", window.S3_BRAND_BUCKET);
 	</script>
 <script type="module" src="js/3dmodel.js?ver=1.0"></script>
 
