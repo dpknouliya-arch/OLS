@@ -1,5 +1,9 @@
 <?php
 //include('up-session.php');
+header("Cache-Control: no-cache, no-store, must-revalidate");
+header("Pragma: no-cache");
+header("Expires: 0");
+
 session_start();
     $user_id = 0 ;
     $customer_id = 0 ; 
@@ -53,7 +57,7 @@ if ((isset($_SESSION['JOGOLS']) && ($_SESSION['JOGOLS'] != "")) || (isset($_SESS
     
     if($user_id || $customer_id){
          $status = 'archived' ;
-         require_once('db.php');
+         require_once 'db.php';
         
 
         //------- Saved order count -----------------
@@ -143,6 +147,13 @@ if ((isset($_SESSION['JOGOLS']) && ($_SESSION['JOGOLS'] != "")) || (isset($_SESS
                     $totalOrderHistory = $row['total_order'] ?? 0 ; 
                     $stmt->close();
             }
+        
+            $stmt = $conn->prepare("SELECT brand_id FROM tbl_user WHERE user_id = ?");
+            $stmt->bind_param("i", $user_id);
+            $stmt->execute(); 
+            $result = $stmt->get_result(); 
+            $data = $result->fetch_assoc();
+            $brand_id = $data['brand_id'] ?? 1  ; 
 
 
             
@@ -296,13 +307,25 @@ if ((isset($_SESSION['JOGOLS']) && ($_SESSION['JOGOLS'] != "")) || (isset($_SESS
         <div class="container-fluid p-0 h-100 dashboardMain">
             <div class="sidebar">
                 <a href="?vp=YWRkT3JkZXI=" class="sidebar-heading ">
-                    <figure class="text-center  my-auto"><img src="images/logo/jogLOGO.png" alt="" class="brandLogo">
+                    <?php
+                    if ($brand_id ==1) {
+                    ?>
+                        <figure class="text-center  my-auto"><img src="images/logo/jogLOGO.png" alt="" class="brandLogo">                       
+                    <?php               
+                    } else {
+                    ?>
+                        <figure class="text-center  my-auto"><img src="images/logo/bauerLogoWhite.webp" alt="" class="brandLogo">
+                    <?php
+                    }
+                    ?>
                     </figure>
                     <figure class="text-center my-auto "><img src="images/vector/feviconIcon.png" alt="" class="brandLogoCollapsed">
                     </figure>
                 </a>
                 <?php
                 if (isset($_SESSION['JOGOLS'])) {
+                    if ($brand_id ==1) {
+                     
                 ?>
                     <ul class="nav menu">
                         <li class="nav-item  <?php if ($_GET['vp'] == base64_encode('dashboradMain')) {
@@ -426,14 +449,14 @@ if ((isset($_SESSION['JOGOLS']) && ($_SESSION['JOGOLS'] != "")) || (isset($_SESS
                         </li>
 
 
-                    <li class="nav-item <?php if($_GET['vp'] == base64_encode('archived')){echo 'active' ;}?>">
-                            <a class="nav-link" href="?vp=<?php echo base64_encode('archived');?>">
-                            <i class="menu-icon fa fa-archive"></i>
-                            <span class="menu-title">Archived Orders</span>
-                            <span class="badge bg-success"><?= $totalArchivedOrder ?></span>
+                        <li class="nav-item <?php if($_GET['vp'] == base64_encode('archived')){echo 'active' ;}?>">
+                                <a class="nav-link" href="?vp=<?php echo base64_encode('archived');?>">
+                                <i class="menu-icon fa fa-archive"></i>
+                                <span class="menu-title">Archived Orders</span>
+                                <span class="badge bg-success"><?= $totalArchivedOrder ?></span>
 
-                            </a>
-                    </li>
+                                </a>
+                        </li>
 
 
                         <!-- <li class="nav-item ">
@@ -509,6 +532,35 @@ if ((isset($_SESSION['JOGOLS']) && ($_SESSION['JOGOLS'] != "")) || (isset($_SESS
                             </a>
                         </li>
                     </ul>
+                    <?php } elseif ($brand_id == 2) { ?>
+                        <div class="sidebar-separator pt-3">
+                            <h4>3D Customiser</h4>
+                        </div>
+                        <ul class="nav menu" style="padding-top: 0px !important; ">
+                            <li class="nav-item <?php if ($_GET['vp'] == base64_encode('save_draft')) {
+                                                    echo 'active';
+                                                } ?> ">
+                                <a class="nav-link" href="?vp=<?php echo base64_encode('save_draft'); ?>">
+                                    <figure class="whiteIcon"><img src="images/icons/Jersey,Shorts.png" alt="">
+                                    </figure>
+                                    <figure class="blueIcon"><img src="images/icons/Jersey,Shorts.png" alt=""></figure>
+                                    <span class="menu-title">3D Draft</span>
+                                </a>
+                            </li>
+                            <li class="nav-item <?php if ($_GET['vp'] == base64_encode('3d_orders')) {
+                                                    echo 'active';
+                                                } ?> ">
+                                <a class="nav-link" href="?vp=<?php echo base64_encode('3d_orders'); ?>">
+                                    <figure class="whiteIcon"><img src="images/icons/Jersey,Shorts.png" alt="">
+                                    </figure>
+                                    <figure class="blueIcon"><img src="images/icons/Jersey,Shorts.png" alt=""></figure>
+                                    <span class="menu-title">3D Orders</span>
+                                </a>
+                            </li>
+                        </ul>
+                    <?php
+                    }
+                    ?>
                 <?php }
 
 

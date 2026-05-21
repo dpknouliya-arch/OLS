@@ -109,18 +109,26 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
-                try {
+               try {
 
-                    if (response.textdecals) textDecals = JSON.parse(response.textdecals);
+                    textDecals = typeof response.textdecals === "string"
+                        ? JSON.parse(response.textdecals)
+                        : (response.textdecals || []);
 
-                    if (response.imagedecals) imageDecals = JSON.parse(response.imagedecals);
+                    imageDecals = typeof response.imagedecals === "string"
+                        ? JSON.parse(response.imagedecals)
+                        : (response.imagedecals || []);
 
-                    if (response.colorDecals) colorDecals = JSON.parse(response.colorDecals);
+                    colorDecals = typeof response.colorDecals === "string"
+                        ? JSON.parse(response.colorDecals)
+                        : (response.colorDecals || {});
 
                 } catch (e) {
 
                     console.error("❌ Error parsing JSON:", e);
-
+                    console.log("textdecals:", response.textdecals);
+                    console.log("imagedecals:", response.imagedecals);
+                    console.log("colorDecals:", response.colorDecals);
                 }
 
 
@@ -168,27 +176,30 @@ document.addEventListener("DOMContentLoaded", function () {
                 // Restore image decals
 
                 window.imageDecals = (imageDecals || []).map(d => {
-
                     const image = new Image();
 
                     const decal = {
-
                         ...d,
-
                         offset: new THREE.Vector2(d.offset?.x || 0, d.offset?.y || 0),
-
                         mesh: model.getObjectByName(d.meshName) || null,
-
                         image: image
-
                     };
 
-                    if (d.imageSrc) image.src = d.imageSrc;
+                    if (d.imageSrc) {
+                        image.crossOrigin = "anonymous";
 
-                    image.onload = () => updateMeshTextureWithAllDecalsUser();
+                        image.onload = () => {
+                            updateMeshTextureWithAllDecalsUser();
+                        };
+
+                        image.onerror = () => {
+                            console.error("Failed to load image:", d.imageSrc);
+                        };
+
+                        image.src = d.imageSrc+"?ver=1";
+                    }
 
                     return decal;
-
                 });
 
 
@@ -235,7 +246,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 stripes: StripeValues
             },
             success: function (response) {                        
-                const defaultModelUrl = BASE_3D_URL + 'admin/uploads/designs/models/' + response.model;
+                const defaultModelUrl = window.APP_CONFIG.S3_BUCKET + 'admin/uploads/designs/models/' + response.model;
                 const defaultModelType = "halfSleeves";
                 const defaultColorMappings = {
                     Plane: "primary",
@@ -637,7 +648,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 cb(true);
 
-                setTimeout(updateMeshTextureWithAllDecals, 50);
+                setTimeout(updateMeshTextureWithAllDecalsUser, 50);
 
             };
 

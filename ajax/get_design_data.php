@@ -2,18 +2,13 @@
 include('../db.php');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $collar  = intval($_POST['collar']);
+    $style   = intval($_POST['style']);
+    $stripes = intval($_POST['stripes']);
 
-    $collar  = $_POST['collar'];
-    $style   = $_POST['style'];
-    $stripes = $_POST['stripes'];
+    $result = callAPI("get_design_data.php?collar=$collar&style=$style&stripes=$stripes");
 
-    // ✅ Call API instead of DB
-    $res = callAPI("get_design_data.php?collar=$collar&style=$style&stripes=$stripes");
-
-    if (!$res || empty($res['data'])) {
-        echo json_encode([]);
-        exit;
-    }
-
-    echo json_encode($res['data']);
+    // API returns {"status": true/false, "data": {...}} — forward only data to keep
+    // the same response shape the frontend expects (raw design object with colors)
+    echo json_encode($result['data'] ?? null);
 }

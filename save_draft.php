@@ -1,6 +1,7 @@
 <?php
+error_reporting(E_ALL & ~E_WARNING & ~E_NOTICE);
 include('check-session.php');
-// 
+require_once 'db.php';
 include 'encryption_helper.php';
 $obj_user = json_decode(base64_decode($_SESSION["JOGOLS"]));
 $user_id = $obj_user->user_id;
@@ -941,7 +942,7 @@ $user_id = $obj_user->user_id;
 
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 <script>
-const D_BASE_URL = "<?= D_BASE_URL ?>";
+const S3_BRAND_BUCKET = "<?= S3_BRAND_BUCKET ?>";
 
 /* ═══════════════════════════════════════════════════════════
    DUMMY DATA
@@ -1059,7 +1060,7 @@ function renderDraftCards(data) {
     <div class="col-12 col-md-6 col-xl-3 draft-card-col" data-status="${status}" data-name="${d.name.toLowerCase()}">
       <div class="draft-card">
         <div class="card-thumb">
-          <img class="jersey-img" src="${D_BASE_URL}admin/uploads/${d.jersey_style_image}" />
+          <img class="jersey-img" src="${S3_BRAND_BUCKET}admin/uploads/${d.jersey_style_image}" />
           <span class="style-badge">New</span>
           <div class="thumb-actions deleteDraftsItems">
               <button class="dropdown-item-custom danger" data-draft-id="${d.draft_id}" onclick="deleteDraft(this)">
