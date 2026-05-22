@@ -1,15 +1,15 @@
 <?php
 include('check-session.php');
-
+require_once('db.php');
 include 'encryption_helper.php';
-
 $obj_user = json_decode(base64_decode($_SESSION["JOGOLS"]));
 $user_id  = (int) $obj_user->user_id;
+
+
 
 // ── 1. Fetch all 3D orders from external API
 $api_response = callAPI("get_order_details.php");
 $api_orders   = !empty($api_response['data']) ? $api_response['data'] : [];
-
 // ── 2. Load ALL tbl_order_form rows for this user in ONE query.
 //       Map: design_order_id → { is_submitted, order_status }
 //       This avoids N+1 queries inside the loop below.
@@ -185,6 +185,7 @@ foreach ($orders as $o) {
         $oid          = (int) $order['order_id'];
         $enc_id       = customEncode($oid);
         $status       = $order['_status'];
+        $brand_id     = (int) ($order['brand_id'] ?? 1);
         $is_submitted = $order['_is_submitted'];
         $cls          = $badge_cls[$status] ?? 'ols3d-badge-new';
         $date_str     = !empty($order['added_date'])
@@ -199,7 +200,7 @@ foreach ($orders as $o) {
            data-submitted="<?= $is_submitted ?>">
 
         <div class="ols3d-card-img">
-          <img src="<?= $img ?>" alt="<?= $name ?>">
+          <img src="<?= S3_Buckets ?><?= $brand_id ?>/<?= $img ?>" alt="<?= $name ?>">
         </div>
 
         <?php if (!$is_submitted): ?>

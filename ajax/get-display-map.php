@@ -2650,7 +2650,7 @@ function getDisplayMap($designId)
                     "lslf-2" => ["x" => 1.7, "y" => 56, "rotate" => 270] // 👈 front sleeve
                 ]
             ],
-            "Shoulder Right" => [
+            "Shoulder  Right" => [
                 "items" => [
                     "lslf" => ["x" => 3.68, "y" => 3.3, "rotate" =>  270, "height" => 30, "width" => 30],
                     "lslf-4" => ["x" => 1.47, "y" => 400, "rotate" => 270, "height" => 30, "width" => 30] // 👈 front sleeve
@@ -2662,13 +2662,13 @@ function getDisplayMap($designId)
                     "lslb" => ["x" => 5.35, "y" => 4.7, "rotate" => 90]
                 ]
             ],
-            "Shoulder Left" => [
+            "Shoulder  Left" => [
                 "items" => [
                     "rslb" => ["x" => 3.35, "y" => 1.58, "rotate" => 90],
                     "lslf-3" => ["x" => 2.49, "y" => 5.4, "rotate" => 90 , "height" => 30, "width" => 30]
                 ]
             ],    
-            "Neck" => [
+            "Neck Patch" => [
                 "items" => [
                     "l_shoulsadasder_logo_b" => ["x" => 2.2, "y" => 7.1, "rotate" => 90]
                 ]
@@ -2688,12 +2688,12 @@ function getDisplayMap($designId)
                     "front_number" => ["x" => 1.85, "y" => 3.0, "rotate" => 0, "size" => 20]
                 ]
             ],
-            "Upper Chest Logo Right" => [
+            "Upper Chest" => [
                 "items" => [
                     "Upper_chest_flag" => ["x" => 1.9, "y" => 3.4, "rotate" => 0, "height" => 20, "width" => 20]
                 ]
             ],
-            "Upper Chest Logo Left" => [
+            "Upper Chest Logo" => [
                 "items" => [
                     "Upper_chest_flag" => ["x" => 1.85, "y" => 3.4, "rotate" => 0, "height" => 20, "width" => 20]
                 ]

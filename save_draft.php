@@ -942,7 +942,9 @@ $user_id = $obj_user->user_id;
 
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 <script>
-const S3_BRAND_BUCKET = "<?= S3_BRAND_BUCKET ?>";
+const S3_BRAND_BUCKET = "<?= S3_Buckets?>";
+const JOGURL   = "<?= JOGURL ?>";
+const BAUERURL = "<?= BAUERURL ?>";
 
 /* ═══════════════════════════════════════════════════════════
    DUMMY DATA
@@ -1056,11 +1058,13 @@ function renderDraftCards(data) {
     const ctaText = isUsed ? 'Continue to Roster' : 'Resume Design';
     const ctaClass = isUsed ? 'btn-roster' : '';
     const ctaIcon = isUsed ? 'bi-arrow-right-circle' : 'bi-pencil';
+    const D3_BASE_URL = d.brand_id==1 ? JOGURL : BAUERURL;
+
     return `
     <div class="col-12 col-md-6 col-xl-3 draft-card-col" data-status="${status}" data-name="${d.name.toLowerCase()}">
       <div class="draft-card">
         <div class="card-thumb">
-          <img class="jersey-img" src="${S3_BRAND_BUCKET}admin/uploads/${d.jersey_style_image}" />
+          <img class="jersey-img" src="${S3_BRAND_BUCKET}${d.brand_id}/admin/uploads/${d.jersey_style_image}" />
           <span class="style-badge">New</span>
           <div class="thumb-actions deleteDraftsItems">
               <button class="dropdown-item-custom danger" data-draft-id="${d.draft_id}" onclick="deleteDraft(this)">
@@ -1086,7 +1090,7 @@ function renderDraftCards(data) {
         
         <div class="card-footer-inner">
           <a 
-          href="${D_BASE_URL}customize.php?cat=${d.cat_enc}&subcat=${d.subcat_enc}&style=${d.style_id}&draft=${d.draft_enc}"
+          href="${D3_BASE_URL}customize.php?cat=${d.cat_enc}&subcat=${d.subcat_enc}&style=${d.style_id}&draft=${d.draft_enc}"
           target="_blank"
           class="btn-primary-cta ${ctaClass}">
             <i class="bi ${ctaIcon}"></i>${ctaText}

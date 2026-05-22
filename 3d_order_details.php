@@ -25,6 +25,7 @@ if (isset($_GET['order_id'])) {
 
     $designId   = $order['design_id']  ?? 0;
     $added_date = $order['added_date'] ?? '';
+    $brand_id   = $order['brand_id']   ?? 1;
 
     // design_json is loaded from S3 by get_order.php and already decoded as a PHP array.
     // Old orders stored colorDecals/imagedecals/textdecals as JSON strings in DB columns;
@@ -631,7 +632,9 @@ function getPantonNameAPI($zone, $designId, $type = 'pantonName') {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
 	<script>
-		window.S3_BRAND_BUCKET = "<?php echo S3_BRAND_BUCKET; ?>";
+   
+		window.S3_BRAND_BUCKET = "<?php echo S3_Buckets  . $brand_id . '/'; ?>";
+		window.APP_CONFIG = { S3_BUCKET: window.S3_BRAND_BUCKET };
     console.log("Base 3D URL:", window.S3_BRAND_BUCKET);
 	</script>
 <script type="module" src="js/3dmodel.js?ver=1.0"></script>

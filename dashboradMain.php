@@ -2,7 +2,7 @@
 
 include('check-session.php');
 
-
+require_once 'db.php';
 include( __DIR__ .'/ajax/dashboard/dashboard_sql.php');
 
 $year_arr = GetYearArr();
