@@ -332,7 +332,9 @@ function getPantonNameAPI($zone, $designId, $type = 'pantonName') {
             <div style="width: 60px;height: 60px;border: 6px solid #ddd;border-top: 6px solid #333;border-radius: 50%;animation: spin 1s linear infinite;">                            
             </div>
         </div>
-        <div class="my-auto d-flex align-items-center" id="frontPreview"></div>
+        <div class="my-auto d-flex align-items-center" id="frontPreview">
+          <img src="<?= $order['artwork_svg'] ?>" alt="">
+        </div>
         <div class="my-auto d-flex align-items-center">
             <div id="backPreview">
             </div>
