@@ -208,7 +208,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     updateMeshTextureWithAllDecalsUser();
 
-                    loadArtAprovel();
+                    //loadArtAprovel();
 
                 }, 500);
 
@@ -246,7 +246,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 stripes: StripeValues
             },
             success: function (response) {                        
-                const defaultModelUrl = window.APP_CONFIG.S3_BUCKET + 'admin/uploads/designs/models/' + response.model;
+                const defaultModelUrl = window.S3_BRAND_BUCKET + 'admin/uploads/designs/models/' + response.model;
                 const defaultModelType = "halfSleeves";
                 const defaultColorMappings = {
                     Plane: "primary",
@@ -890,42 +890,42 @@ document.addEventListener("DOMContentLoaded", function () {
 
     }    
 
-    function loadArtAprovel(){
-        const loader = document.getElementById("svgLoader");
-        loader.style.display = "flex";   // 🔥 show loader
-        const design_id = document.querySelector("input[name='design_id']").value;
-        fetch("ajax/generate_artwork_svg.php", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            design_id: design_id,
-            artwork: window.finalArtworkData,
-            color: window.MESH_COLORS,
-            textDecals: window.textDecals,
-            imageDecals: window.imageDecals
-        })
-        })
-        .then(r => r.json())
-        .then(res => {
-            // document.getElementById("frontPreview").innerHTML = res.svg;
-            // const svg = document.querySelector("#frontPreview svg");
-            // svg.setAttribute("style", "font-family: JerseyM54Jog3, SuperstarM54JOG, sans-serif");
+    // function loadArtAprovel(){
+    //     const loader = document.getElementById("svgLoader");
+    //     loader.style.display = "flex";   // 🔥 show loader
+    //     const design_id = document.querySelector("input[name='design_id']").value;
+    //     fetch("ajax/generate_artwork_svg.php", {
+    //     method: "POST",
+    //     headers: {
+    //         "Content-Type": "application/json"
+    //     },
+    //     body: JSON.stringify({
+    //         design_id: design_id,
+    //         artwork: window.finalArtworkData,
+    //         color: window.MESH_COLORS,
+    //         textDecals: window.textDecals,
+    //         imageDecals: window.imageDecals
+    //     })
+    //     })
+    //     .then(r => r.json())
+    //     .then(res => {
+    //         // document.getElementById("frontPreview").innerHTML = res.svg;
+    //         // const svg = document.querySelector("#frontPreview svg");
+    //         // svg.setAttribute("style", "font-family: JerseyM54Jog3, SuperstarM54JOG, sans-serif");
 
-            const blob = new Blob([res.svg], { type: "image/svg+xml" });
-            const url = URL.createObjectURL(blob);
+    //         const blob = new Blob([res.svg], { type: "image/svg+xml" });
+    //         const url = URL.createObjectURL(blob);
 
-            document.getElementById("frontPreview").innerHTML =
-                `<img src="${url}" style="width:100%">`;
-            // const base64 = btoa(unescape(encodeURIComponent(res.svg)));
+    //         document.getElementById("frontPreview").innerHTML =
+    //             `<img src="${url}" style="width:100%">`;
+    //         // const base64 = btoa(unescape(encodeURIComponent(res.svg)));
 
-            // document.getElementById("frontPreview").innerHTML =
-            // `<img src="data:image/svg+xml;base64,${base64}" style="width:100%;">`;
-        }).finally(() => {
-            loader.style.display = "none";   // ✅ hide loader always
-        });
+    //         // document.getElementById("frontPreview").innerHTML =
+    //         // `<img src="data:image/svg+xml;base64,${base64}" style="width:100%;">`;
+    //     }).finally(() => {
+    //         loader.style.display = "none";   // ✅ hide loader always
+    //     });
 
-    }
+    // }
 });
 
