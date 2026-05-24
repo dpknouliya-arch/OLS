@@ -32,8 +32,45 @@ if (empty($order_check['data']) || $order_check['status'] !== 200) {
     exit();
 }
 
-// Get or create the draft order form
-$of_id = getOrCreateDraftOrder($conn, $design_order_id, $user_id);
+// Resolve of_id: use the client-provided value if it belongs to this design_order_id,
+// otherwise find any existing order form (submitted or not), and only create a fresh
+// draft when no record exists at all — this prevents duplicate orders when the user
+// reopens the roster on an already-submitted order.
+$client_of_id = (int)($input['of_id'] ?? 0);
+$of_id = 0;
+
+if ($client_of_id > 0) {
+    $stmt_chk = $conn->prepare(
+        "SELECT of_id FROM tbl_order_form WHERE of_id=? AND design_order_id=? LIMIT 1"
+    );
+    $stmt_chk->bind_param("ii", $client_of_id, $design_order_id);
+    $stmt_chk->execute();
+    $res_chk = $stmt_chk->get_result();
+    if ($res_chk->num_rows > 0) {
+        $of_id = $client_of_id;
+    }
+    $stmt_chk->close();
+}
+
+if ($of_id <= 0) {
+    // Fallback: find any order form for this design_order_id (prefer submitted over draft)
+    $stmt_find = $conn->prepare(
+        "SELECT of_id FROM tbl_order_form WHERE design_order_id=? ORDER BY is_submitted DESC LIMIT 1"
+    );
+    $stmt_find->bind_param("i", $design_order_id);
+    $stmt_find->execute();
+    $res_find = $stmt_find->get_result();
+    if ($res_find->num_rows > 0) {
+        $of_id = (int)$res_find->fetch_assoc()['of_id'];
+    }
+    $stmt_find->close();
+}
+
+if ($of_id <= 0) {
+    // No existing record at all — create a new draft
+    $of_id = getOrCreateDraftOrder($conn, $design_order_id, $user_id);
+}
+
 if ($of_id <= 0) {
     echo json_encode(['success' => false, 'message' => 'Could not create draft order. Check server error log for details.']);
     exit();
@@ -57,12 +94,16 @@ $stmt->close();
 // Determine target table
 $target_table = ($is_submitted === 0) ? 'tbl_draft_oi' : 'tbl_order_item';
 
-// Build size name → size_id lookup map once
+// Build size name → size_id lookup map (first occurrence wins for duplicate names,
+// consistent with the dropdown list order shown to the user)
 $size_map = [];
-$sz_res = $conn->query("SELECT size_id, size_name FROM tbl_size");
+$sz_res = $conn->query("SELECT size_id, size_name FROM tbl_size ORDER BY size_id ASC");
 if ($sz_res) {
     while ($sz = $sz_res->fetch_assoc()) {
-        $size_map[strtolower(trim($sz['size_name']))] = (int)$sz['size_id'];
+        $key = strtolower(trim($sz['size_name']));
+        if (!isset($size_map[$key])) {
+            $size_map[$key] = (int)$sz['size_id'];
+        }
     }
 }
 

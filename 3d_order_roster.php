@@ -34,13 +34,22 @@ $jersey_type = $order_design_data[0]['modal_type'] ?? '—';
 $order_id_enc   = customEncode($order_id);
 $order_date_fmt = !empty($added_date) ? date('d-m-Y H:i:s', strtotime($added_date)) : '—';
 // Build reverse size map: size_id → size_name for display
+// and a deduplicated ordered list for the dropdown (first occurrence wins for duplicates)
 $size_id_to_name = [];
-$sz_res = $conn->query("SELECT size_id, size_name FROM tbl_size");
+$size_dropdown_list = [];
+$size_names_seen = [];
+$sz_res = $conn->query("SELECT size_id, size_name FROM tbl_size ORDER BY size_id ASC");
 if ($sz_res) {
     while ($sz = $sz_res->fetch_assoc()) {
         $size_id_to_name[(int)$sz['size_id']] = $sz['size_name'];
+        $name = trim($sz['size_name']);
+        if ($name !== '' && !in_array($name, $size_names_seen)) {
+            $size_dropdown_list[] = $name;
+            $size_names_seen[] = $name;
+        }
     }
 }
+$size_list_json = json_encode($size_dropdown_list);
 
 // Find or create the OLS order form record (never duplicate)
 $of_id           = 0;
@@ -219,11 +228,11 @@ $color_list_json = json_encode($color_list);
   <div class="ols3d-team-fields">
     <div class="ols3d-team-field">
       <label for="roster_team_name">Team Name</label>
-      <input type="text" id="roster_team_name" placeholder="e.g. Thunder Hawks" value="<?= $team_name_val ?>">
+      <input type="text" id="roster_team_name" placeholder="e.g. Thunder Hawks" value="<?= $team_name_val ?>" maxlength="100">
     </div>
     <div class="ols3d-team-field">
       <label for="roster_team_year">Year</label>
-      <input type="text" id="roster_team_year" placeholder="e.g. 2025" value="<?= $team_year_val ?>" style="max-width:140px;">
+      <input type="text" id="roster_team_year" placeholder="e.g. 2025" value="<?= $team_year_val ?>" style="max-width:140px;" maxlength="4" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
     </div>
   </div>
 
@@ -303,7 +312,7 @@ $color_list_json = json_encode($color_list);
   var existingRows    = <?= $existing_rows_json ?>;
 
   /* ── Dropdown option lists (colors dynamic from DB) ── */
-  var JERSEY_SIZES  = ['AS-46','AS-48','A4XL-50','A4XL-52','A5XL-54','A5XL-56','Youth-S','Youth-M','Youth-L'];
+  var JERSEY_SIZES  = <?= $size_list_json ?>;
   var SOCK_SIZES    = ['S','M','L','XL','XXL'];
   var PATTERN_CUTS  = ['Adult','Youth'];
   var PG_OPTIONS    = ['Player','Goalie'];
@@ -319,8 +328,8 @@ $color_list_json = json_encode($color_list);
     return h + '</select>';
   }
 
-  function inp(val, placeholder, type) {
-    return '<input type="' + (type || 'text') + '" value="' + escHtml(val) + '" placeholder="' + escHtml(placeholder || '') + '">';
+  function inp(val, placeholder, type, attrs) {
+    return '<input type="' + (type || 'text') + '" value="' + escHtml(val) + '" placeholder="' + escHtml(placeholder || '') + '"' + (attrs ? ' ' + attrs : '') + '>';
   }
 
   function escHtml(s) {
@@ -341,11 +350,11 @@ $color_list_json = json_encode($color_list);
       /* col 0: trash delete */
       '<td class="ols3d-td-del"><button class="ols3d-del-btn" type="button" onclick="rosterDelRow(this)" title="Remove row">' + TRASH_ICON + '</button></td>' +
       /* col 1..17: data fields */
-      '<td>' + inp(d.player_name,       'Player name')  + '</td>' +
+      '<td>' + inp(d.player_name, 'Player name', 'text', 'maxlength="50" oninput="this.value=this.value.replace(/[^a-zA-Z\\s]/g,\'\')"') + '</td>' +
       '<td>' + sel(PATTERN_CUTS,  d.pattern_cut,        'Cut')    + '</td>' +
       '<td>' + sel(PG_OPTIONS,    d.player_or_goalie,   'P/G')    + '</td>' +
       '<td>' + sel(JERSEY_SIZES,  d.jersey_size,        'Size')   + '</td>' +
-      '<td>' + inp(d.jersey_no,         '#')             + '</td>' +
+      '<td>' + inp(d.jersey_no, '#', 'text', 'maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,\'\')"') + '</td>' +
       '<td>' + inp(d.jersey_color,       'Jersey color')  + '</td>' +
       '<td>' + inp(d.jersey_qty,        '1', 'number')  + '</td>' +
       '<td>' + inp(d.jersey_color2,      'Jersey color2')  + '</td>' +
@@ -420,6 +429,27 @@ $color_list_json = json_encode($color_list);
 
     var teamName = document.getElementById('roster_team_name').value.trim();
     var teamYear = document.getElementById('roster_team_year').value.trim();
+
+    // Validate team fields
+    if (teamYear !== '' && !/^\d{4}$/.test(teamYear)) {
+      showToast('Year must be a 4-digit number (e.g. 2025).');
+      return;
+    }
+
+    // Validate each roster row
+    for (var ri = 0; ri < rows.length; ri++) {
+      var rowNum = ri + 1;
+      var jNo = rows[ri].jersey_no;
+      var pName = rows[ri].player_name;
+      if (jNo !== '' && !/^\d+$/.test(jNo)) {
+        showToast('Row ' + rowNum + ': Jersey # must contain numbers only.');
+        return;
+      }
+      if (pName.length > 50) {
+        showToast('Row ' + rowNum + ': Name on Jersey must be 50 characters or fewer.');
+        return;
+      }
+    }
 
     var btn = document.getElementById('rosterSaveBtn');
     btn.disabled = true;

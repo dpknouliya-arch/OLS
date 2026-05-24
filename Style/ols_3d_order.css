@@ -26,6 +26,22 @@
 .ols3d-module *::before,
 .ols3d-module *::after { box-sizing: border-box; }
 
+/* Reset global label span checkbox style (default.css) for required-field markers */
+.ols3d-module label span {
+  display: inline;
+  position: static;
+  width: auto;
+  height: auto;
+  border: none;
+  background-color: transparent;
+  vertical-align: baseline;
+  margin: 0;
+  transform-origin: unset;
+  transition: none;
+}
+.ols3d-module label span::before,
+.ols3d-module label span::after { display: none; }
+
 /* ── Page Header ─────────────────────────────── */
 .ols3d-page-header {
   display: flex;
