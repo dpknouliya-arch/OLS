@@ -34,26 +34,25 @@ if (empty($order_check['data']) || $order_check['status'] !== 200) {
     exit();
 }
 
-// Fetch the existing UNSUBMITTED draft — filter is_submitted=0 to avoid acting on a
-// previously submitted row, which would re-submit it and corrupt the record.
+// Find the order form for this design_order — prefer unsubmitted draft, fall back to
+// submitted record so that re-opening a submitted order's checkout still works.
 $stmt = $conn->prepare(
-    "SELECT of_id FROM tbl_order_form WHERE design_order_id = ? AND is_submitted = 0 LIMIT 1"
+    "SELECT of_id, is_submitted FROM tbl_order_form WHERE design_order_id = ? ORDER BY is_submitted ASC LIMIT 1"
 );
 $stmt->bind_param("i", $design_order_id);
 $stmt->execute();
 $res = $stmt->get_result();
 if ($res->num_rows === 0) {
-    echo json_encode(['result' => 'fail', 'msg' => 'No draft order found for this design order. It may already be submitted.']);
+    echo json_encode(['result' => 'fail', 'msg' => 'No order form found for this design order.']);
     exit();
 }
-$row_draft = $res->fetch_assoc();
-$of_id     = (int)$row_draft['of_id'];
+$row_draft        = $res->fetch_assoc();
+$of_id            = (int)$row_draft['of_id'];
+$already_submitted = (int)$row_draft['is_submitted'] === 1;
 $stmt->close();
 
-// DEBUG GUARD: of_id must never be 0 — indicates create3DOrderDraft was never called
-// or data was corrupted (e.g. a direct tbl_order_form INSERT without tbl_draft_of).
 if ($of_id === 0) {
-    error_log("submit_order CRITICAL: of_id=0 for design_order_id=$design_order_id — draft was created without tbl_draft_of, or of_id was never set. Aborting submission.");
+    error_log("submit_order CRITICAL: of_id=0 for design_order_id=$design_order_id");
     echo json_encode(['result' => 'fail', 'msg' => 'Order integrity error: of_id is 0. Contact support.']);
     exit();
 }
@@ -100,11 +99,12 @@ if ($rs_deli && $rs_deli->num_rows > 0) {
     $deli['tax_id']       = addslashes($row_deli['tax_id']       ?? '');
 }
 
-// UPDATE tbl_order_form — mark as submitted. Never INSERT a new row; never touch of_id.
+// Build the SET clause — on first submission also set is_submitted and submitted_date.
+$extra_fields = $already_submitted
+    ? ""
+    : ",\n    is_submitted   = 1,\n    submitted_date = NOW(),\n    order_status   = 'new'";
+
 $sql_update = "UPDATE tbl_order_form SET
-    is_submitted      = 1,
-    submitted_date    = NOW(),
-    order_status      = 'new',
     customer_po       = '$customer_po',
     req_due_date      = '$req_due_date',
     game_event_date   = '$game_event_date',
@@ -130,8 +130,8 @@ $sql_update = "UPDATE tbl_order_form SET
     deli_zip_code     = '{$deli['zip_code']}',
     deli_tel          = '{$deli['tel']}',
     deli_email        = '{$deli['email']}',
-    deli_tax_id       = '{$deli['tax_id']}'
-WHERE of_id = '$of_id' AND is_submitted = 0";
+    deli_tax_id       = '{$deli['tax_id']}'" . $extra_fields . "
+WHERE of_id = '$of_id'";
 
 $update_ok = $conn->query($sql_update);
 if (!$update_ok) {
@@ -139,40 +139,36 @@ if (!$update_ok) {
     echo json_encode(['result' => 'fail', 'msg' => 'Failed to submit order. Please try again.']);
     exit();
 }
-if ($conn->affected_rows === 0) {
-    error_log("submit_order UPDATE matched 0 rows for of_id=$of_id — already submitted or of_id mismatch.");
-    echo json_encode(['result' => 'fail', 'msg' => 'Order could not be submitted. It may already be submitted.']);
-    exit();
-}
 
-// Migrate roster from tbl_draft_oi → tbl_order_item (only when draft items exist)
-$draft_count_res = $conn->query("SELECT COUNT(*) AS cnt FROM tbl_draft_oi WHERE of_id='$of_id'");
-$draft_count     = (int)($draft_count_res ? $draft_count_res->fetch_assoc()['cnt'] : 0);
+// Migrate roster from tbl_draft_oi → tbl_order_item only on first submission
+if (!$already_submitted) {
+    $draft_count_res = $conn->query("SELECT COUNT(*) AS cnt FROM tbl_draft_oi WHERE of_id='$of_id'");
+    $draft_count     = (int)($draft_count_res ? $draft_count_res->fetch_assoc()['cnt'] : 0);
 
-if ($draft_count > 0) {
-    $sql_migrate = "INSERT INTO tbl_order_item
-        (of_id, player_name, sex, p_or_g,
-         product_size_id, jersey_number,
-         color_top1, qty_top1, color_top2, qty_top2,
-         bottom_size, color_bottom1, qty_bottom1, color_bottom2, qty_bottom2,
-         c_or_a, name_for_packing, note)
-    SELECT
-        of_id, player_name, sex, p_or_g,
-        product_size_id, jersey_number,
-        color_top1, qty_top1, color_top2, qty_top2,
-        bottom_size, color_bottom1, qty_bottom1, color_bottom2, qty_bottom2,
-        c_or_a, name_for_packing, note
-    FROM tbl_draft_oi
-    WHERE of_id='$of_id'";
+    if ($draft_count > 0) {
+        $sql_migrate = "INSERT INTO tbl_order_item
+            (of_id, player_name, sex, p_or_g,
+             product_size_id, jersey_number,
+             color_top1, qty_top1, color_top2, qty_top2,
+             bottom_size, color_bottom1, qty_bottom1, color_bottom2, qty_bottom2,
+             c_or_a, name_for_packing, note)
+        SELECT
+            of_id, player_name, sex, p_or_g,
+            product_size_id, jersey_number,
+            color_top1, qty_top1, color_top2, qty_top2,
+            bottom_size, color_bottom1, qty_bottom1, color_bottom2, qty_bottom2,
+            c_or_a, name_for_packing, note
+        FROM tbl_draft_oi
+        WHERE of_id='$of_id'";
 
-    $migrate_ok = $conn->query($sql_migrate);
-    if (!$migrate_ok) {
-        echo json_encode(['result' => 'fail', 'msg' => 'Roster migration failed: ' . $conn->error]);
-        exit();
+        $migrate_ok = $conn->query($sql_migrate);
+        if (!$migrate_ok) {
+            echo json_encode(['result' => 'fail', 'msg' => 'Roster migration failed: ' . $conn->error]);
+            exit();
+        }
+        $conn->query("DELETE FROM tbl_draft_oi WHERE of_id='$of_id'");
     }
-    $conn->query("DELETE FROM tbl_draft_oi WHERE of_id='$of_id'");
 }
-// If draft_count=0 the roster was already in tbl_order_item (re-submission) — nothing to migrate
 
 // Notification
 if ($sales_rep_id > 0) {
