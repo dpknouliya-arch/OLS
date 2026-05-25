@@ -6,7 +6,19 @@ header("Expires: 0");
 
 session_start();
     $user_id = 0 ;
-    $customer_id = 0 ; 
+    $customer_id = 0 ;
+
+// Cross-domain SSO: 3dbauer passes s_obj token in URL because
+// third-party iframe cookies are blocked by Chrome in production.
+if (!empty($_GET['sso_token'])) {
+    $decoded = json_decode(base64_decode($_GET['sso_token']), true);
+    if (isset($decoded['user_id'], $decoded['user_email'])) {
+        $_SESSION['JOGOLS'] = $_GET['sso_token'];
+        $vp_param = !empty($_GET['vp']) ? '?vp=' . urlencode($_GET['vp']) : '';
+        header('Location: ' . $vp_param);
+        exit;
+    }
+}
 
 if ((isset($_SESSION['JOGOLS']) && ($_SESSION['JOGOLS'] != "")) || (isset($_SESSION['JOGOLSSUB']) && ($_SESSION['JOGOLSSUB'] != "")) || (isset($_SESSION['JOGOLSSALE']) && ($_SESSION['JOGOLSSALE'] != ""))) {
     if (isset($_SERVER["HTTPS"]) && strtolower($_SERVER["HTTPS"]) == "on") {
