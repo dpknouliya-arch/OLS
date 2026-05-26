@@ -24,6 +24,15 @@ if (!empty($_GET['sso_token'])) {
             if (is_array($decoded) && isset($decoded['user_id'], $decoded['user_email'])) {
                 $_SESSION['JOGOLS'] = $payload;
                 set_ols_brand_id((int)($decoded['brand_id'] ?? 1));
+
+                // Generate API JWT so callAPI() works for SSO users (same as normal login)
+                require_once __DIR__ . '/api/Authentication/JWTHelper.php';
+                $_SESSION['API_TOKEN'] = JWTHelper::generate([
+                    'user_id' => $decoded['user_id'],
+                    'email'   => $decoded['user_email'],
+                    'level'   => $decoded['user_level'] ?? 'user',
+                ]);
+
                 $vp_param = !empty($_GET['vp']) ? '?vp=' . urlencode($_GET['vp']) : '';
                 header('Location: ' . $vp_param);
                 exit;
@@ -562,6 +571,16 @@ if ((isset($_SESSION['JOGOLS']) && ($_SESSION['JOGOLS'] != "")) || (isset($_SESS
                         </li>
                     </ul>
                     <?php } elseif ($brand_id == 2) { ?>
+                        <ul class="nav menu">
+                            <li class="nav-item <?php if ($_GET['vp'] == base64_encode('new_order')) { echo 'active'; } ?>">
+                                <a class="nav-link" href="?vp=<?php echo base64_encode('new_order'); ?>">
+                                    <figure class="whiteIcon"><img src="images/vector/orderStatus.png" alt=""></figure>
+                                    <figure class="blueIcon"><img src="images/vector/orderStatusBlue.png" alt=""></figure>
+                                    <span class="menu-title">Order Status</span>
+                                    <span class="badge bg-success"><?= $TotalOrderCount ?></span>
+                                </a>
+                            </li>
+                        </ul>
                         <div class="sidebar-separator pt-3">
                             <h4>3D Customiser</h4>
                         </div>

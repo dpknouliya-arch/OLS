@@ -99,6 +99,16 @@ if ($rs_deli && $rs_deli->num_rows > 0) {
     $deli['tax_id']       = addslashes($row_deli['tax_id']       ?? '');
 }
 
+// Block submission if addresses are missing
+if (empty($bill['address']) || empty($bill['comp_name'])) {
+    echo json_encode(['result' => 'fail', 'msg' => 'Billing address is required before submitting.']);
+    exit();
+}
+if (empty($deli['address']) || empty($deli['comp_name'])) {
+    echo json_encode(['result' => 'fail', 'msg' => 'Delivery address is required before submitting.']);
+    exit();
+}
+
 // Build the SET clause — on first submission also set is_submitted and submitted_date.
 $extra_fields = $already_submitted
     ? ""

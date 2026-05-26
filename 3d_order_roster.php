@@ -431,8 +431,19 @@ $color_list_json = json_encode($color_list);
     var teamYear = document.getElementById('roster_team_year').value.trim();
 
     // Validate team fields
-    if (teamYear !== '' && !/^\d{4}$/.test(teamYear)) {
+    if (!teamName) {
+      showToast('Please enter a Team Name before continuing.');
+      document.getElementById('roster_team_name').focus();
+      return;
+    }
+    if (!teamYear) {
+      showToast('Please enter the Year before continuing.');
+      document.getElementById('roster_team_year').focus();
+      return;
+    }
+    if (!/^\d{4}$/.test(teamYear)) {
       showToast('Year must be a 4-digit number (e.g. 2025).');
+      document.getElementById('roster_team_year').focus();
       return;
     }
 

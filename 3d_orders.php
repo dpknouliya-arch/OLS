@@ -7,7 +7,7 @@ $user_id  = (int) $obj_user->user_id;
 // $brand_id is already resolved by db.php via get_ols_brand_id()
 
 // ── 1. Fetch 3D orders for this user, scoped to the active brand
-$api_response = callAPI("get_order_details.php?brand_id=" . $brand_id);
+$api_response = callAPI("get_order_details.php?brand_id=" . $brand_id . "&user_id=" . $user_id);
 $api_orders   = !empty($api_response['data']) ? $api_response['data'] : [];
 
 // Client-side safety net: strip any cross-brand orders the API might return
