@@ -1,18 +1,12 @@
 <?php
-// Allow iframe logout from jogsports.com
-header("Access-Control-Allow-Origin: https://jogsports.com");
+// Allow iframe logout from any origin in the same app
+$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+if ($origin) {
+    header("Access-Control-Allow-Origin: $origin");
+}
 header("Access-Control-Allow-Credentials: true");
 header("Access-Control-Allow-Headers: Content-Type");
 header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
-
-session_set_cookie_params([
-    'lifetime' => 0,
-    'path' => '/',
-    'domain' => 'ols-test.jog-joinourgame.com',
-    'secure' => true,
-    'httponly' => false,
-    'samesite' => 'None'
-]);
 
 session_start();
 

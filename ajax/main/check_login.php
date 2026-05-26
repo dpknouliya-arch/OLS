@@ -16,17 +16,13 @@
 	if(isset($_POST["user"])){ $strUser = base64_decode($_POST["user"]); }
 
     if(isset($_POST["password"])){ $strPass = md5(base64_decode($_POST["password"])); }
+	$brand_id = isset($_POST['brand_id']) ? intval($_POST['brand_id']) : 1;
 
-	
-
-	$sql = 'SELECT * FROM tbl_user WHERE user_email="'.$strUser.'" AND user_password="'.$strPass.'" AND enable=1 ';
-
-	$rs = $conn->query($sql);
-
+	// Step 1: check if email exists for this brand
+	$rs = $conn->query("SELECT * FROM tbl_user WHERE user_email='$strUser' AND brand_id=$brand_id AND enable=1");
 
 
 	if($rs->num_rows==1){
-
 
 
 		$row_user = $rs->fetch_assoc();
