@@ -4,12 +4,16 @@ require_once('db.php');
 include 'encryption_helper.php';
 $obj_user = json_decode(base64_decode($_SESSION["JOGOLS"]));
 $user_id  = (int) $obj_user->user_id;
+// $brand_id is already resolved by db.php via get_ols_brand_id()
 
-
-
-// ── 1. Fetch all 3D orders from external API
-$api_response = callAPI("get_order_details.php");
+// ── 1. Fetch 3D orders for this user, scoped to the active brand
+$api_response = callAPI("get_order_details.php?brand_id=" . $brand_id);
 $api_orders   = !empty($api_response['data']) ? $api_response['data'] : [];
+
+// Client-side safety net: strip any cross-brand orders the API might return
+$api_orders = array_values(array_filter($api_orders, function ($o) use ($brand_id) {
+    return !isset($o['brand_id']) || (int)$o['brand_id'] === $brand_id;
+}));
 // ── 2. Load ALL tbl_order_form rows for this user in ONE query.
 //       Map: design_order_id → { is_submitted, order_status }
 //       This avoids N+1 queries inside the loop below.

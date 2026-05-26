@@ -1,25 +1,22 @@
 <?php
-session_start();
-require_once __DIR__ . '/db.php';
-$_SESSION['JOGOLS'] = "";
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+if (!function_exists('get_ols_brand_id')) {
+    require_once __DIR__ . '/db.php';
+}
+
+// Capture brand BEFORE clearing the user session so we can restore it
+$_logout_brand_id = get_ols_brand_id();
+
+// Clear user session key only — brand key survives
+$_SESSION['JOGOLS'] = '';
 unset($_SESSION['JOGOLS']);
 
-if ( isset( $_SERVER["HTTPS"] ) && strtolower( $_SERVER["HTTPS"] ) == "on" ) {
-	$pageURL = 'https';
+// Restore brand context so login page reads it immediately
+$_SESSION['OLS_BRAND_ID'] = $_logout_brand_id;
+set_ols_brand_id($_logout_brand_id);
 
-}else{
-	$pageURL = 'http';
-
-}
-
-$pageURL .= '://';
-
-if($_SERVER['SERVER_PORT']!='80'){
-	$pageURL .= $_SERVER['SERVER_NAME'].':'.$_SERVER['SERVER_PORT'];//.''.$_SERVER['REQUEST_URI'];
-
-}else{
-	$pageURL .= $_SERVER['SERVER_NAME'];//.''.$_SERVER['REQUEST_URI'];
-	$loginURL = OLS_BASE_URL . 'login.php';
-}
-echo '<meta http-equiv="refresh" content="0; url='.$loginURL.'" />';
+header('Location: ' . OLS_BASE_URL . '/login.php');
+exit;
 ?>

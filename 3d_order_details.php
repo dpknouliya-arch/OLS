@@ -123,6 +123,7 @@ if (isset($_GET['order_id'])) {
 // Fetch order status from tbl_order_form if it exists
 $ols_order_status = '';
 $ols_step_done    = false;
+$ols_is_submitted = false;
 $stmt_st = $conn->prepare(
     "SELECT order_status, is_submitted FROM tbl_order_form WHERE design_order_id=? ORDER BY is_submitted DESC LIMIT 1"
 );
@@ -130,9 +131,10 @@ $stmt_st->bind_param("i", $order_id);
 $stmt_st->execute();
 $res_st = $stmt_st->get_result();
 if ($res_st->num_rows > 0) {
-    $row_st        = $res_st->fetch_assoc();
+    $row_st           = $res_st->fetch_assoc();
     $ols_order_status = $row_st['order_status'] ?? '';
     $ols_step_done    = true;
+    $ols_is_submitted = (int)($row_st['is_submitted'] ?? 0) === 1;
 }
 $stmt_st->close();
 
@@ -269,10 +271,14 @@ function getPantonNameAPI($zone, $designId, $type = 'pantonName') {
         </div>
         <span class="ols3d-step-label <?= $ols_step_done ? 'done' : '' ?>">Add Roster</span>
       </div>
-      <div class="ols3d-step-connector <?= ($ols_order_status === 'new' || $ols_order_status === 'draft' && false) && $ols_step_done ? 'done' : '' ?>"></div>
+      <div class="ols3d-step-connector <?= $ols_is_submitted ? 'done' : '' ?>"></div>
       <div class="ols3d-step">
-        <div class="ols3d-step-num">3</div>
-        <span class="ols3d-step-label">Checkout</span>
+        <div class="ols3d-step-num <?= $ols_is_submitted ? 'done' : '' ?>">
+          <?php if ($ols_is_submitted): ?>
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+          <?php else: ?>3<?php endif; ?>
+        </div>
+        <span class="ols3d-step-label <?= $ols_is_submitted ? 'done' : '' ?>">Checkout</span>
       </div>
     </div>
     <div class="ols3d-step-bar-note">
@@ -609,7 +615,8 @@ function getPantonNameAPI($zone, $designId, $type = 'pantonName') {
     </div><!-- /.ols3d-specs-card-body -->
   </div><!-- /.ols3d-specs-card -->
 
-  <!-- Action Buttons -->
+  <!-- Action Buttons (hidden for fully submitted orders) -->
+  <?php if (!$ols_is_submitted): ?>
   <div class="ols3d-actions">
     <a href="?vp=<?= base64_encode('3d_order_roster') ?>&order_id=<?= $order_id_enc ?>"
        class="ols3d-btn-primary">
@@ -619,6 +626,7 @@ function getPantonNameAPI($zone, $designId, $type = 'pantonName') {
       Save Draft
     </a>
   </div>
+  <?php endif; ?>
 
 </div><!-- /.ols3d-module -->
 
