@@ -1,3 +1,7 @@
+<?php
+session_start();
+require_once __DIR__ . '/db.php';
+?>
 <!DOCTYPE html>
 
 <html lang="en">
@@ -5,7 +9,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JOG LOGIN</title>
+    <title><?= htmlspecialchars($brand['page_title']) ?> — Login</title>
     <!-- Bootstrap 5.3.x CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Css  -->
@@ -14,7 +18,7 @@
     <link rel="stylesheet" href="Style/resposive.css">
     <!-- Css  -->
     <!-- faviconIcon -->
-    <link rel="icon" type="image/x-icon" href="/images/vector/feviconIcon.png">
+    <link rel="icon" type="image/x-icon" href="<?= $brand['favicon'] ?>">
     <!-- faviconIcon -->
     <style>
         body {
@@ -69,9 +73,8 @@
                             <form id="loginForm">
 
                                 <div class="text-center w-100 ">
-                                    <!-- <ion-icon name="lock-closed-outline" class="lockIcn"></ion-icon> -->
-                                    <figure class="text-center mb-0"><img src="assets/images/auth/Joglogosymbol.png" alt="" class="brandLogo"></figure>
-                                    <h6 class="formTitle"> LOGIN AS USER</h6>
+                                    <figure class="text-center mb-0"><img src="<?= $brand['login_logo'] ?>" alt="<?= htmlspecialchars($brand['name']) ?>" class="brandLogo"></figure>
+                                    <h6 class="formTitle">LOGIN AS <?= strtoupper(htmlspecialchars($brand['name'])) ?> USER</h6>
                                 </div>
                                 <div class="form-group" style="padding-bottom:4px;">
                                     <div class="input-group" style="margin: 0 0 8px 0px;">
@@ -125,7 +128,7 @@
                                     </div>
                                 </div>
                                 <div class="wrapper mt-5 text-gray">
-                                    <p class="footer-text XSmall">Copyright © 2024 JOG Athletics. All rights reserved. </p>
+                                    <p class="footer-text XSmall"><?= $brand['copyright'] ?></p>
                                 </div>
                             </form>
                         </div>
@@ -144,9 +147,8 @@
                         <div class="card bg-none d-flex border-none  h-100  align-items-center  justify-content-center">
                             <form id="loginFormSub">
                                 <div class="text-center w-100 ">
-                                    <figure class="text-center mb-0"><img src="assets/images/auth/Joglogosymbol.png" alt="" class="brandLogo"></figure>
-
-                                    <h6 class="formTitle"> LOGIN AS TEAM MEMBER</h6>
+                                    <figure class="text-center mb-0"><img src="<?= $brand['login_logo'] ?>" alt="<?= htmlspecialchars($brand['name']) ?>" class="brandLogo"></figure>
+                                    <h6 class="formTitle">LOGIN AS TEAM MEMBER</h6>
                                 </div>
                                 <div class="form-group" style="padding-bottom:4px;">
                                     <div class="input-group" style="margin: 0 0 15px 0px;">
@@ -182,9 +184,7 @@
                                     </div>
                                 </div>
                                 <div class="wrapper mt-5 text-gray">
-                                    <p class="footer-text XSmall">
-                                        Copyright © 2024 JOG Athletics. All rights reserved.
-                                    </p>
+                                    <p class="footer-text XSmall"><?= $brand['copyright'] ?></p>
                                 </div>
                             </form>
                         </div>
@@ -212,9 +212,8 @@
                         <div class="card bg-none d-flex border-none  h-100  align-items-center  justify-content-center">
                             <form id="loginFormSeles">
                                 <div class="text-center w-100 ">
-                                    <figure class="text-center mb-0"><img src="assets/images/auth/Joglogosymbol.png" alt="" class="brandLogo"></figure>
-
-                                    <h6 class="formTitle"> LOGIN AS SALES</h6>
+                                    <figure class="text-center mb-0"><img src="<?= $brand['login_logo'] ?>" alt="<?= htmlspecialchars($brand['name']) ?>" class="brandLogo"></figure>
+                                    <h6 class="formTitle">LOGIN AS SALES</h6>
                                 </div>
                                 <div class="form-group" style="padding-bottom:4px;">
                                     <div class="input-group" style="margin: 0 0 15px 0px;">
@@ -264,9 +263,7 @@
                                     </div>
                                 </div>
                                 <div class="wrapper mt-5 text-gray">
-                                    <p class="footer-text XSmall">
-                                        Copyright © 2024 JOG Athletics. All rights reserved.
-                                    </p>
+                                    <p class="footer-text XSmall"><?= $brand['copyright'] ?></p>
                                 </div>
                             </form>
                         </div>
@@ -580,7 +577,8 @@
                 url: "ajax/main/check_login.php",
                 data: {
                     "user": window.btoa(user_email),
-                    "password": window.btoa(user_password)
+                    "password": window.btoa(user_password),
+                    "brand_id": <?= $brand_id ?>
                 },
                 success: function(resp) {
                     if (resp.result == "success") {

@@ -5,18 +5,39 @@ header("Pragma: no-cache");
 header("Expires: 0");
 
 session_start();
+require_once __DIR__ . '/db.php';
+
     $user_id = 0 ;
     $customer_id = 0 ;
 
-// Cross-domain SSO: 3dbauer passes s_obj token in URL because
-// third-party iframe cookies are blocked by Chrome in production.
+// Cross-domain SSO: brand projects pass a signed sso_token (payload.hmac) in the URL.
+// Verify the HMAC before trusting any user data in the token.
 if (!empty($_GET['sso_token'])) {
-    $decoded = json_decode(base64_decode($_GET['sso_token']), true);
-    if (isset($decoded['user_id'], $decoded['user_email'])) {
-        $_SESSION['JOGOLS'] = $_GET['sso_token'];
-        $vp_param = !empty($_GET['vp']) ? '?vp=' . urlencode($_GET['vp']) : '';
-        header('Location: ' . $vp_param);
-        exit;
+    $token = $_GET['sso_token'];
+    $dot   = strrpos($token, '.');
+    if ($dot !== false) {
+        $payload  = substr($token, 0, $dot);
+        $sig      = substr($token, $dot + 1);
+        $expected = hash_hmac('sha256', $payload, JWT_SECRET);
+        if (hash_equals($expected, $sig)) {
+            $decoded = json_decode(base64_decode($payload), true);
+            if (is_array($decoded) && isset($decoded['user_id'], $decoded['user_email'])) {
+                $_SESSION['JOGOLS'] = $payload;
+                set_ols_brand_id((int)($decoded['brand_id'] ?? 1));
+
+                // Generate API JWT so callAPI() works for SSO users (same as normal login)
+                require_once __DIR__ . '/api/Authentication/JWTHelper.php';
+                $_SESSION['API_TOKEN'] = JWTHelper::generate([
+                    'user_id' => $decoded['user_id'],
+                    'email'   => $decoded['user_email'],
+                    'level'   => $decoded['user_level'] ?? 'user',
+                ]);
+
+                $vp_param = !empty($_GET['vp']) ? '?vp=' . urlencode($_GET['vp']) : '';
+                header('Location: ' . $vp_param);
+                exit;
+            }
+        }
     }
 }
 
@@ -69,7 +90,6 @@ if ((isset($_SESSION['JOGOLS']) && ($_SESSION['JOGOLS'] != "")) || (isset($_SESS
     
     if($user_id || $customer_id){
          $status = 'archived' ;
-         require_once 'db.php';
         
 
         //------- Saved order count -----------------
@@ -169,6 +189,8 @@ if ((isset($_SESSION['JOGOLS']) && ($_SESSION['JOGOLS'] != "")) || (isset($_SESS
                 $data = $result->fetch_assoc();
                 $brand_id = $data['brand_id'] ?? 1;
                 $stmt->close();
+                set_ols_brand_id($brand_id);
+                $brand = $BRAND_CONFIG[$brand_id] ?? $BRAND_CONFIG[1];
             }
 
 
@@ -185,7 +207,7 @@ if ((isset($_SESSION['JOGOLS']) && ($_SESSION['JOGOLS'] != "")) || (isset($_SESS
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Join Our Game</title>
+        <title><?= htmlspecialchars($brand['page_title']) ?></title>
         <!-- Bootstrap 5.3.x CSS -->
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -198,7 +220,7 @@ if ((isset($_SESSION['JOGOLS']) && ($_SESSION['JOGOLS'] != "")) || (isset($_SESS
 
         <!-- Css  -->
         <!-- faviconIcon -->
-        <link rel="icon" type="image/x-icon" href="images/logo//feviconIcon.png">
+        <link rel="icon" type="image/x-icon" href="<?= $brand['favicon'] ?>">
         <!-- faviconIcon -->
         <style>
             .sidebar-heading {
@@ -335,7 +357,7 @@ if ((isset($_SESSION['JOGOLS']) && ($_SESSION['JOGOLS'] != "")) || (isset($_SESS
                     }
                     ?>
                     </figure>
-                    <figure class="text-center my-auto "><img src="images/vector/feviconIcon.png" alt="" class="brandLogoCollapsed">
+                    <figure class="text-center my-auto "><img src="<?= $brand['favicon'] ?>" alt="" class="brandLogoCollapsed">
                     </figure>
                 </a>
                 <?php
@@ -549,6 +571,16 @@ if ((isset($_SESSION['JOGOLS']) && ($_SESSION['JOGOLS'] != "")) || (isset($_SESS
                         </li>
                     </ul>
                     <?php } elseif ($brand_id == 2) { ?>
+                        <ul class="nav menu">
+                            <li class="nav-item <?php if ($_GET['vp'] == base64_encode('new_order')) { echo 'active'; } ?>">
+                                <a class="nav-link" href="?vp=<?php echo base64_encode('new_order'); ?>">
+                                    <figure class="whiteIcon"><img src="images/vector/orderStatus.png" alt=""></figure>
+                                    <figure class="blueIcon"><img src="images/vector/orderStatusBlue.png" alt=""></figure>
+                                    <span class="menu-title">Order Status</span>
+                                    <span class="badge bg-success"><?= $TotalOrderCount ?></span>
+                                </a>
+                            </li>
+                        </ul>
                         <div class="sidebar-separator pt-3">
                             <h4>3D Customiser</h4>
                         </div>
@@ -838,13 +870,13 @@ if ((isset($_SESSION['JOGOLS']) && ($_SESSION['JOGOLS'] != "")) || (isset($_SESS
                                             <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#changePasswordModal">Change Password</a></li>
                                             <li>
                                                 <?php if (isset($_SESSION['JOGOLS'])) { ?>
-                                                    <a class="dropdown-item" href="?vp=<?php echo base64_encode('logout'); ?>">Logout</a>
+                                                    <a class="dropdown-item" href="logout.php">Logout</a>
                                                 <?php } ?>
                                                 <?php if (isset($_SESSION['JOGOLSSUB'])) { ?>
-                                                    <a class="dropdown-item" href="?vp=<?php echo base64_encode('logout_user'); ?>">Logout</a>
+                                                    <a class="dropdown-item" href="logout_user.php">Logout</a>
                                                 <?php } ?>
                                                 <?php if (isset($_SESSION['JOGOLSSALE']) && !isset($_SESSION['JOGOLS'])) { ?>
-                                                    <a class="dropdown-item" href="?vp=<?php echo base64_encode('logout_sales'); ?>">Logout</a>
+                                                    <a class="dropdown-item" href="logout_sales.php">Logout</a>
                                                 <?php } ?>
                                             </li>
                                         </ul>
@@ -895,7 +927,7 @@ if ((isset($_SESSION['JOGOLS']) && ($_SESSION['JOGOLS'] != "")) || (isset($_SESS
 
                 <div class="main-content-footer">
 
-                    <a href="">Copyright © 2020 JOGSPORTS. All rights reserved. </a>
+                    <a href=""><?= $brand['copyright'] ?></a>
 
                 </div>
 

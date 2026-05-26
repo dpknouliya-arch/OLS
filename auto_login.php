@@ -52,25 +52,27 @@ require_once __DIR__ . "/db.php";
 // ------------------------------------------------------
 // INPUT
 // ------------------------------------------------------
-$user = isset($_GET['u']) ? base64_decode($_GET['u']) : '';
-$pass = isset($_GET['p']) ? md5(base64_decode($_GET['p'])) : '';
+$user     = isset($_GET['u']) ? base64_decode($_GET['u']) : '';
+$pass     = isset($_GET['p']) ? md5(base64_decode($_GET['p'])) : '';
+$brand_id = isset($_GET['b']) ? intval($_GET['b']) : 0;
 
-// Missing data?
-if ($user === "" || $pass === "") {
+// Missing data or no brand?
+if ($user === "" || $pass === "" || $brand_id === 0) {
     ob_clean();
     echo "fail";
     exit;
 }
 
 // ------------------------------------------------------
-// QUERY USER
+// QUERY USER — enforce brand_id to prevent cross-brand login
 // ------------------------------------------------------
-$sql = "SELECT * FROM tbl_user 
-        WHERE user_email='$user' 
-        AND user_password='$pass' 
-        AND enable=1";
-
-$rs = $conn->query($sql);
+$stmt = $conn->prepare(
+    "SELECT * FROM tbl_user WHERE user_email = ? AND user_password = ? AND brand_id = ? AND enable = 1"
+);
+$stmt->bind_param("ssi", $user, $pass, $brand_id);
+$stmt->execute();
+$rs = $stmt->get_result();
+$stmt->close();
 
 // ------------------------------------------------------
 // SUCCESS LOGIN
@@ -85,10 +87,12 @@ if ($rs && $rs->num_rows === 1) {
         "customer_id" => $row['customer_id'],
         "user_email"  => $row['user_email'],
         "user_level"  => $row['user_level'],
+        "brand_id"    => (int)$row['brand_id'],
     ];
 
     // SAVE SAME SESSION KEY USED BY index.php
     $_SESSION['JOGOLS'] = base64_encode(json_encode($obj));
+    set_ols_brand_id($brand_id);
 
     // IMPORTANT: SAVE SESSION TO DISK NOW
     

@@ -40,7 +40,15 @@ if (isset($designId)) {
 $design_name  = !empty($order_design_data[0]['name'])       ? $order_design_data[0]['name']       : '—';
 $jersey_type  = !empty($order_design_data[0]['modal_type']) ? $order_design_data[0]['modal_type'] : '—';
 $design_price = !empty($order_design_data[0]['price'])      ? $order_design_data[0]['price']      : '0.00';
-$design_image = !empty($order_design_data[0]['jersey_style_image'])      ? $order_design_data[0]['jersey_style_image']      : '';
+$design_image_raw = !empty($order_design_data[0]['jersey_style_image']) ? $order_design_data[0]['jersey_style_image'] : '';
+// API returns full jogdigital URL — extract the relative path and repoint to S3
+$design_image = '';
+if (!empty($design_image_raw)) {
+    $rel_pos = strpos($design_image_raw, 'admin/uploads/');
+    $design_image = $rel_pos !== false
+        ? S3_BRAND_BUCKET . substr($design_image_raw, $rel_pos)
+        : $design_image_raw;
+}
 $order_id_enc = customEncode($order_id);
 $total_qty    = count($order_team_data);
 $order_date_fmt = !empty($added_date) ? date('d/m/Y', strtotime($added_date)) : date('d/m/Y');
@@ -489,6 +497,17 @@ function submitOrder() {
   var reorder_num     = document.getElementById('reorder_num').value.trim();
 
   if (!design_order_id) { showToast('Missing order ID. Please refresh the page.'); return; }
+
+  if (!BILLING_DATA.company || !BILLING_DATA.address) {
+    showToast('Please add your Billing Information before submitting.');
+    document.getElementById('billingCard').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+  if (!DELIVERY_DATA.company || !DELIVERY_DATA.address) {
+    showToast('Please add your Delivery Address before submitting.');
+    document.getElementById('deliveryCard').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
 
   var btn = document.getElementById('printBtn');
   btn.disabled = true;

@@ -17,9 +17,13 @@
 
     if(isset($_POST["password"])){ $strPass = md5(base64_decode($_POST["password"])); }
 	$brand_id = isset($_POST['brand_id']) ? intval($_POST['brand_id']) : 1;
-
-	// Step 1: check if email exists for this brand
-	$rs = $conn->query("SELECT * FROM tbl_user WHERE user_email='$strUser' AND brand_id=$brand_id AND enable=1");
+	
+	// Check email + password for this brand
+	$stmt = $conn->prepare("SELECT * FROM tbl_user WHERE user_email=? AND user_password=? AND brand_id=? AND enable=1");
+	$stmt->bind_param("ssi", $strUser, $strPass, $brand_id);
+	$stmt->execute();
+	$rs = $stmt->get_result();
+	$stmt->close();
 
 
 	if($rs->num_rows==1){
@@ -41,6 +45,8 @@
 
 		$obj_data["user_level"] = $row_user['user_level'];
 
+		$obj_data["brand_id"] = (int)$row_user['brand_id'];
+
 
 
 		$s_obj = base64_encode(json_encode($obj_data));
@@ -48,6 +54,9 @@
 
 
 		$_SESSION['JOGOLS'] = $s_obj;
+		if (function_exists('set_ols_brand_id')) {
+			set_ols_brand_id((int)$row_user['brand_id']);
+		}
 
 		function apiLogin($user, $password) {
 
