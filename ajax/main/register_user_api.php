@@ -33,8 +33,28 @@ $stmt = $conn->prepare("
 $stmt->bind_param("ssssi", $user_email, $user_password, $full_name, $customer_id, $brand_id);
 
 if ($stmt->execute()) {
-    echo json_encode(['result' => 'success', 'user_id' => $stmt->insert_id]);
+    $new_user_id = $stmt->insert_id;
+    $stmt->close();
+
+    if ($brand_id == 2) {
+        $tpl_file = __DIR__ . '/../../email-templates/bauer-welcome.html';
+        if (file_exists($tpl_file)) {
+            $cta_url = defined('BAUERURL') ? rtrim(BAUERURL, '/') : 'https://3d.jog-joinourgame.com/3dbauer';
+            $html_welcome = file_get_contents($tpl_file);
+            $html_welcome = str_replace(
+                ['{{first_name}}', '{{cta_url}}', '{{support_email}}', '{{company_address}}', '{{preferences_url}}', '{{unsubscribe_url}}', '{{year}}'],
+                [$full_name, $cta_url, 'support@jog-joinourgame.com', 'Bauer Hockey', $cta_url . '/profile.php', $cta_url . '/profile.php', date('Y')],
+                $html_welcome
+            );
+            $w_headers  = "MIME-Version: 1.0\r\n";
+            $w_headers .= "Content-Type: text/html; charset=UTF-8\r\n";
+            $w_headers .= "From: Bauer Hockey <no-reply@jog-joinourgame.com>\r\n";
+            mail($user_email, 'Welcome to the Bauer 3D Customizer', $html_welcome, $w_headers);
+        }
+    }
+
+    echo json_encode(['result' => 'success', 'user_id' => $new_user_id]);
 } else {
     echo json_encode(['result' => 'fail', 'message' => 'DB insert failed: ' . $stmt->error]);
+    $stmt->close();
 }
-$stmt->close();
