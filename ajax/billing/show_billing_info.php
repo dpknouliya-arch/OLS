@@ -20,9 +20,11 @@ function encryptAddrId($addr_id, $key)
 	return base64_encode($encrypted . '::' . base64_encode($iv));
 }
 
+$brand_id = get_ols_brand_id();
+
 // Use prepared statement to prevent SQL injection
-$stmt = $conn->prepare("SELECT * FROM tbl_address WHERE user_id = ? AND enable = 1 ORDER BY date_add DESC");
-$stmt->bind_param("i", $user_id);
+$stmt = $conn->prepare("SELECT * FROM tbl_address WHERE user_id = ? AND brand_id = ? AND enable = 1 ORDER BY date_add DESC");
+$stmt->bind_param("ii", $user_id, $brand_id);
 $stmt->execute();
 $rs_select = $stmt->get_result();
 

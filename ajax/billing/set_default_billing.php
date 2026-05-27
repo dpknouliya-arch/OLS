@@ -14,6 +14,7 @@
 
 	$obj_user = json_decode(base64_decode($_SESSION["JOGOLS"]));
 	$user_id = $obj_user->user_id;
+	$brand_id = get_ols_brand_id();
 
 	$TOKEN_KEY = 'jogsports_secure_key_' . session_id();
 	function decryptAddrId($encrypted_data, $key) {
@@ -40,8 +41,8 @@
 	}
 
 
-	$stmt1 = $conn->prepare("UPDATE tbl_address SET is_billing_addr=0 WHERE user_id=?");
-	$stmt1->bind_param("i", $user_id);
+	$stmt1 = $conn->prepare("UPDATE tbl_address SET is_billing_addr=0 WHERE user_id=? AND brand_id=?");
+	$stmt1->bind_param("ii", $user_id, $brand_id);
 	$stmt1->execute();
 	$stmt1->close();
 
