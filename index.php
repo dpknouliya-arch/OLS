@@ -719,7 +719,7 @@ if ((isset($_SESSION['JOGOLS']) && ($_SESSION['JOGOLS'] != "")) || (isset($_SESS
 
                             <div class="d-flex">
 
-                                <?php if (isset($_SESSION['JOGOLS'])) { ?>
+                                <?php if (isset($_SESSION['JOGOLS']) && (!isset($brand_id) || $brand_id != 2)) { ?>
 
                                     <div class="header-links">
 
@@ -750,6 +750,17 @@ if ((isset($_SESSION['JOGOLS']) && ($_SESSION['JOGOLS'] != "")) || (isset($_SESS
                                     <div class="header-links">
 
                                         <button class="toggle-btn" onclick="toggleSidebar()">⮜ </button>
+
+                                    </div>
+
+                                <?php } ?>
+                                  <?php
+
+                                if (isset($brand_id) && $brand_id == 2) { ?>
+
+                                    <div class="header-links">
+
+                                        <a href="?vp=<?php echo base64_encode('billingInfo'); ?>" class="sm-size">Billing <span>Info</span></a>
 
                                     </div>
 

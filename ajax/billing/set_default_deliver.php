@@ -31,12 +31,13 @@ $addr_id = decryptAddrId($encrypted_addr_id, $TOKEN_KEY);
 
 $obj_user = json_decode(base64_decode($_SESSION["JOGOLS"]));
 $user_id = $obj_user->user_id;
+$brand_id = get_ols_brand_id();
 
-$sql_update1 = "UPDATE tbl_address SET is_deliver_addr = 0 WHERE user_id = ?";
+$sql_update1 = "UPDATE tbl_address SET is_deliver_addr = 0 WHERE user_id = ? AND brand_id = ?";
 $stmt1 = $conn->prepare($sql_update1);
 
 if ($stmt1) {
-	$stmt1->bind_param("i", $user_id);
+	$stmt1->bind_param("ii", $user_id, $brand_id);
 	$stmt1->execute();
 	$stmt1->close();
 } else {

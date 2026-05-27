@@ -54,8 +54,14 @@ $total_qty    = count($order_team_data);
 $order_date_fmt = !empty($added_date) ? date('d/m/Y', strtotime($added_date)) : date('d/m/Y');
 
 $a_data = [0 => null, 1 => null];
-$sql_select = "SELECT * FROM tbl_address WHERE user_id='" . (int)$user_id . "' AND enable=1 AND (is_billing_addr=1 OR is_deliver_addr=1) ORDER BY is_billing_addr DESC, is_deliver_addr DESC";
-$rs_select = $conn->query($sql_select);
+$stmt_addr = $conn->prepare(
+    "SELECT * FROM tbl_address WHERE user_id=? AND brand_id=? AND enable=1
+     AND (is_billing_addr=1 OR is_deliver_addr=1)
+     ORDER BY is_billing_addr DESC, is_deliver_addr DESC"
+);
+$stmt_addr->bind_param("ii", $user_id, $brand_id);
+$stmt_addr->execute();
+$rs_select = $stmt_addr->get_result();
 if ($rs_select) {
     while ($row_select = $rs_select->fetch_assoc()) {
         if ($row_select['is_billing_addr'] == '1' && $a_data[0] === null) { $a_data[0] = $row_select; }
@@ -215,7 +221,7 @@ $delivery_js = json_encode([
       <div class="ols3d-field">
         <label for="sales_rep">Sales Representative</label>
         <select id="sales_rep" name="sales_rep">
-          <option value="">Select</option>
+          <option value=""<?= $pf_sales_rep_id === 0 ? ' selected' : '' ?>>No Sales Rep</option>
           <?php
           $sql_emp = "SELECT * FROM employee WHERE employee_position_id='5'";
           $emps    = $conn3->query($sql_emp);
@@ -316,15 +322,15 @@ $delivery_js = json_encode([
         <div id="billingForm" style="display:none;">
           <div class="ols3d-inline-form">
             <div class="ols3d-inline-form-grid">
-              <div class="ols3d-inline-form-field"><label>Company Name <span style="color:#EF4444">*</span></label><input type="text" id="b_company" placeholder="Company name"></div>
-              <div class="ols3d-inline-form-field"><label>Contact Name <span style="color:#EF4444">*</span></label><input type="text" id="b_contact" placeholder="Contact person"></div>
-              <div class="ols3d-inline-form-field full"><label>Address <span style="color:#EF4444">*</span></label><input type="text" id="b_address" placeholder="Street address"></div>
-              <div class="ols3d-inline-form-field"><label>City <span style="color:#EF4444">*</span></label><input type="text" id="b_city" placeholder="City"></div>
+              <div class="ols3d-inline-form-field"><label>Company Name <span style="color:#EF4444">*</span></label><input type="text" id="b_company" placeholder="Company name"><span class="ols3d-field-msg" id="msg_b_company">Company name is required.</span></div>
+              <div class="ols3d-inline-form-field"><label>Contact Name <span style="color:#EF4444">*</span></label><input type="text" id="b_contact" placeholder="Contact person"><span class="ols3d-field-msg" id="msg_b_contact">Contact name is required.</span></div>
+              <div class="ols3d-inline-form-field full"><label>Address <span style="color:#EF4444">*</span></label><input type="text" id="b_address" placeholder="Street address"><span class="ols3d-field-msg" id="msg_b_address">Address is required.</span></div>
+              <div class="ols3d-inline-form-field"><label>City <span style="color:#EF4444">*</span></label><input type="text" id="b_city" placeholder="City"><span class="ols3d-field-msg" id="msg_b_city">City is required.</span></div>
               <div class="ols3d-inline-form-field"><label>State / Province</label><input type="text" id="b_state" placeholder="State or Province"></div>
-              <div class="ols3d-inline-form-field"><label>Postal Code <span style="color:#EF4444">*</span></label><input type="text" id="b_postal" placeholder="ZIP code"></div>
-              <div class="ols3d-inline-form-field"><label>Country <span style="color:#EF4444">*</span></label><input type="text" id="b_country" placeholder="Country"></div>
-              <div class="ols3d-inline-form-field"><label>Phone <span style="color:#EF4444">*</span></label><input type="text" id="b_phone" placeholder="Phone number"></div>
-              <div class="ols3d-inline-form-field"><label>Email <span style="color:#EF4444">*</span></label><input type="email" id="b_email" placeholder="Email address"></div>
+              <div class="ols3d-inline-form-field"><label>Postal Code <span style="color:#EF4444">*</span></label><input type="text" id="b_postal" placeholder="ZIP code"><span class="ols3d-field-msg" id="msg_b_postal">Postal code is required.</span></div>
+              <div class="ols3d-inline-form-field"><label>Country <span style="color:#EF4444">*</span></label><input type="text" id="b_country" placeholder="Country"><span class="ols3d-field-msg" id="msg_b_country">Country is required.</span></div>
+              <div class="ols3d-inline-form-field"><label>Phone <span style="color:#EF4444">*</span></label><input type="text" id="b_phone" placeholder="e.g. +1 555 000 0000" oninput="this.value=this.value.replace(/[^0-9+\-\s()]/g,'')"><span class="ols3d-field-msg" id="msg_b_phone">Enter a valid phone number (digits, +, -, spaces only).</span></div>
+              <div class="ols3d-inline-form-field"><label>Email <span style="color:#EF4444">*</span></label><input type="email" id="b_email" placeholder="Email address"><span class="ols3d-field-msg" id="msg_b_email">Enter a valid email address.</span></div>
               <div class="ols3d-inline-form-field"><label>TAX / GST Number</label><input type="text" id="b_tax" placeholder="Tax ID (optional)"></div>
             </div>
             <div class="ols3d-inline-form-actions">
@@ -360,15 +366,15 @@ $delivery_js = json_encode([
         <div id="deliveryForm" style="display:none;">
           <div class="ols3d-inline-form">
             <div class="ols3d-inline-form-grid">
-              <div class="ols3d-inline-form-field"><label>Company Name <span style="color:#EF4444">*</span></label><input type="text" id="d_company" placeholder="Company name"></div>
-              <div class="ols3d-inline-form-field"><label>Contact Name <span style="color:#EF4444">*</span></label><input type="text" id="d_contact" placeholder="Contact person"></div>
-              <div class="ols3d-inline-form-field full"><label>Address <span style="color:#EF4444">*</span></label><input type="text" id="d_address" placeholder="Street address"></div>
-              <div class="ols3d-inline-form-field"><label>City <span style="color:#EF4444">*</span></label><input type="text" id="d_city" placeholder="City"></div>
+              <div class="ols3d-inline-form-field"><label>Company Name <span style="color:#EF4444">*</span></label><input type="text" id="d_company" placeholder="Company name"><span class="ols3d-field-msg" id="msg_d_company">Company name is required.</span></div>
+              <div class="ols3d-inline-form-field"><label>Contact Name <span style="color:#EF4444">*</span></label><input type="text" id="d_contact" placeholder="Contact person"><span class="ols3d-field-msg" id="msg_d_contact">Contact name is required.</span></div>
+              <div class="ols3d-inline-form-field full"><label>Address <span style="color:#EF4444">*</span></label><input type="text" id="d_address" placeholder="Street address"><span class="ols3d-field-msg" id="msg_d_address">Address is required.</span></div>
+              <div class="ols3d-inline-form-field"><label>City <span style="color:#EF4444">*</span></label><input type="text" id="d_city" placeholder="City"><span class="ols3d-field-msg" id="msg_d_city">City is required.</span></div>
               <div class="ols3d-inline-form-field"><label>State / Province</label><input type="text" id="d_state" placeholder="State or Province"></div>
-              <div class="ols3d-inline-form-field"><label>Postal Code <span style="color:#EF4444">*</span></label><input type="text" id="d_postal" placeholder="ZIP code"></div>
-              <div class="ols3d-inline-form-field"><label>Country <span style="color:#EF4444">*</span></label><input type="text" id="d_country" placeholder="Country"></div>
-              <div class="ols3d-inline-form-field"><label>Phone <span style="color:#EF4444">*</span></label><input type="text" id="d_phone" placeholder="Phone number"></div>
-              <div class="ols3d-inline-form-field"><label>Email <span style="color:#EF4444">*</span></label><input type="email" id="d_email" placeholder="Email address"></div>
+              <div class="ols3d-inline-form-field"><label>Postal Code <span style="color:#EF4444">*</span></label><input type="text" id="d_postal" placeholder="ZIP code"><span class="ols3d-field-msg" id="msg_d_postal">Postal code is required.</span></div>
+              <div class="ols3d-inline-form-field"><label>Country <span style="color:#EF4444">*</span></label><input type="text" id="d_country" placeholder="Country"><span class="ols3d-field-msg" id="msg_d_country">Country is required.</span></div>
+              <div class="ols3d-inline-form-field"><label>Phone <span style="color:#EF4444">*</span></label><input type="text" id="d_phone" placeholder="e.g. +1 555 000 0000" oninput="this.value=this.value.replace(/[^0-9+\-\s()]/g,'')"><span class="ols3d-field-msg" id="msg_d_phone">Enter a valid phone number (digits, +, -, spaces only).</span></div>
+              <div class="ols3d-inline-form-field"><label>Email <span style="color:#EF4444">*</span></label><input type="email" id="d_email" placeholder="Email address"><span class="ols3d-field-msg" id="msg_d_email">Enter a valid email address.</span></div>
               <div class="ols3d-inline-form-field"><label>TAX / GST Number</label><input type="text" id="d_tax" placeholder="Tax ID (optional)"></div>
             </div>
             <div class="ols3d-inline-form-actions">
@@ -438,10 +444,32 @@ function prefillForm(type) {
   document.getElementById(p+'tax').value     = data.tax     || '';
 }
 
+/* ── Inline address validation helpers ── */
+var PHONE_RE = /^[0-9+\-\s()]{7,30}$/;
+var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+function addrFieldError(id, msg) {
+  var el = document.getElementById(id);
+  if (el) { el.classList.add('ols3d-field-error'); }
+  var m = document.getElementById('msg_' + id);
+  if (m) { if (msg) m.textContent = msg; m.style.display = 'block'; }
+}
+function addrFieldOk(id) {
+  var el = document.getElementById(id);
+  if (el) el.classList.remove('ols3d-field-error');
+  var m = document.getElementById('msg_' + id);
+  if (m) m.style.display = 'none';
+}
+function clearAddrErrors(p) {
+  ['company','contact','address','city','postal','country','phone','email'].forEach(function(f){ addrFieldOk(p+f); });
+}
+
 /* ── Save inline address ── */
 function saveAddrInline(type) {
   var p    = type === 'billing' ? 'b_' : 'd_';
   var data = type === 'billing' ? BILLING_DATA : DELIVERY_DATA;
+
+  clearAddrErrors(p);
 
   var payload = {
     mode:         data.enc_id ? 'edit' : 'add',
@@ -458,10 +486,25 @@ function saveAddrInline(type) {
     tax_no:       document.getElementById(p+'tax').value.trim()
   };
 
-  var required = ['company_name','contact','address_info','city','zipcode','country','tel','email_info'];
-  for (var i = 0; i < required.length; i++) {
-    if (!payload[required[i]]) { showToast('Please fill all required fields.'); return; }
+  var ok = true;
+  if (!payload.company_name) { addrFieldError(p+'company', 'Company name is required.');   ok = false; }
+  if (!payload.contact)      { addrFieldError(p+'contact', 'Contact name is required.');   ok = false; }
+  if (!payload.address_info) { addrFieldError(p+'address', 'Address is required.');        ok = false; }
+  if (!payload.city)         { addrFieldError(p+'city',    'City is required.');            ok = false; }
+  if (!payload.zipcode)      { addrFieldError(p+'postal',  'Postal code is required.');    ok = false; }
+  if (!payload.country)      { addrFieldError(p+'country', 'Country is required.');        ok = false; }
+  if (!payload.tel) {
+    addrFieldError(p+'phone', 'Phone number is required.'); ok = false;
+  } else if (!PHONE_RE.test(payload.tel)) {
+    addrFieldError(p+'phone', 'Enter a valid phone number (digits, +, -, spaces only).'); ok = false;
   }
+  if (!payload.email_info) {
+    addrFieldError(p+'email', 'Email address is required.'); ok = false;
+  } else if (!EMAIL_RE.test(payload.email_info)) {
+    addrFieldError(p+'email', 'Enter a valid email address (e.g. name@domain.com).'); ok = false;
+  }
+
+  if (!ok) return;
 
   if (data.enc_id) { payload.edit_addr_id = data.enc_id; }
 

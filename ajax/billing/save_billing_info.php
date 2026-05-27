@@ -12,6 +12,7 @@
 
     $obj_user = json_decode(base64_decode($_SESSION["JOGOLS"]));
     $user_id = $obj_user->user_id;
+    $brand_id = get_ols_brand_id();
     $date_add = date("Y-m-d H:i:s");
 
 	$addr_name = $_POST["company_name"];
@@ -24,10 +25,8 @@
     $email = $_POST["email_info"];
     $tax_id = $_POST["tax_no"];
 
-    //addr_name	contact_name	address	city	country	zip_code	tel	email	tax_id	user_id	enable	date_add
-
-	$stmt = $conn->prepare("INSERT INTO tbl_address (addr_name,contact_name,address,city,country,zip_code,tel,email,tax_id,user_id,date_add) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-	$stmt->bind_param("sssssssssis", $addr_name, $contact_name, $address, $city, $country, $zip_code, $tel, $email, $tax_id, $user_id, $date_add);
+	$stmt = $conn->prepare("INSERT INTO tbl_address (addr_name,contact_name,address,city,country,zip_code,tel,email,tax_id,user_id,brand_id,date_add) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+	$stmt->bind_param("sssssssssiis", $addr_name, $contact_name, $address, $city, $country, $zip_code, $tel, $email, $tax_id, $user_id, $brand_id, $date_add);
 
 	if($stmt->execute()){
 

@@ -10,7 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 $draft_id = isset($_POST['draft_id']) ? (int)$_POST['draft_id'] : 0;
-
+$brand_id = isset($_POST['brand_id']) ? (int)$_POST['brand_id'] : 1;
 if (!$draft_id) {
     echo json_encode(['status' => 400, 'msg' => 'draft_id is required']);
     exit;

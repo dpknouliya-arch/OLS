@@ -8,6 +8,7 @@ include('../../db.php');
 
 $obj_user = json_decode(base64_decode($_SESSION["JOGOLS"]));
 $user_id  = $obj_user->user_id;
+$brand_id = get_ols_brand_id();
 $date_add = date('Y-m-d H:i:s');
 
 header('Content-Type: application/json');
@@ -61,12 +62,12 @@ if ($mode === 'edit' && $edit_addr_id) {
 } else {
     // Insert new address
     $stmt = $conn->prepare(
-        "INSERT INTO tbl_address (addr_name,contact_name,address,city,country,zip_code,tel,email,tax_id,user_id,date_add)
-         VALUES (?,?,?,?,?,?,?,?,?,?,?)"
+        "INSERT INTO tbl_address (addr_name,contact_name,address,city,country,zip_code,tel,email,tax_id,user_id,brand_id,date_add)
+         VALUES (?,?,?,?,?,?,?,?,?,?,?,?)"
     );
-    $stmt->bind_param('sssssssssis',
+    $stmt->bind_param('sssssssssiis',
         $addr_name, $contact_name, $address, $city, $country,
-        $zip_code, $tel, $email, $tax_id, $user_id, $date_add
+        $zip_code, $tel, $email, $tax_id, $user_id, $brand_id, $date_add
     );
     if (!$stmt->execute()) {
         echo json_encode(['result' => 'fail', 'msg' => 'Insert failed']);
@@ -75,13 +76,17 @@ if ($mode === 'edit' && $edit_addr_id) {
     $addr_id = $conn->insert_id;
 }
 
-// Set as default billing or delivery
+// Set as default billing or delivery (scoped to brand so other brand defaults are not affected)
 if ($addr_type === 'billing') {
-    $conn->query("UPDATE tbl_address SET is_billing_addr=0 WHERE user_id=$user_id");
-    $conn->query("UPDATE tbl_address SET is_billing_addr=1 WHERE addr_id=$addr_id AND user_id=$user_id");
+    $s1 = $conn->prepare("UPDATE tbl_address SET is_billing_addr=0 WHERE user_id=? AND brand_id=?");
+    $s1->bind_param("ii", $user_id, $brand_id); $s1->execute(); $s1->close();
+    $s2 = $conn->prepare("UPDATE tbl_address SET is_billing_addr=1 WHERE addr_id=? AND user_id=? AND brand_id=?");
+    $s2->bind_param("iii", $addr_id, $user_id, $brand_id); $s2->execute(); $s2->close();
 } else {
-    $conn->query("UPDATE tbl_address SET is_deliver_addr=0 WHERE user_id=$user_id");
-    $conn->query("UPDATE tbl_address SET is_deliver_addr=1 WHERE addr_id=$addr_id AND user_id=$user_id");
+    $s1 = $conn->prepare("UPDATE tbl_address SET is_deliver_addr=0 WHERE user_id=? AND brand_id=?");
+    $s1->bind_param("ii", $user_id, $brand_id); $s1->execute(); $s1->close();
+    $s2 = $conn->prepare("UPDATE tbl_address SET is_deliver_addr=1 WHERE addr_id=? AND user_id=? AND brand_id=?");
+    $s2->bind_param("iii", $addr_id, $user_id, $brand_id); $s2->execute(); $s2->close();
 }
 
 echo json_encode(['result' => 'success']);

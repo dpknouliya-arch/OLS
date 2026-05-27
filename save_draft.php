@@ -1067,7 +1067,7 @@ function renderDraftCards(data) {
           <img class="jersey-img" src="${S3_BRAND_BUCKET}${d.brand_id}/admin/uploads/${d.jersey_style_image}" />
           <span class="style-badge">New</span>
           <div class="thumb-actions deleteDraftsItems">
-              <button class="dropdown-item-custom danger" data-draft-id="${d.draft_id}" onclick="deleteDraft(this)">
+              <button class="dropdown-item-custom danger" data-draft-id="${d.draft_id}" data-brand-id="${d.brand_id}" onclick="deleteDraft(this)">
               <figure class="my-0"><img src="images/vector/trashredIcon.png" alt=""></figure>
               </button>
           </div>
@@ -1461,7 +1461,8 @@ function showToast(msg, icon = 'bi-check-circle-fill') {
    DELETE DRAFT
 ═══════════════════════════════════════════════════════════ */
 function deleteDraft(btn) {
-  const draftId = btn.dataset.draftId;
+  const draftId  = btn.dataset.draftId;
+  const brandId  = btn.dataset.brandId || '1';
   if (!draftId) return;
 
   const card = btn.closest('.draft-card-col');
@@ -1489,6 +1490,7 @@ function deleteDraft(btn) {
 
     const body = new URLSearchParams();
     body.append('draft_id', draftId);
+    body.append('brand_id', brandId);
 
     fetch('<?= OLS_BASE_URL ?>ajax/delete_draft_proxy.php', {
       method: 'POST',

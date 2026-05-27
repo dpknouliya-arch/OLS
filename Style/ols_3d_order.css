@@ -837,3 +837,13 @@
   color: #CBD3E8; padding: 4px; border-radius: 5px; transition: all .15s;
 }
 .ols3d-del-btn:hover { color: #EF4444; background: #FEE2E2; }
+
+/* ── Inline address form validation ───────────────────── */
+.ols3d-inline-form-field input.ols3d-field-error {
+  border-color: #EF4444 !important;
+  background: #FFF5F5;
+}
+.ols3d-field-msg {
+  font-size: 11px; color: #EF4444;
+  margin-top: 3px; display: none;
+}
