@@ -868,6 +868,62 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 ctx.fillText(decal.text, centerX, centerY);
 
+                ctx.save();
+
+                /* =========================
+                NAME BAR FIRST
+                ========================= */
+
+                if (decal.hasNameBar) {
+
+                    let textWidth = ctx.measureText(decal.text).width;
+
+                    const metrics = ctx.measureText("M");
+
+                    const ascent =
+                        metrics.actualBoundingBoxAscent || decal.fontSize * 0.8;
+
+                    const descent =
+                        metrics.actualBoundingBoxDescent || decal.fontSize * 0.2;
+
+                    const textHeight = ascent + descent;
+
+                    const paddingX = 20;
+                    const paddingY = 12;
+
+                    const rectX = centerX - textWidth / 2 - paddingX / 2;
+                    const rectY = centerY - ascent - paddingY / 2;
+
+                    const rectW = textWidth + paddingX;
+                    const rectH = textHeight + paddingY;
+
+                    // BACKGROUND
+                    ctx.fillStyle = decal.nameBarColor || "#00aa00";
+
+                    ctx.fillRect(
+                        rectX,
+                        rectY,
+                        rectW,
+                        rectH
+                    );
+                }
+
+                /* =========================
+                TEXT AFTER BACKGROUND
+                ========================= */
+
+                ctx.fillStyle = decal.color || "#000";
+
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+
+                ctx.fillText(
+                    decal.text,
+                    centerX,
+                    centerY
+                );                
+                
+
                 ctx.restore();
 
             }
@@ -888,7 +944,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
         });
 
-    }    
+    }  
+    
+    function drawDecalBorderWithBackground(ctx, x, y, width, height) {
+    
+        ctx.save();
+        ctx.strokeStyle = "transparent";
+        ctx.lineWidth = 1;
+        ctx.setLineDash([8, 2]);
+        ctx.strokeRect(x, y, width, height);
+        ctx.restore();
+    }
 
     // function loadArtAprovel(){
     //     const loader = document.getElementById("svgLoader");

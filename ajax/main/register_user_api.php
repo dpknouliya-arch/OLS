@@ -5,6 +5,9 @@ header("Content-Type: application/json");
 $user_email = base64_decode($_POST['user_email'] ?? '');
 $user_password = md5(base64_decode($_POST['user_password'] ?? ''));
 $full_name = $_POST['full_name'] ?? '';
+$Countryname = $_POST['Countryname'] ?? '';
+$Statename = $_POST['Statename'] ?? '';
+$Cityname = $_POST['Cityname'] ?? '';
 $customer_id = $_POST['customer_id'] ?? '';
 $brand_id = $_POST['brand_id'] ?? 1; // Default to 1 if not provided
 
@@ -26,11 +29,11 @@ $stmt->close();
 
 // Insert user
 $stmt = $conn->prepare("
-    INSERT INTO tbl_user (user_email, user_password, full_name, customer_id, enable, date_add, first_login, brand_id)
-    VALUES (?, ?, ?, ?, 1, NOW(), 1, ?)
+    INSERT INTO tbl_user (user_email, user_password, full_name, country_name, state_name, city_name, customer_id, enable, date_add, first_login, brand_id)
+    VALUES (?, ?, ?, ?, ?, ?, ?, 1, NOW(), 1, ?)
 ");
 
-$stmt->bind_param("ssssi", $user_email, $user_password, $full_name, $customer_id, $brand_id);
+$stmt->bind_param("sssssssi", $user_email, $user_password, $full_name, $Countryname, $Statename, $Cityname, $customer_id, $brand_id);
 
 if ($stmt->execute()) {
     $new_user_id = $stmt->insert_id;
