@@ -63,16 +63,22 @@ $row_product = $rs_prod->fetch_assoc();
 							<td style="border-width: 0px;">
 								<!-- <img src="/assets/images/logo-order-form.png"> -->
 								<figure>
-									<img src="images/logo/jogLOGO.png" alt="">
+									<img src="<?php echo $brand['logo']; ?>" alt="">
 								</figure>
 							</td>
 					</td>
+				<?php if ($brand_id == 2): ?>
+				<tr>
+					<td style="text-align: left; border-width: 0px; " class="link"><u>www.bauer.com</u></td>
+				</tr>
+				<?php else: ?>
 				<tr>
 					<td style="text-align: left; border-width: 0px;  " class="link"><u>www.jogsportswear.com</u></td>
 				</tr>
 				<tr>
 					<td style="text-align: left; border-width: 0px; " class="link"><u>www.jogsports.com</u></td>
 				</tr>
+				<?php endif; ?>
 				<tr style="background-color: #CCF;">
 					<td colspan="2" style="text-align: center; border-width: 0px;"><b>SALES REP + SALES MAN + PROC</b></td>
 				</tr>

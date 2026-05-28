@@ -17,6 +17,16 @@ if( ($new_password=="") || ($new_password!=$confirm_password) ){
 
 include('../../db.php');
 
+$sql_current = "SELECT user_password FROM tbl_user WHERE user_id='" . $conn->real_escape_string($user_id) . "' AND activate_key='" . $conn->real_escape_string($activate_key) . "';";
+$rs_current = $conn->query($sql_current);
+if ($rs_current && $rs_current->num_rows > 0) {
+	$row_current = $rs_current->fetch_assoc();
+	if ($row_current['user_password'] === md5($new_password)) {
+		echo "New password must be different from your current password.";
+		exit();
+	}
+}
+
 $token = bin2hex(random_bytes(32)); // 64 char token
 $expiry = date("Y-m-d H:i:s", strtotime("+24 hours"));
 $update_condition = $is_ios ?  " , auth_token = '$token' , token_expiry = '$expiry'" : "" ; 
