@@ -238,7 +238,7 @@ $delivery_js = json_encode([
 
       <div class="ols3d-field">
         <label for="project_name">Project Name</label>
-        <input type="text" id="project_name" name="project_name" placeholder="Enter project name" value="<?= $pf_project_name ?>">
+        <input type="text" id="project_name" name="project_name" placeholder="Enter project name" value="<?= $pf_project_name ?>" required>
       </div>
 
       <div class="ols3d-field">
@@ -540,6 +540,12 @@ function submitOrder() {
   var reorder_num     = document.getElementById('reorder_num').value.trim();
 
   if (!design_order_id) { showToast('Missing order ID. Please refresh the page.'); return; }
+
+  if (!project_name) {
+    showToast('Please enter a Project Name before submitting.');
+    document.getElementById('project_name').focus();
+    return;
+  }
 
   if (!BILLING_DATA.company || !BILLING_DATA.address) {
     showToast('Please add your Billing Information before submitting.');
