@@ -220,7 +220,7 @@ $color_list_json = json_encode($color_list);
   <?php if (!empty($sock_design)): ?>
   <div class="ols3d-socks-panel">
     <h5>Socks</h5>
-      <img src="<?= JOGURL . htmlspecialchars($sock_design) ?>" alt="Sock Design">
+      <img src="<?= htmlspecialchars($sock_design) ?>" alt="Sock Design">
   </div>
   <?php endif; ?>
 
