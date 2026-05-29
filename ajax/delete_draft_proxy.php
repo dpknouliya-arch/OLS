@@ -16,6 +16,6 @@ if (!$draft_id) {
     exit;
 }
 
-$res = callAPI_POST('deleted_draft.php', ['draft_id' => $draft_id]);
+$res = callAPI_POST('deleted_draft.php', ['draft_id' => $draft_id, 'brand_id' => $brand_id]);
 
 echo json_encode($res);

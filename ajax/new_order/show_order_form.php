@@ -130,11 +130,19 @@ $row_product = $rs_prod->fetch_assoc();
 				<tr>
 					<td style="border-width: 0px; height: 40px; border:1px solid #000; background-color: #CCF;">&nbsp;</td>
 				</tr>
+				<?php if ($brand_id == 1): ?>
 				<tr>
-					<td style="height:100%; text-align: center; border-width: 0px; height: 20px; border:1px solid #000; font-size: 20px; font-weight: 700;">
+					<td style="text-align: center; border-width: 0px; border:1px solid #000; font-size: 20px; font-weight: 700;">
 						<b>J<br>O<br>I<br>N<br> <br>O<br>U<br>R<br> <br>G<br>A<br>M<br>E</b>
 					</td>
 				</tr>
+				<?php elseif($brand_id == 2): ?>
+				<tr>
+					<td style="text-align: center; border-width: 0px; border:1px solid #000; font-size: 20px; font-weight: 700;">
+						<b>B<br><br>A<br><br>U<br><br>E<br><br>R</b>
+					</td>
+				</tr>
+				<?php endif; ?>
 			</table>
 		</td>
 	</tr>

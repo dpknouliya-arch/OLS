@@ -354,7 +354,7 @@ $color_list_json = json_encode($color_list);
       '<td>' + sel(PATTERN_CUTS,  d.pattern_cut,        'Cut')    + '</td>' +
       '<td>' + sel(PG_OPTIONS,    d.player_or_goalie,   'P/G')    + '</td>' +
       '<td>' + sel(JERSEY_SIZES,  d.jersey_size,        'Size')   + '</td>' +
-      '<td>' + inp(d.jersey_no, '#', 'text', 'maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,\'\')"') + '</td>' +
+      '<td>' + inp(d.jersey_no, '#', 'text', 'maxlength="10" required oninput="this.value=this.value.replace(/[^0-9]/g,\'\')"') + '</td>' +
       '<td>' + inp(d.jersey_color,       'Jersey color')  + '</td>' +
       '<td>' + inp(d.jersey_qty,        '1', 'number')  + '</td>' +
       '<td>' + inp(d.jersey_color2,      'Jersey color2')  + '</td>' +
@@ -452,7 +452,11 @@ $color_list_json = json_encode($color_list);
       var rowNum = ri + 1;
       var jNo = rows[ri].jersey_no;
       var pName = rows[ri].player_name;
-      if (jNo !== '' && !/^\d+$/.test(jNo)) {
+      if (jNo === '') {
+        showToast('Row ' + rowNum + ': Jersey # is required.');
+        return;
+      }
+      if (!/^\d+$/.test(jNo)) {
         showToast('Row ' + rowNum + ': Jersey # must contain numbers only.');
         return;
       }
