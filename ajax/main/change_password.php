@@ -6,8 +6,8 @@ $user_id = $_POST["user_id"];
 $activate_key = $_POST["confirm_key"];
 $new_password = $_POST["new_password"];
 $confirm_password = $_POST["confirm_password"];
-
-$is_ios = $_POST['is_ios']; 
+$brand_id = (int)($_POST["brand_id"] ?? 1);
+$is_ios = $_POST['is_ios'];
 
 if( ($new_password=="") || ($new_password!=$confirm_password) ){
 
@@ -29,70 +29,27 @@ if ($rs_current && $rs_current->num_rows > 0) {
 
 $token = bin2hex(random_bytes(32)); // 64 char token
 $expiry = date("Y-m-d H:i:s", strtotime("+24 hours"));
-$update_condition = $is_ios ?  " , auth_token = '$token' , token_expiry = '$expiry'" : "" ; 
- 
+$update_condition = $is_ios ?  " , auth_token = '$token' , token_expiry = '$expiry'" : "" ;
+
 $sql_update = "UPDATE tbl_user SET enable=1,user_password='".md5($new_password)."',activate_key='',last_active='".date("Y-m-d H:i:s")."'  $update_condition  WHERE user_id='".$user_id."' AND activate_key='".$activate_key."'; ";
 
 // echo $sql_update ; die ;
 
 if($conn->query($sql_update)){
-	
-	$sql_select = "SELECT user_id,full_name,customer_id,user_email,user_level FROM tbl_user WHERE user_id='".$user_id."'; ";
+
+	// Set brand cookie so the login page shows the correct brand
+	set_ols_brand_id($brand_id);
+
+	// Fetch customer_id for address sync (no session created)
+	$sql_select = "SELECT customer_id FROM tbl_user WHERE user_id='".$user_id."'; ";
 	$rs_select = $conn->query($sql_select);
 	$row_user = $rs_select->fetch_assoc();
-
-	$obj_data = array();
-	$obj_data["user_id"] = $user_id;
-	$obj_data["full_name"] = $row_user['full_name'];
-	$obj_data["customer_id"] = $row_user['customer_id'];
-	$obj_data["user_email"] = $row_user['user_email'];
-	$obj_data["user_level"] = $row_user['user_level'];
-
-	$s_obj = base64_encode(json_encode($obj_data));
-
-	$_SESSION['JOGOLS'] = $s_obj;
-
-	function apiLogin($user, $password) {
-
-		$url = OLS_BASE_URL . "api/login.php";
-
-		$postData = json_encode([
-			"email" => $user, // ✅ decode email
-			"password" => $password          // ✅ plain password
-		]);
-
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_URL, $url);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($ch, CURLOPT_POST, true);
-		curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
-		curl_setopt($ch, CURLOPT_HTTPHEADER, [
-			"Content-Type: application/json"
-		]);
-
-		$res = curl_exec($ch);
-	
-		if (curl_errno($ch)) {
-			print_r($url); // ✅ debug: show what was sent
-			echo "Curl Error: " . curl_error($ch);
-			curl_close($ch);
-			return null;
-		}
-
-		curl_close($ch);
-
-		$data = json_decode($res, true);
-
-		return $data['token'] ?? null;
-	}
-
-	$_SESSION['API_TOKEN'] = apiLogin($obj_data["user_email"], $new_password);
-
+	$customer_id = $row_user['customer_id'] ?? 0;
 
 	$conn3 = new mysqli($serverName,$userName,$userPassword,$dbName3);
 	mysqli_set_charset($conn3, "utf8");
 
-	$sql_select2 = "SELECT * FROM customer WHERE customer_id='".$obj_data["customer_id"]."'; ";
+	$sql_select2 = "SELECT * FROM customer WHERE customer_id='".$customer_id."'; ";
 	$rs_customer = $conn3->query($sql_select2); //--Pull from LKR
 
 	if( $rs_customer->num_rows > 0 ){
@@ -106,38 +63,14 @@ if($conn->query($sql_update)){
 
 	}
 
-	/*if( (strtotime(date("Y-m-d H:i:s")) > strtotime(date("Y-m-d 18:00:00"))) || (strtotime(date("Y-m-d H:i:s")) < strtotime(date("Y-m-d 08:00:00"))) ){
-		$exp_in = 3600; // 1 hour
-	}else{
-		$exp_in = 36000; // 10 hours
-	}*/
-
-
-	/*if ( isset( $_SERVER["HTTPS"] ) && strtolower( $_SERVER["HTTPS"] ) == "on" ) {
-		$pageURL = 'https';
-
-	}else{
-		$pageURL = 'http';
-
-	}
-
-	$pageURL .= '://';
-
-	if($_SERVER['SERVER_PORT']!='80'){
-		$pageURL .= $_SERVER['SERVER_NAME'].':'.$_SERVER['SERVER_PORT'].''.$_SERVER['REQUEST_URI'];
-
-	}else{
-		$pageURL .= $_SERVER['SERVER_NAME'].''.$_SERVER['REQUEST_URI'];
-
-	}*/
    if($is_ios){
-	   echo json_encode(['status' => 'success' , 'authToken' => $token]); 
-	   exit ; 
+	   echo json_encode(['status' => 'success' , 'authToken' => $token]);
+	   exit ;
    }
 	$result = "success";
 
 }else{
-	
+
 	$result = "Fail to save password.";
 }
 

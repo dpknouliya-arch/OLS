@@ -8,7 +8,7 @@ if (!isset($_GET["key"]) || ($_GET["key"] == "")) {
 
 
 
-$sql_select = "SELECT user_id,user_email FROM tbl_user WHERE activate_key='" . $_GET["key"] . "' ; ";
+$sql_select = "SELECT user_id,user_email,brand_id FROM tbl_user WHERE activate_key='" . $_GET["key"] . "' ; ";
 
 $rs_user = $conn->query($sql_select);
 $num_row = $rs_user->num_rows;
@@ -234,7 +234,7 @@ $row_user = $rs_user->fetch_assoc();
 								<input type="hidden" name="user_id" value="<?php echo $row_user["user_id"]; ?>">
 								<input type="hidden" name="confirm_key" value="<?php echo $_GET["key"]; ?>">
 								<input type="hidden" name="url_src" id="url_src" value="<?php echo urldecode($_GET["url_src"]); ?>">
-
+								<input type="hidden" name="brand_id" value="<?php echo (int)$row_user["brand_id"]; ?>">
 								<input type="hidden" name="is_ios"  id="is_ios"  value="0">
 							</div>
 
@@ -277,7 +277,7 @@ $row_user = $rs_user->fetch_assoc();
 					<i class="fa fa-check-circle text-success" style="font-size:60px;"></i>
 					<h5 class="mt-3 mb-2">Password Reset Successful!</h5>
 					<p class="text-muted mb-4">Your password has been updated. You can now log in with your new password.</p>
-					<a id="loginBtn" href="#" class="themeBtn btn text-white w-100">Go to Bauer 3D</a>
+					<a id="loginBtn" href="#" class="themeBtn btn text-white w-100">Go to Login</a>
 				</div>
 			</div>
 		</div>
@@ -330,8 +330,10 @@ $row_user = $rs_user->fetch_assoc();
 									$('#loginBtn').attr('href', url_src);
 									$('#successModal').modal('show');
 								}else{
-									window.location.href = "../OLS?vp=ZGFzaGJvcmFkTWFpbg==";
+								$('#loginBtn').attr('href', 'login.php');
+								$('#successModal').modal('show');
 								}
+							
 							}
 						} else {
 							if(is_ios){
