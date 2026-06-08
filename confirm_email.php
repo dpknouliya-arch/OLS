@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/db.php';
+
 if (!isset($_GET["key"]) || ($_GET["key"] == "")) {
 	echo "Invalid access page";
 	exit();
@@ -6,7 +8,7 @@ if (!isset($_GET["key"]) || ($_GET["key"] == "")) {
 
 
 
-$sql_select = "SELECT user_id,user_email FROM tbl_user WHERE activate_key='" . $_GET["key"] . "' ; ";
+$sql_select = "SELECT user_id,user_email,brand_id FROM tbl_user WHERE activate_key='" . $_GET["key"] . "' ; ";
 
 $rs_user = $conn->query($sql_select);
 $num_row = $rs_user->num_rows;
@@ -201,7 +203,7 @@ $row_user = $rs_user->fetch_assoc();
 								<input type="hidden" name="user_id" value="<?php echo $row_user["user_id"]; ?>">
 								<input type="hidden" name="confirm_key" value="<?php echo $_GET["key"]; ?>">
 								<input type="hidden" name="url_src" id="url_src" value="<?php echo urldecode($_GET["url_src"]); ?>">
-
+								<input type="hidden" name="brand_id" value="<?php echo (int)$row_user["brand_id"]; ?>">
 								<input type="hidden" name="is_ios"  id="is_ios"  value="0">
 							</div>
 
@@ -300,26 +302,23 @@ $row_user = $rs_user->fetch_assoc();
 				data: $('#form_change_password').serialize(),
 				success: function(resp) {
 						if (resp == "success" || isJSON(resp)) {
-							//alert(resp.url);
 							if(is_ios){
-			                    // window.webkit.messageHandlers.iosListener.postMessage("success");
-								let response = JSON.stringify(JSON.parse(resp)); 
+								let response = JSON.stringify(JSON.parse(resp));
 								window.webkit.messageHandlers.iosListener.postMessage(response);
 							}else{
-
 								if (url_src !== "") {
 									$('#loginBtn').attr('href', url_src);
 									$('#successModal').modal('show');
 								}else{
-									window.location.href = "../OLS?vp=ZGFzaGJvcmFkTWFpbg==";
+									$('#loginBtn').attr('href', 'login.php');
+									$('#successModal').modal('show');
 								}
+							
 							}
 						} else {
 							if(is_ios){
 			                    window.webkit.messageHandlers.iosListener.postMessage("fail");
-                              
 							}else{
-
 								alert(resp);
 							}
 						}
