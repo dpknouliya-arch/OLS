@@ -111,12 +111,12 @@ if ((isset($_SESSION['JOGOLS']) && ($_SESSION['JOGOLS'] != "")) || (isset($_SESS
 
 
         //------------------ total order count ------------------
-        $stmt = $conn->prepare("SELECT COUNT(DISTINCT of_id) AS order_count FROM tbl_order_form  WHERE user_id = ? AND enable = 1 AND order_status != ?" );
-        $stmt->bind_param("is", $user_id ,$status);
-        $stmt->execute(); 
-        $result = $stmt->get_result(); 
+        $stmt = $conn->prepare("SELECT COUNT(DISTINCT tbl_order_form.of_id) AS order_count FROM tbl_order_form INNER JOIN tbl_user ON tbl_order_form.user_id=tbl_user.user_id WHERE tbl_order_form.user_id = ? AND tbl_user.brand_id = ? AND tbl_order_form.enable = 1 AND tbl_order_form.order_status != ?" );
+        $stmt->bind_param("iis", $user_id, $brand_id, $status);
+        $stmt->execute();
+        $result = $stmt->get_result();
         $data = $result->fetch_assoc();
-        $TotalOrderCount = $data['order_count'] ?? 0  ; 
+        $TotalOrderCount = $data['order_count'] ?? 0  ;
 
 
        //-------------- Final approval count ----------------------    
@@ -138,11 +138,11 @@ if ((isset($_SESSION['JOGOLS']) && ($_SESSION['JOGOLS'] != "")) || (isset($_SESS
 
 
         //---------------------- Archived order ----------------
-        $stmt = $conn->prepare("SELECT COUNT(DISTINCT of_id) AS orderCount FROM tbl_order_form  WHERE user_id = ? AND enable= 1  AND order_status =?" );
-       
-        $stmt->bind_param("is", $user_id ,$status);
-        $stmt->execute(); 
-        $result = $stmt->get_result(); 
+        $stmt = $conn->prepare("SELECT COUNT(DISTINCT tbl_order_form.of_id) AS orderCount FROM tbl_order_form INNER JOIN tbl_user ON tbl_order_form.user_id=tbl_user.user_id WHERE tbl_order_form.user_id = ? AND tbl_user.brand_id = ? AND tbl_order_form.enable= 1  AND tbl_order_form.order_status =?" );
+
+        $stmt->bind_param("iis", $user_id, $brand_id, $status);
+        $stmt->execute();
+        $result = $stmt->get_result();
         $data = $result->fetch_assoc();
         $totalArchivedOrder = $data['orderCount'] ?? 0  ;
 

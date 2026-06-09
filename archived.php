@@ -7,9 +7,10 @@ $user_id = $obj_user->user_id;
 $full_name = $obj_user->full_name;
 
 $sql_select = "SELECT tbl_order_form.*,tbl_product.prod_name,tbl_product.split_name,COUNT(tbl_order_item.oi_id) AS item_num,SUM(tbl_order_item.qty_top1+tbl_order_item.qty_top2+tbl_order_item.qty_bottom1+tbl_order_item.qty_bottom2) AS qty_sum ";
-$sql_select .= " FROM tbl_order_form LEFT JOIN tbl_product ON tbl_order_form.prod_id=tbl_product.prod_id ";
+$sql_select .= " FROM tbl_order_form INNER JOIN tbl_user ON tbl_order_form.user_id=tbl_user.user_id";
+$sql_select .= " LEFT JOIN tbl_product ON tbl_order_form.prod_id=tbl_product.prod_id ";
 $sql_select .= " LEFT JOIN tbl_order_item ON tbl_order_form.of_id=tbl_order_item.of_id";
-$sql_select .= " WHERE tbl_order_form.user_id='".$user_id."' AND tbl_order_form.enable=1 AND tbl_order_form.order_status='archived' GROUP BY tbl_order_form.of_id ORDER BY tbl_order_form.order_date DESC; ";
+$sql_select .= " WHERE tbl_order_form.user_id='".intval($user_id)."' AND tbl_user.brand_id=".intval($brand_id)." AND tbl_order_form.enable=1 AND tbl_order_form.order_status='archived' GROUP BY tbl_order_form.of_id ORDER BY tbl_order_form.order_date DESC; ";
 //echo $sql_select;
 
 $rs_tmp = $conn->query($sql_select);

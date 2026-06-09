@@ -443,7 +443,8 @@ $sales_data_assign = $conn->query($sql);
 
                         <?php
 
-                        $sql_all_user = "SELECT * FROM `tbl_user` WHERE  1; ";
+                        $current_brand = intval($brand_id);
+                        $sql_all_user = "SELECT * FROM `tbl_user` WHERE brand_id=$current_brand; ";
 
                         $all_user = $conn->query($sql_all_user);
 
