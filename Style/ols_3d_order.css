@@ -838,6 +838,79 @@
 }
 .ols3d-del-btn:hover { color: #EF4444; background: #FEE2E2; }
 
+/* ── Multi-team tabs bar ─────────────────────── */
+.ols3d-teams-section { margin-bottom: 18px; }
+
+.ols3d-teams-tabs-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-bottom: none;
+  border-radius: var(--r) var(--r) 0 0;
+  padding: 12px 16px;
+  flex-wrap: wrap;
+}
+
+.ols3d-teams-tabs-nav {
+  display: flex;
+  gap: 6px;
+  flex: 1;
+  flex-wrap: wrap;
+}
+
+.ols3d-team-tab {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 6px 14px; border-radius: 7px;
+  border: 1.5px solid var(--border);
+  background: #F8F9FC; color: var(--text-muted);
+  font-size: 13px; font-weight: 600;
+  cursor: pointer; font-family: inherit; transition: all .15s;
+}
+.ols3d-team-tab:hover { background: #EEF3FF; color: var(--brand); border-color: #C5D3F5; }
+.ols3d-team-tab.active { background: var(--brand); color: white; border-color: var(--brand); }
+
+.ols3d-team-tab-del {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 16px; height: 16px; border-radius: 50%;
+  font-size: 13px; font-weight: 700; cursor: pointer;
+  transition: background .15s; line-height: 1;
+  background: rgba(0,0,0,.07);
+}
+.ols3d-team-tab.active .ols3d-team-tab-del { background: rgba(255,255,255,.25); }
+.ols3d-team-tab.active .ols3d-team-tab-del:hover { background: rgba(255,255,255,.45); }
+.ols3d-team-tab:not(.active) .ols3d-team-tab-del:hover { background: #FEE2E2; color: #EF4444; }
+
+.ols3d-btn-add-team {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 14px; border-radius: 8px;
+  border: 1.5px dashed var(--border);
+  background: transparent; color: var(--text-muted);
+  font-size: 12px; font-weight: 700;
+  cursor: pointer; font-family: inherit; transition: all .15s; white-space: nowrap;
+}
+.ols3d-btn-add-team:hover { border-color: var(--brand); color: var(--brand); background: #F5F7FF; }
+
+/* ── Team panel (content below the tabs bar) ─── */
+.ols3d-team-panel {
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 var(--r) var(--r);
+  padding: 20px;
+  overflow: hidden;
+}
+
+/* Inside the panel, the roster-wrap sits flush (no extra card) */
+.ols3d-team-panel .ols3d-roster-header-row { margin-top: 4px; }
+.ols3d-team-panel .ols3d-roster-scroll     { overflow-x: auto; }
+.ols3d-team-panel .ols3d-roster-table-footer {
+  padding: 10px 0;
+  border-top: 1px solid var(--border);
+  margin-top: 4px;
+}
+
 /* ── Inline address form validation ───────────────────── */
 .ols3d-inline-form-field input.ols3d-field-error {
   border-color: #EF4444 !important;

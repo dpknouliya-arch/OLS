@@ -19,13 +19,13 @@ if (!$data || !$data['status']) {
     exit;
 }
 
-$order           = $data['order'];
-$api_team_data   = $data['team'];
+$order             = $data['order'];
+$api_team_data     = $data['team'];
 $order_design_data = [$data['design']];
-$color_list      = $data['colors'];
+$color_list        = $data['colors'];
 
-$designId   = $order['design_id'];
-$added_date = $order['added_date'];
+$designId    = $order['design_id'];
+$added_date  = $order['added_date'];
 $sock_design = $order['sock_design'] ?? '';
 
 $design_name = $order_design_data[0]['name']       ?? '—';
@@ -33,11 +33,11 @@ $jersey_type = $order_design_data[0]['modal_type'] ?? '—';
 
 $order_id_enc   = customEncode($order_id);
 $order_date_fmt = !empty($added_date) ? date('d-m-Y H:i:s', strtotime($added_date)) : '—';
-// Build reverse size map: size_id → size_name for display
-// and a deduplicated ordered list for the dropdown (first occurrence wins for duplicates)
-$size_id_to_name = [];
+
+// Build reverse size map: size_id → size_name and deduplicated dropdown list
+$size_id_to_name    = [];
 $size_dropdown_list = [];
-$size_names_seen = [];
+$size_names_seen    = [];
 $sz_res = $conn->query("SELECT size_id, size_name FROM tbl_size ORDER BY size_id ASC");
 if ($sz_res) {
     while ($sz = $sz_res->fetch_assoc()) {
@@ -51,102 +51,114 @@ if ($sz_res) {
 }
 $size_list_json = json_encode($size_dropdown_list);
 
-// Find or create the OLS order form record (never duplicate)
-$of_id           = 0;
-$is_of_submitted = 0;
-$stmt_find = $conn->prepare(
-    "SELECT of_id, is_submitted FROM tbl_order_form WHERE design_order_id=? ORDER BY is_submitted DESC LIMIT 1"
-);
-$stmt_find->bind_param("i", $order_id);
-$stmt_find->execute();
-$res_find = $stmt_find->get_result();
-if ($res_find->num_rows > 0) {
-    $row_find        = $res_find->fetch_assoc();
-    $of_id           = (int)$row_find['of_id'];
-    $is_of_submitted = (int)$row_find['is_submitted'];
-}
-$stmt_find->close();
-if ($of_id === 0) {
-    $of_id = getOrCreateDraftOrder($conn, $order_id, $user_id);
-}
-
-// Team name/year: prefer saved OLS value, fall back to API
-$of_team_row = null;
-$stmt_tn = $conn->prepare(
-    "SELECT on_team_name, on_year FROM tbl_order_form WHERE of_id=? LIMIT 1"
-);
-$stmt_tn->bind_param("i", $of_id);
-$stmt_tn->execute();
-$res_tn = $stmt_tn->get_result();
-if ($res_tn->num_rows > 0) { $of_team_row = $res_tn->fetch_assoc(); }
-$stmt_tn->close();
-
-$team_name_val = htmlspecialchars(
-    ($of_team_row['on_team_name'] ?? '') !== '' ? $of_team_row['on_team_name'] : ($order['on_team_name'] ?? '')
-);
-$team_year_val = htmlspecialchars(
-    ($of_team_row['on_year'] ?? '') !== '' ? $of_team_row['on_year'] : ($order['on_year'] ?? '')
-);
-
-// Load saved roster rows from OLS tables
-$source_table       = ($is_of_submitted === 1) ? 'tbl_order_item' : 'tbl_draft_oi';
-$existing_rows_json = '[]';
-
-$oi_res = $conn->query("SELECT * FROM $source_table WHERE of_id=" . (int)$of_id);
-if ($oi_res && $oi_res->num_rows > 0) {
-    $loaded_rows = [];
-    while ($dr = $oi_res->fetch_assoc()) {
-        $size_text     = $size_id_to_name[(int)($dr['product_size_id'] ?? 0)] ?? '';
-        $loaded_rows[] = [
-            'item_id'          => (int)$dr['oi_id'],
-            'player_name'      => $dr['player_name']      ?? '',
-            'pattern_cut'      => $dr['sex']              ?? '',
-            'player_or_goalie' => $dr['p_or_g']           ?? '',
-            'jersey_size'      => $size_text,
-            'jersey_no'        => $dr['jersey_number']    ?? '',
-            'jersey_color'     => $dr['color_top1']       ?? '',
-            'jersey_qty'       => $dr['qty_top1']         ?? '',
-            'jersey_color2'    => $dr['color_top2']       ?? '',
-            'jersey_qty2'      => $dr['qty_top2']         ?? '',
-            'sock_size'        => $dr['bottom_size']      ?? '',
-            'sock_color'       => $dr['color_bottom1']    ?? '',
-            'sock_qty'         => $dr['qty_bottom1']      ?? '',
-            'sock_color2'      => $dr['color_bottom2']    ?? '',
-            'sock_qty2'        => $dr['qty_bottom2']      ?? '',
-            'cor_a'            => $dr['c_or_a']           ?? '',
-            'name_for_packing' => $dr['name_for_packing'] ?? '',
-            'notes'            => $dr['note']             ?? '',
-        ];
+// Helper: load roster rows for one order form
+function loadRosterRows3D($conn, $of_id, $is_submitted, $size_id_to_name) {
+    $source = ($is_submitted === 1) ? 'tbl_order_item' : 'tbl_draft_oi';
+    $rows   = [];
+    $res    = $conn->query("SELECT * FROM $source WHERE of_id=" . (int)$of_id);
+    if ($res) {
+        while ($dr = $res->fetch_assoc()) {
+            $sz = $size_id_to_name[(int)($dr['product_size_id'] ?? 0)] ?? '';
+            $rows[] = [
+                'item_id'          => (int)$dr['oi_id'],
+                'player_name'      => $dr['player_name']      ?? '',
+                'pattern_cut'      => $dr['sex']              ?? '',
+                'player_or_goalie' => $dr['p_or_g']           ?? '',
+                'jersey_size'      => $sz,
+                'jersey_no'        => $dr['jersey_number']    ?? '',
+                'jersey_color'     => $dr['color_top1']       ?? '',
+                'jersey_qty'       => $dr['qty_top1']         ?? '',
+                'jersey_color2'    => $dr['color_top2']       ?? '',
+                'jersey_qty2'      => $dr['qty_top2']         ?? '',
+                'sock_size'        => $dr['bottom_size']      ?? '',
+                'sock_color'       => $dr['color_bottom1']    ?? '',
+                'sock_qty'         => $dr['qty_bottom1']      ?? '',
+                'sock_color2'      => $dr['color_bottom2']    ?? '',
+                'sock_qty2'        => $dr['qty_bottom2']      ?? '',
+                'cor_a'            => $dr['c_or_a']           ?? '',
+                'name_for_packing' => $dr['name_for_packing'] ?? '',
+                'notes'            => $dr['note']             ?? '',
+            ];
+        }
     }
-    $existing_rows_json = json_encode($loaded_rows);
-} elseif ($is_of_submitted === 0) {
-    // No saved rows yet — seed from API team data (item_id=0 means new INSERT on save)
-    $seeded = [];
-    foreach (($api_team_data ?? []) as $row) {
-        $seeded[] = [
-            'item_id'          => 0,
-            'player_name'      => $row['player_name']      ?? '',
-            'pattern_cut'      => $row['pattern_cut']      ?? '',
-            'player_or_goalie' => $row['player_or_goalie'] ?? '',
-            'jersey_size'      => $row['jersey_size']      ?? '',
-            'jersey_no'        => $row['jersey_no']        ?? '',
-            'jersey_color'     => $row['jersey_color']     ?? '',
-            'jersey_qty'       => $row['jersey_qty']       ?? '',
-            'jersey_color2'    => $row['jersey_color2']    ?? '',
-            'jersey_qty2'      => $row['jersey_qty2']      ?? '',
-            'sock_size'        => $row['sock_size']        ?? '',
-            'sock_color'       => $row['sock_color']       ?? '',
-            'sock_qty'         => $row['sock_qty']         ?? '',
-            'sock_color2'      => $row['sock_color2']      ?? '',
-            'sock_qty2'        => $row['sock_qty2']        ?? '',
-            'cor_a'            => $row['cor_a']            ?? '',
-            'name_for_packing' => $row['name_for_packing'] ?? '',
-            'notes'            => $row['notes']            ?? '',
-        ];
-    }
-    $existing_rows_json = json_encode($seeded);
+    return $rows;
 }
 
+// Load ALL order forms for this design_order_id (one per team)
+$all_forms = [];
+$stmt_all  = $conn->prepare(
+    "SELECT of_id, is_submitted, on_team_name, on_year FROM tbl_order_form WHERE design_order_id=? ORDER BY of_id ASC"
+);
+$stmt_all->bind_param("i", $order_id);
+$stmt_all->execute();
+$res_all = $stmt_all->get_result();
+while ($rf = $res_all->fetch_assoc()) { $all_forms[] = $rf; }
+$stmt_all->close();
+
+// If no forms exist yet, create a draft
+if (empty($all_forms)) {
+    $new_of_id = getOrCreateDraftOrder($conn, $order_id, $user_id);
+    $all_forms[] = [
+        'of_id'        => $new_of_id,
+        'is_submitted' => 0,
+        'on_team_name' => $order['on_team_name'] ?? '',
+        'on_year'      => $order['on_year']      ?? '',
+    ];
+}
+
+// Build teams JSON for JS
+$teams_data = [];
+$is_first   = true;
+foreach ($all_forms as $form) {
+    $f_of_id = (int)$form['of_id'];
+    $f_sub   = (int)$form['is_submitted'];
+    $f_name  = $form['on_team_name'] ?? '';
+    $f_year  = $form['on_year']      ?? '';
+
+    // First team: fall back to API order data if saved value is empty
+    if ($is_first && $f_name === '') { $f_name = $order['on_team_name'] ?? ''; }
+    if ($is_first && $f_year === '') { $f_year = $order['on_year']      ?? ''; }
+
+    $rows = loadRosterRows3D($conn, $f_of_id, $f_sub, $size_id_to_name);
+
+    // First team with no saved rows: seed from API team data
+    if ($is_first && empty($rows) && $f_sub === 0) {
+        foreach (($api_team_data ?? []) as $row) {
+            $rows[] = [
+                'item_id'          => 0,
+                'player_name'      => $row['player_name']      ?? '',
+                'pattern_cut'      => $row['pattern_cut']      ?? '',
+                'player_or_goalie' => $row['player_or_goalie'] ?? '',
+                'jersey_size'      => $row['jersey_size']      ?? '',
+                'jersey_no'        => $row['jersey_no']        ?? '',
+                'jersey_color'     => $row['jersey_color']     ?? '',
+                'jersey_qty'       => $row['jersey_qty']       ?? '',
+                'jersey_color2'    => $row['jersey_color2']    ?? '',
+                'jersey_qty2'      => $row['jersey_qty2']      ?? '',
+                'sock_size'        => $row['sock_size']        ?? '',
+                'sock_color'       => $row['sock_color']       ?? '',
+                'sock_qty'         => $row['sock_qty']         ?? '',
+                'sock_color2'      => $row['sock_color2']      ?? '',
+                'sock_qty2'        => $row['sock_qty2']        ?? '',
+                'cor_a'            => $row['cor_a']            ?? '',
+                'name_for_packing' => $row['name_for_packing'] ?? '',
+                'notes'            => $row['notes']            ?? '',
+            ];
+        }
+    }
+
+    $teams_data[] = [
+        'of_id'     => $f_of_id,
+        'name'      => $f_name,
+        'year'      => $f_year,
+        'rows'      => $rows,
+        'submitted' => $f_sub,
+    ];
+    $is_first = false;
+}
+
+$primary_of_id   = (int)$all_forms[0]['of_id'];
+$teams_json      = json_encode($teams_data);
 $color_list_json = json_encode($color_list);
 ?>
 
@@ -214,76 +226,32 @@ $color_list_json = json_encode($color_list);
     <span class="ols3d-info-value"><?= htmlspecialchars($jersey_type) ?></span>
   </div>
 
-  <p class="ols3d-hint">Add player details below. Click <strong>+ Add Player</strong> to insert a row, or delete a row using the × button. Changes are saved when you click <strong>Save &amp; Continue</strong>.</p>
+  <p class="ols3d-hint">Add teams and player details below. Use <strong>+ Add New Team</strong> to add multiple teams, each with its own roster. Click <strong>+ Add Player</strong> to insert a row, or delete a row using the × button.</p>
 
   <!-- Socks preview (if any) -->
   <?php if (!empty($sock_design)): ?>
   <div class="ols3d-socks-panel">
     <h5>Socks</h5>
-      <img src="<?= htmlspecialchars($sock_design) ?>" alt="Sock Design">
+    <img src="<?= htmlspecialchars($sock_design) ?>" alt="Sock Design">
   </div>
   <?php endif; ?>
 
-  <!-- Team Name + Year -->
-  <div class="ols3d-team-fields">
-    <div class="ols3d-team-field">
-      <label for="roster_team_name">Team Name</label>
-      <input type="text" id="roster_team_name" placeholder="e.g. Thunder Hawks" value="<?= $team_name_val ?>" maxlength="100">
-    </div>
-    <div class="ols3d-team-field">
-      <label for="roster_team_year">Year</label>
-      <input type="text" id="roster_team_year" placeholder="e.g. 2025" value="<?= $team_year_val ?>" style="max-width:140px;" maxlength="4" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
-    </div>
-  </div>
-
-  <!-- ── Roster Table ──────────────────────────────────── -->
-  <div class="ols3d-roster-wrap">
-    <div class="ols3d-roster-header-row">
-      <h5 id="ols3d-roster-count-title">
-        Roster Details
-        <span id="ols3d-row-count" style="font-size:12px;font-weight:500;color:#6B7A9F;margin-left:10px;">0 players</span>
-      </h5>
-      <button class="ols3d-btn-add-row" type="button" onclick="rosterAddRow()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+  <!-- ── Multi-Team Roster Section ──────────────────────── -->
+  <div class="ols3d-teams-section">
+    <!-- Tabs bar -->
+    <div class="ols3d-teams-tabs-bar">
+      <div class="ols3d-teams-tabs-nav" id="teamsTabsNav">
+        <!-- team tab buttons injected by JS -->
+      </div>
+      <button type="button" class="ols3d-btn-add-team" onclick="openAddTeamModal()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
         </svg>
-        Add Player
+        Add New Team
       </button>
     </div>
-
-    <div class="ols3d-roster-scroll">
-      <table class="ols3d-roster-table" id="rosterTable">
-        <thead>
-          <tr class="ols3d-roster-thead-dark">
-            <th class="ols3d-th-del"></th>
-            <th>Name on Jersey</th>
-            <th>Pattern Cut</th>
-            <th>P or G</th>
-            <th>Jersey Size</th>
-            <th>Jersey No</th>
-            <th>Jersey Color</th>
-            <th>QTY</th>
-            <th>Jersey Color 2</th>
-            <th>QTY</th>
-            <th>Sock Size</th>
-            <th>Sock Color</th>
-            <th>QTY</th>
-            <th>Sock Color 2</th>
-            <th>QTY</th>
-            <th>C or A</th>
-            <th>Name for Packing</th>
-            <th>Notes</th>
-          </tr>
-        </thead>
-        <tbody id="rosterBody">
-          <!-- rows injected by JS -->
-        </tbody>
-      </table>
-    </div>
-    <!-- Footer: player count + add button -->
-    <div class="ols3d-roster-table-footer">
-      <span class="ols3d-roster-total">Total players: <strong id="ols3d-row-count-foot">0</strong></span>
-    </div>
+    <!-- Team panels container — JS populates one panel per team -->
+    <div id="teamPanelsContainer"></div>
   </div>
 
   <!-- Action Buttons -->
@@ -302,22 +270,54 @@ $color_list_json = json_encode($color_list);
 <!-- Toast -->
 <div class="ols3d-toast" id="ols3dToast"></div>
 
+<!-- Add New Team Modal -->
+<div class="ols3d-modal-overlay" id="addTeamOverlay">
+  <div class="ols3d-modal">
+    <div class="ols3d-modal-header">
+      <span>Add New Team</span>
+      <button class="ols3d-modal-close" type="button" onclick="closeAddTeamModal()">×</button>
+    </div>
+    <div class="ols3d-modal-body">
+      <div class="ols3d-modal-grid">
+        <div class="ols3d-modal-field">
+          <label>Team Name <span class="ols3d-required-star">*</span></label>
+          <input type="text" id="newTeamNameIn" placeholder="e.g. Thunder Hawks" maxlength="100">
+        </div>
+        <div class="ols3d-modal-field">
+          <label>Year <span class="ols3d-required-star">*</span></label>
+          <input type="text" id="newTeamYearIn" placeholder="e.g. 2025" maxlength="4"
+                 oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+        </div>
+      </div>
+    </div>
+    <div class="ols3d-modal-footer">
+      <button class="ols3d-modal-cancel" type="button" onclick="closeAddTeamModal()">Cancel</button>
+      <button class="ols3d-modal-save"   type="button" onclick="confirmAddTeam()">Add Team</button>
+    </div>
+  </div>
+</div>
+
 <script>
 (function () {
   /* ── Server data ── */
   var DESIGN_ORDER_ID = <?= (int)$order_id ?>;
-  var OF_ID           = <?= (int)$of_id ?>;
   var ORDER_ID_ENC    = '<?= $order_id_enc ?>';
   var CHECKOUT_URL    = '?vp=<?= base64_encode('order_info') ?>&order_id=' + ORDER_ID_ENC;
-  var existingRows    = <?= $existing_rows_json ?>;
+  var initialTeams    = <?= $teams_json ?>;
 
-  /* ── Dropdown option lists (colors dynamic from DB) ── */
+  /* ── Dropdown lists (colors from DB) ── */
   var JERSEY_SIZES  = <?= $size_list_json ?>;
   var SOCK_SIZES    = ['S','M','L','XL','XXL'];
   var PATTERN_CUTS  = ['Adult','Youth'];
   var PG_OPTIONS    = ['Player','Goalie'];
-  var JERSEY_COLORS = <?= $color_list_json ?>;   // fetched from colors table
+  var JERSEY_COLORS = <?= $color_list_json ?>;
   var COR_A_OPTS    = ['','C','A'];
+
+  /* ── State ── */
+  var teamIdCtr   = 0;
+  var teams       = [];          // [{teamId, of_id, name, year}]
+  var activeTeamId = null;
+  var deletedOfIds = [];         // of_ids removed by user (to delete on save)
 
   /* ── Helpers ── */
   function sel(opts, val, placeholder) {
@@ -339,72 +339,242 @@ $color_list_json = json_encode($color_list);
   }
 
   var TRASH_ICON = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6M10 11v6M14 11v6M9 6V4h6v2"/></svg>';
+  var PLUS_SVG   = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>';
 
-  /* Each row carries data-tid = oi_id from tbl_draft_oi (0 = not yet saved) */
-  function makeRow(d, idx) {
+  /* ── Row builder ── */
+  /* tr.dataset.tid holds the DB oi_id (0 = new, not yet persisted) */
+  function makeRow(d) {
     d = d || {};
     var tid = d.item_id || 0;
     var tr  = document.createElement('tr');
     tr.dataset.tid = tid;
     tr.innerHTML =
-      /* col 0: trash delete */
       '<td class="ols3d-td-del"><button class="ols3d-del-btn" type="button" onclick="rosterDelRow(this)" title="Remove row">' + TRASH_ICON + '</button></td>' +
-      /* col 1..17: data fields */
       '<td>' + inp(d.player_name, 'Player name', 'text', 'maxlength="50" oninput="this.value=this.value.replace(/[^a-zA-Z\\s]/g,\'\')"') + '</td>' +
       '<td>' + sel(PATTERN_CUTS,  d.pattern_cut,        'Cut')    + '</td>' +
       '<td>' + sel(PG_OPTIONS,    d.player_or_goalie,   'P/G')    + '</td>' +
       '<td>' + sel(JERSEY_SIZES,  d.jersey_size,        'Size')   + '</td>' +
-      '<td>' + inp(d.jersey_no, '#', 'text', 'maxlength="10" required oninput="this.value=this.value.replace(/[^0-9]/g,\'\')"') + '</td>' +
-      '<td>' + inp(d.jersey_color,       'Jersey color')  + '</td>' +
-      '<td>' + inp(d.jersey_qty,        '1', 'number')  + '</td>' +
-      '<td>' + inp(d.jersey_color2,      'Jersey color2')  + '</td>' +
-      '<td>' + inp(d.jersey_qty2,       '0', 'number')  + '</td>' +
+      '<td>' + inp(d.jersey_no,   '#', 'text', 'maxlength="10" required oninput="this.value=this.value.replace(/[^0-9]/g,\'\')"') + '</td>' +
+      '<td>' + inp(d.jersey_color,  'Jersey color')  + '</td>' +
+      '<td>' + inp(d.jersey_qty,   '1', 'number')    + '</td>' +
+      '<td>' + inp(d.jersey_color2, 'Jersey color 2') + '</td>' +
+      '<td>' + inp(d.jersey_qty2,  '0', 'number')    + '</td>' +
       '<td>' + sel(SOCK_SIZES,    d.sock_size,          'Size')   + '</td>' +
-      '<td>' + inp(d.sock_color,         'Sock color')  + '</td>' +
-      '<td>' + inp(d.sock_qty,          '0', 'number')  + '</td>' +
-      '<td>' + inp(d.sock_color2,        'Sock color2')  + '</td>' +
-      '<td>' + inp(d.sock_qty2,         '0', 'number')  + '</td>' +
+      '<td>' + inp(d.sock_color,   'Sock color')    + '</td>' +
+      '<td>' + inp(d.sock_qty,    '0', 'number')    + '</td>' +
+      '<td>' + inp(d.sock_color2,  'Sock color 2')  + '</td>' +
+      '<td>' + inp(d.sock_qty2,   '0', 'number')    + '</td>' +
       '<td>' + sel(COR_A_OPTS,    d.cor_a,              '—')      + '</td>' +
-      '<td>' + inp(d.name_for_packing,  'Packing name') + '</td>' +
-      '<td>' + inp(d.notes,             'Notes')         + '</td>';
+      '<td>' + inp(d.name_for_packing, 'Packing name') + '</td>' +
+      '<td>' + inp(d.notes,        'Notes')          + '</td>';
     return tr;
   }
 
-  function updateCount() {
-    var n = document.getElementById('rosterBody').rows.length;
+  /* ── Count updater ── */
+  function updateTeamCount(teamId) {
+    var tbody = document.getElementById('rosterBody_' + teamId);
+    if (!tbody) return;
+    var n = tbody.rows.length;
     var txt = n + ' player' + (n !== 1 ? 's' : '');
-    var a = document.getElementById('ols3d-row-count');
-    var b = document.getElementById('ols3d-row-count-foot');
+    var a = document.getElementById('rc_'  + teamId);
+    var b = document.getElementById('rcf_' + teamId);
     if (a) a.textContent = txt;
     if (b) b.textContent = n;
   }
 
-  function renumber() { updateCount(); }
+  /* ── Team panel builder ── */
+  function makeTeamPanel(team) {
+    var id  = team.teamId;
+    var nv  = escHtml(team.name || '');
+    var yv  = escHtml(team.year || '');
 
-  /* ── Public API ── */
-  window.rosterAddRow = function () {
-    var tbody = document.getElementById('rosterBody');
-    tbody.appendChild(makeRow({item_id: 0}, tbody.rows.length));
-    updateCount();
+    var panel = document.createElement('div');
+    panel.className = 'ols3d-team-panel';
+    panel.id = 'teamPanel_' + id;
+
+    panel.innerHTML =
+      '<div class="ols3d-team-fields">' +
+        '<div class="ols3d-team-field">' +
+          '<label>Team Name</label>' +
+          '<input type="text" id="team_name_' + id + '" value="' + nv + '" placeholder="e.g. Thunder Hawks" maxlength="100">' +
+        '</div>' +
+        '<div class="ols3d-team-field">' +
+          '<label>Year</label>' +
+          '<input type="text" id="team_year_' + id + '" value="' + yv + '" placeholder="e.g. 2025" maxlength="4" oninput="this.value=this.value.replace(/[^0-9]/g,\'\')" style="max-width:140px;">' +
+        '</div>' +
+      '</div>' +
+      '<div class="ols3d-roster-header-row">' +
+        '<h5 id="rh5_' + id + '" style="margin:0;font-size:14px;font-weight:800;">Roster Details ' +
+          '<span id="rc_' + id + '" style="font-size:12px;font-weight:500;color:#6B7A9F;margin-left:10px;">0 players</span>' +
+        '</h5>' +
+        '<button class="ols3d-btn-add-row" type="button" onclick="rosterAddRow(' + id + ')">' +
+          PLUS_SVG + ' Add Player' +
+        '</button>' +
+      '</div>' +
+      '<div class="ols3d-roster-scroll">' +
+        '<table class="ols3d-roster-table">' +
+          '<thead>' +
+            '<tr class="ols3d-roster-thead-dark">' +
+              '<th class="ols3d-th-del"></th>' +
+              '<th>Name on Jersey</th><th>Pattern Cut</th><th>P or G</th>' +
+              '<th>Jersey Size</th><th>Jersey No</th>' +
+              '<th>Jersey Color</th><th>QTY</th>' +
+              '<th>Jersey Color 2</th><th>QTY</th>' +
+              '<th>Sock Size</th><th>Sock Color</th><th>QTY</th>' +
+              '<th>Sock Color 2</th><th>QTY</th>' +
+              '<th>C or A</th><th>Name for Packing</th><th>Notes</th>' +
+            '</tr>' +
+          '</thead>' +
+          '<tbody id="rosterBody_' + id + '"></tbody>' +
+        '</table>' +
+      '</div>' +
+      '<div class="ols3d-roster-table-footer">' +
+        '<span class="ols3d-roster-total">Total players: <strong id="rcf_' + id + '">0</strong></span>' +
+      '</div>';
+
+    // Populate existing rows
+    var tbody = panel.querySelector('#rosterBody_' + id);
+    (team.rows || []).forEach(function (d) { tbody.appendChild(makeRow(d)); });
+    updateTeamCount(id);
+
+    return panel;
+  }
+
+  /* ── Tab renderer ── */
+  function renderTeamTabs() {
+    var nav = document.getElementById('teamsTabsNav');
+    nav.innerHTML = '';
+    teams.forEach(function (team, idx) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'ols3d-team-tab' + (team.teamId === activeTeamId ? ' active' : '');
+      btn.textContent = 'Team ' + (idx + 1);
+      btn.setAttribute('data-tid', team.teamId);
+      btn.onclick = (function (tid) { return function () { switchTeam(tid); }; }(team.teamId));
+
+      if (teams.length > 1) {
+        var del = document.createElement('span');
+        del.className = 'ols3d-team-tab-del';
+        del.innerHTML = '×';
+        del.title = 'Remove team';
+        del.onclick = (function (tid) {
+          return function (e) {
+            e.stopPropagation();
+            removeTeam(tid);
+          };
+        }(team.teamId));
+        btn.appendChild(del);
+      }
+      nav.appendChild(btn);
+    });
+  }
+
+  /* ── Switch active panel ── */
+  function switchTeam(tid) {
+    if (activeTeamId !== null) {
+      var prev = document.getElementById('teamPanel_' + activeTeamId);
+      if (prev) prev.style.display = 'none';
+    }
+    activeTeamId = tid;
+    var next = document.getElementById('teamPanel_' + tid);
+    if (next) next.style.display = 'block';
+    renderTeamTabs();
+  }
+
+  /* ── Add a new team ── */
+  function addTeam(name, year) {
+    var tid  = ++teamIdCtr;
+    var team = { teamId: tid, of_id: 0, name: name, year: year, rows: [] };
+    teams.push(team);
+
+    var container = document.getElementById('teamPanelsContainer');
+    var panel = makeTeamPanel(team);
+    panel.style.display = 'none';
+    container.appendChild(panel);
+
+    switchTeam(tid);
+  }
+
+  /* ── Remove a team ── */
+  function removeTeam(tid) {
+    if (teams.length <= 1) {
+      showToast('At least one team is required.');
+      return;
+    }
+
+    // Track deleted of_ids so backend can clean up
+    var t = teams.filter(function (x) { return x.teamId === tid; })[0];
+    if (t && t.of_id > 0) { deletedOfIds.push(t.of_id); }
+
+    // Remove from state and DOM
+    teams = teams.filter(function (x) { return x.teamId !== tid; });
+    var panel = document.getElementById('teamPanel_' + tid);
+    if (panel) panel.remove();
+
+    // Switch to another team if we removed the active one
+    if (activeTeamId === tid) {
+      activeTeamId = null;
+      switchTeam(teams[0].teamId);
+    } else {
+      renderTeamTabs();
+    }
+  }
+
+  /* ── Public: add player row ── */
+  window.rosterAddRow = function (teamId) {
+    var tbody = document.getElementById('rosterBody_' + teamId);
+    if (!tbody) return;
+    tbody.appendChild(makeRow({ item_id: 0 }));
+    updateTeamCount(teamId);
   };
 
+  /* ── Public: delete player row ── */
   window.rosterDelRow = function (btn) {
-    btn.closest('tr').remove();
-    renumber();
+    var tr    = btn.closest('tr');
+    var tbody = tr.closest('tbody');
+    tr.remove();
+    var teamId = parseInt(tbody.id.replace('rosterBody_', ''), 10);
+    updateTeamCount(teamId);
   };
 
-  window.rosterSave = function () {
-    var tbody = document.getElementById('rosterBody');
-    var rows  = [];
+  /* ── Modal controls ── */
+  window.openAddTeamModal = function () {
+    document.getElementById('newTeamNameIn').value = '';
+    document.getElementById('newTeamYearIn').value = '';
+    document.getElementById('addTeamOverlay').classList.add('open');
+    document.getElementById('newTeamNameIn').focus();
+  };
 
+  window.closeAddTeamModal = function () {
+    document.getElementById('addTeamOverlay').classList.remove('open');
+  };
+
+  window.confirmAddTeam = function () {
+    var name = document.getElementById('newTeamNameIn').value.trim();
+    var year = document.getElementById('newTeamYearIn').value.trim();
+    if (!name) {
+      document.getElementById('newTeamNameIn').focus();
+      showToast('Please enter a Team Name.');
+      return;
+    }
+    if (!year || !/^\d{4}$/.test(year)) {
+      document.getElementById('newTeamYearIn').focus();
+      showToast('Please enter a valid 4-digit Year.');
+      return;
+    }
+    closeAddTeamModal();
+    addTeam(name, year);
+  };
+
+  /* ── Collect rows from one team tbody ── */
+  function collectRows(tbody) {
+    var rows = [];
     Array.prototype.forEach.call(tbody.rows, function (tr) {
       var cells = tr.cells;
-
       function v(i) {
         var el = cells[i].querySelector('input,select');
         return el ? el.value : '';
       }
-
       rows.push({
         item_id:          parseInt(tr.dataset.tid || '0', 10),
         player_name:      v(1),
@@ -426,54 +596,83 @@ $color_list_json = json_encode($color_list);
         notes:            v(17)
       });
     });
+    return rows;
+  }
 
-    var teamName = document.getElementById('roster_team_name').value.trim();
-    var teamYear = document.getElementById('roster_team_year').value.trim();
+  /* ── Save all teams ── */
+  window.rosterSave = function () {
+    var teamsPayload = [];
 
-    // Validate team fields
-    if (!teamName) {
-      showToast('Please enter a Team Name before continuing.');
-      document.getElementById('roster_team_name').focus();
-      return;
-    }
-    if (!teamYear) {
-      showToast('Please enter the Year before continuing.');
-      document.getElementById('roster_team_year').focus();
-      return;
-    }
-    if (!/^\d{4}$/.test(teamYear)) {
-      showToast('Year must be a 4-digit number (e.g. 2025).');
-      document.getElementById('roster_team_year').focus();
-      return;
-    }
+    for (var i = 0; i < teams.length; i++) {
+      var team   = teams[i];
+      var tid    = team.teamId;
+      var teamNum = i + 1;
 
-    // Validate each roster row
-    for (var ri = 0; ri < rows.length; ri++) {
-      var rowNum = ri + 1;
-      var jNo = rows[ri].jersey_no;
-      var pName = rows[ri].player_name;
-      if (jNo === '') {
-        showToast('Row ' + rowNum + ': Jersey # is required.');
+      var teamName = (document.getElementById('team_name_' + tid) || {}).value || '';
+      var teamYear = (document.getElementById('team_year_' + tid) || {}).value || '';
+      teamName = teamName.trim();
+      teamYear = teamYear.trim();
+
+      if (!teamName) {
+        showToast('Team ' + teamNum + ': Please enter a Team Name.');
+        switchTeam(tid);
         return;
       }
-      if (!/^\d+$/.test(jNo)) {
-        showToast('Row ' + rowNum + ': Jersey # must contain numbers only.');
+      if (!teamYear) {
+        showToast('Team ' + teamNum + ': Please enter the Year.');
+        switchTeam(tid);
         return;
       }
-      if (pName.length > 50) {
-        showToast('Row ' + rowNum + ': Name on Jersey must be 50 characters or fewer.');
+      if (!/^\d{4}$/.test(teamYear)) {
+        showToast('Team ' + teamNum + ': Year must be a 4-digit number (e.g. 2025).');
+        switchTeam(tid);
         return;
       }
+
+      var tbody = document.getElementById('rosterBody_' + tid);
+      var rows  = collectRows(tbody);
+
+      // Validate rows
+      for (var ri = 0; ri < rows.length; ri++) {
+        var rowNum = ri + 1;
+        var jNo    = rows[ri].jersey_no;
+        if (jNo === '') {
+          showToast('Team ' + teamNum + ', Row ' + rowNum + ': Jersey # is required.');
+          switchTeam(tid);
+          return;
+        }
+        if (!/^\d+$/.test(jNo)) {
+          showToast('Team ' + teamNum + ', Row ' + rowNum + ': Jersey # must contain numbers only.');
+          switchTeam(tid);
+          return;
+        }
+        if (rows[ri].player_name.length > 50) {
+          showToast('Team ' + teamNum + ', Row ' + rowNum + ': Name on Jersey must be 50 characters or fewer.');
+          switchTeam(tid);
+          return;
+        }
+      }
+
+      teamsPayload.push({
+        of_id:     team.of_id,
+        team_name: teamName,
+        team_year: teamYear,
+        rows:      rows
+      });
     }
 
     var btn = document.getElementById('rosterSaveBtn');
-    btn.disabled = true;
+    btn.disabled    = true;
     btn.textContent = 'Saving…';
 
     fetch('ajax/roster/save_roster.php', {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ design_order_id: DESIGN_ORDER_ID, of_id: OF_ID, rows: rows, team_name: teamName, team_year: teamYear })
+      body:    JSON.stringify({
+        design_order_id: DESIGN_ORDER_ID,
+        teams:           teamsPayload,
+        deleted_of_ids:  deletedOfIds
+      })
     })
     .then(function (r) {
       if (!r.ok) throw new Error('HTTP ' + r.status);
@@ -481,42 +680,66 @@ $color_list_json = json_encode($color_list);
     })
     .then(function (data) {
       if (data.success) {
-        if (data.of_id) { OF_ID = data.of_id; }
+        // Update of_id for newly created teams
+        if (data.team_of_ids && data.team_of_ids.length === teams.length) {
+          teams.forEach(function (t, idx) { t.of_id = data.team_of_ids[idx]; });
+        }
+        deletedOfIds = [];
+        var total = (data.inserted || 0) + (data.updated || 0);
         showToast('Roster saved (' + (data.inserted||0) + ' added, ' + (data.updated||0) + ' updated, ' + (data.deleted||0) + ' removed)');
         setTimeout(function () { window.location.href = CHECKOUT_URL; }, 1000);
       } else {
         showToast('Error: ' + (data.message || 'Save failed'));
-        btn.disabled = false;
+        btn.disabled    = false;
         btn.textContent = 'Save & Continue →';
       }
     })
     .catch(function (e) {
       showToast('Save failed: ' + e.message);
-      btn.disabled = false;
+      btn.disabled    = false;
       btn.textContent = 'Save & Continue →';
     });
   };
 
+  /* ── Toast ── */
   function showToast(msg) {
     var t = document.getElementById('ols3dToast');
     t.textContent = msg;
     t.classList.add('show');
-    setTimeout(function () { t.classList.remove('show'); }, 3000);
+    setTimeout(function () { t.classList.remove('show'); }, 3500);
   }
 
-  /* ── Teleport toast to <body> to escape any CSS transform context ── */
+  /* Teleport toast to <body> to escape CSS transform context */
   (function () {
     var t = document.getElementById('ols3dToast');
     if (t && t.parentNode !== document.body) document.body.appendChild(t);
-  })();
+  }());
 
-  /* ── Init: render existing rows from DB ── */
+  /* Close modal when clicking overlay backdrop */
+  document.getElementById('addTeamOverlay').addEventListener('click', function (e) {
+    if (e.target === this) closeAddTeamModal();
+  });
+
+  /* ── Init: build team objects and panels from server data ── */
   (function () {
-    var tbody = document.getElementById('rosterBody');
-    if (existingRows && existingRows.length > 0) {
-      existingRows.forEach(function (d, i) { tbody.appendChild(makeRow(d, i)); });
+    var container = document.getElementById('teamPanelsContainer');
+
+    initialTeams.forEach(function (t) {
+      var tid  = ++teamIdCtr;
+      var team = { teamId: tid, of_id: t.of_id, name: t.name, year: t.year, rows: t.rows || [] };
+      teams.push(team);
+
+      var panel = makeTeamPanel(team);
+      panel.style.display = 'none';
+      container.appendChild(panel);
+    });
+
+    if (teams.length > 0) {
+      activeTeamId = teams[0].teamId;
+      var firstPanel = document.getElementById('teamPanel_' + activeTeamId);
+      if (firstPanel) firstPanel.style.display = 'block';
+      renderTeamTabs();
     }
-    updateCount();
   }());
 }());
 </script>

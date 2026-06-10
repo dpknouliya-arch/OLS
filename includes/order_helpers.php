@@ -121,3 +121,92 @@ function getOrCreateDraftOrder($conn, $design_order_id, $user_id) {
     // tbl_draft_of is always inserted FIRST and of_id always originates there.
     return create3DOrderDraft($conn, $design_order_id, $user_id);
 }
+
+/**
+ * Always creates a NEW order form for a team (no dedup check).
+ * Used when a user adds a second/third team in the multi-team roster UI.
+ */
+function createNewTeamDraft($conn, $design_order_id, $user_id) {
+    $design_order_id = (int)$design_order_id;
+    $user_id         = (int)$user_id;
+
+    $draft_id = '3D' . date('YmdHis') . str_pad($design_order_id, 4, '0', STR_PAD_LEFT) . rand(10, 99);
+
+    $stmt = $conn->prepare(
+        "INSERT INTO tbl_draft_of
+            (draft_id, form_name, special_comment,
+             order_date, req_due_date, game_event_date,
+             project_name, payment_opt, sales_rep_id, reorder_num, prod_id,
+             user_id,
+             bill_comp_name, bill_contact_name, bill_address, bill_city,
+             bill_country, bill_zip_code, bill_tel, bill_email,
+             deli_comp_name, deli_contact_name, deli_address, deli_city,
+             deli_country, deli_zip_code, deli_tel, deli_email,
+             is_3dorder, date_add)
+         VALUES
+            (?, '3D Jersey', '',
+             CURDATE(), CURDATE(), '',
+             '', '', 0, '', 1,
+             ?,
+             '', '', '', '',
+             '', '', '', '',
+             '', '', '', '',
+             '', '', '', '',
+             1, NOW())"
+    );
+    if (!$stmt) {
+        error_log('createNewTeamDraft tbl_draft_of prepare failed: ' . $conn->error);
+        return 0;
+    }
+    $stmt->bind_param("si", $draft_id, $user_id);
+    if (!$stmt->execute()) {
+        error_log('createNewTeamDraft tbl_draft_of execute failed: ' . $stmt->error);
+        $stmt->close();
+        return 0;
+    }
+    $of_id = (int)$conn->insert_id;
+    $stmt->close();
+
+    if ($of_id === 0) {
+        error_log("createNewTeamDraft: tbl_draft_of returned insert_id=0 for design_order_id=$design_order_id");
+        return 0;
+    }
+
+    $stmt = $conn->prepare(
+        "INSERT INTO tbl_order_form
+            (of_id, draft_id, is_submitted, form_name, special_comment,
+             order_date, order_status,
+             req_due_date, game_event_date, project_name,
+             payment_opt, sales_rep_id, reorder_num,
+             prod_id, user_id, design_order_id,
+             bill_comp_name, bill_contact_name, bill_address, bill_city,
+             bill_country, bill_zip_code, bill_tel, bill_email,
+             deli_comp_name, deli_contact_name, deli_address, deli_city,
+             deli_country, deli_zip_code, deli_tel, deli_email,
+             date_add)
+         VALUES
+            (?, ?, 0, '3D Jersey', '',
+             CURDATE(), 'draft',
+             CURDATE(), '', '',
+             '', 0, '',
+             1, ?, ?,
+             '', '', '', '',
+             '', '', '', '',
+             '', '', '', '',
+             '', '', '', '',
+             NOW())"
+    );
+    if (!$stmt) {
+        error_log('createNewTeamDraft tbl_order_form prepare failed: ' . $conn->error);
+        return 0;
+    }
+    $stmt->bind_param("isii", $of_id, $draft_id, $user_id, $design_order_id);
+    if (!$stmt->execute()) {
+        error_log('createNewTeamDraft tbl_order_form execute failed: ' . $stmt->error);
+        $stmt->close();
+        return 0;
+    }
+    $stmt->close();
+
+    return $of_id;
+}
