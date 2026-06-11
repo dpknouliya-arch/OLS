@@ -292,7 +292,7 @@ $color_list_json = json_encode($color_list);
     </div>
     <div class="ols3d-modal-footer">
       <button class="ols3d-modal-cancel" type="button" onclick="closeAddTeamModal()">Cancel</button>
-      <button class="ols3d-modal-save"   type="button" onclick="confirmAddTeam()">Add Team</button>
+      <button class="ols3d-btn-primary"   type="button" onclick="confirmAddTeam()">Add Team</button>
     </div>
   </div>
 </div>
@@ -482,9 +482,9 @@ $color_list_json = json_encode($color_list);
   }
 
   /* ── Add a new team ── */
-  function addTeam(name, year) {
+  function addTeam(name, year, ofId) {
     var tid  = ++teamIdCtr;
-    var team = { teamId: tid, of_id: 0, name: name, year: year, rows: [] };
+    var team = { teamId: tid, of_id: ofId || 0, name: name, year: year, rows: [] };
     teams.push(team);
 
     var container = document.getElementById('teamPanelsContainer');
@@ -563,7 +563,23 @@ $color_list_json = json_encode($color_list);
       return;
     }
     closeAddTeamModal();
-    addTeam(name, year);
+    // Create the draft record immediately so every team has a real of_id at save time
+    fetch('ajax/roster/create_team_draft.php', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ design_order_id: DESIGN_ORDER_ID })
+    })
+    .then(function (r) { return r.json(); })
+    .then(function (data) {
+      if (data.success) {
+        addTeam(name, year, data.of_id);
+      } else {
+        showToast('Could not add team: ' + (data.message || 'Please try again.'));
+      }
+    })
+    .catch(function (e) {
+      showToast('Could not add team: ' + e.message);
+    });
   };
 
   /* ── Collect rows from one team tbody ── */
