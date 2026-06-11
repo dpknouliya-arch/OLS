@@ -87,7 +87,7 @@ function create3DOrderDraft($conn, $design_order_id, $user_id) {
              bill_country, bill_zip_code, bill_tel, bill_email,
              deli_comp_name, deli_contact_name, deli_address, deli_city,
              deli_country, deli_zip_code, deli_tel, deli_email,
-             date_add)
+             date_add, enable)
          VALUES
             (?, ?, 0, '3D Jersey', '',
              CURDATE(), 'draft',
@@ -98,7 +98,7 @@ function create3DOrderDraft($conn, $design_order_id, $user_id) {
              '', '', '', '',
              '', '', '', '',
              '', '', '', '',
-             NOW())"
+             NOW(), 1)"
     );
     if (!$stmt) {
         error_log('create3DOrderDraft tbl_order_form INSERT prepare failed: ' . $conn->error);
@@ -183,7 +183,7 @@ function createNewTeamDraft($conn, $design_order_id, $user_id) {
              bill_country, bill_zip_code, bill_tel, bill_email,
              deli_comp_name, deli_contact_name, deli_address, deli_city,
              deli_country, deli_zip_code, deli_tel, deli_email,
-             date_add)
+             date_add, enable)
          VALUES
             (?, ?, 0, '3D Jersey', '',
              CURDATE(), 'draft',
@@ -194,7 +194,7 @@ function createNewTeamDraft($conn, $design_order_id, $user_id) {
              '', '', '', '',
              '', '', '', '',
              '', '', '', '',
-             NOW())"
+             NOW(), 1)"
     );
     if (!$stmt) {
         error_log('createNewTeamDraft tbl_order_form prepare failed: ' . $conn->error);
