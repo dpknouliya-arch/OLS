@@ -204,7 +204,7 @@ foreach ($orders as $o) {
            data-submitted="<?= $is_submitted ?>">
 
         <div class="ols3d-card-img">
-          <img src="<?= S3_Buckets ?><?= $brand_id ?>/<?= $img ?>" alt="<?= $name ?>">
+          <img src="<?= $img ?>" alt="<?= $name ?>">
         </div>
 
         <?php if (!$is_submitted): ?>

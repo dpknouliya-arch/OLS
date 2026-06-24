@@ -17,6 +17,10 @@ unset($_SESSION['JOGOLS']);
 $_SESSION['OLS_BRAND_ID'] = $_logout_brand_id;
 set_ols_brand_id($_logout_brand_id);
 
-header('Location: ' . OLS_BASE_URL . '/login.php');
+if($_logout_brand_id == 1){
+    header('Location: ' . OLS_BASE_URL . '/login.php');
+}else{
+    header('Location: ' . OLS_BASE_URL . '/bauer_login.php');
+}
 exit;
 ?>

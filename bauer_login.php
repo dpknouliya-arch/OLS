@@ -3,12 +3,12 @@ session_start();
 require_once __DIR__ . '/db.php';
 
 $brand = [
-    'name'       => 'JOG Athletics',
-    'logo'       => 'images/logo/jogLOGO.png',
-    'login_logo' => 'assets/images/auth/Joglogosymbol.png',
-    'favicon'    => 'images/logo/feviconIcon.png',
-    'page_title' => 'JOG Online Services',
-    'copyright'  => 'Copyright &copy; 2024 JOG Athletics. All rights reserved.',   
+    'name'       => 'Bauer Hockey',
+    'logo'       => 'images/logo/bauerLogoWhite.webp',
+    'login_logo' => 'assets/images/auth/bauerLogoBlack.webp',
+    'favicon'    => 'images/logo/bauerFeviconIcon.png',
+    'page_title' => 'Bauer Online Services',
+    'copyright'  => 'Copyright &copy; ' . date('Y') . ' Bauer Hockey. All rights reserved.',    
 ];
 
 ?>
@@ -132,9 +132,11 @@ $brand = [
                                                 </div>
                                             </div>
                                         </div>
-                                        <p class="text-center column2 mb-0">or</p>
-                                        <a class="btn  teamMemberLoginBtn team_m_login column2" href="#teamMemberLogin">Team Members - Login Here</a>
-                                        <a href="#SalesLogin" class="btn salesLoginOls team_m_login column2" id="salesloginform">Login as Sales</a>
+                                        <div class="d-none">
+                                            <p class="text-center column2 mb-0">or</p>
+                                            <a class="btn  teamMemberLoginBtn team_m_login column2" href="#teamMemberLogin">Team Members - Login Here</a>
+                                            <a href="#SalesLogin" class="btn salesLoginOls team_m_login column2" id="salesloginform">Login as Sales</a>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="wrapper mt-5 text-gray">
@@ -375,7 +377,7 @@ $brand = [
                 url: "request_reset_password.php",
                 data: {
                     "email": window.btoa(email),
-                    "brand_id": 1
+                    "brand_id": 2
                 },
                 success: function(resp) {
                     if (resp.result == "success") {
@@ -589,7 +591,7 @@ $brand = [
                 data: {
                     "user": window.btoa(user_email),
                     "password": window.btoa(user_password),
-                    "brand_id": 1
+                    "brand_id": 2
                 },
                 success: function(resp) {
                     if (resp.result == "success") {
