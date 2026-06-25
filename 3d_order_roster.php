@@ -311,7 +311,7 @@ $color_list_json = json_encode($color_list);
   var PATTERN_CUTS  = ['Adult','Youth'];
   var PG_OPTIONS    = ['Player','Goalie'];
   var JERSEY_COLORS = <?= $color_list_json ?>;
-  var COR_A_OPTS    = ['','C','A'];
+  var COR_A_OPTS    = ['C','A'];
 
   /* ── State ── */
   var teamIdCtr   = 0;
@@ -364,7 +364,7 @@ $color_list_json = json_encode($color_list);
       '<td>' + inp(d.sock_qty,    '0', 'number')    + '</td>' +
       '<td>' + inp(d.sock_color2,  'Sock color 2')  + '</td>' +
       '<td>' + inp(d.sock_qty2,   '0', 'number')    + '</td>' +
-      '<td>' + sel(COR_A_OPTS,    d.cor_a,              '—')      + '</td>' +
+      '<td>' + sel(COR_A_OPTS,    d.cor_a,              '-Select-')      + '</td>' +
       '<td>' + inp(d.name_for_packing, 'Packing name') + '</td>' +
       '<td>' + inp(d.notes,        'Notes')          + '</td>';
     return tr;

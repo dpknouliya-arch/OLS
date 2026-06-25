@@ -69,14 +69,14 @@ $row_product = $rs_prod->fetch_assoc();
 					</td>
 				<?php if ($brand_id == 2): ?>
 				<tr>
-					<td style="text-align: left; border-width: 0px; " class="link"><u>www.bauer.com</u></td>
+					<td style="text-align: left; border-width: 0px; " class="link"><a href="https://www.bauer.com/" style="text-decoration: underline;">www.bauer.com</a></td>
 				</tr>
 				<?php else: ?>
 				<tr>
-					<td style="text-align: left; border-width: 0px;  " class="link"><u>www.jogsportswear.com</u></td>
+					<td style="text-align: left; border-width: 0px;  " class="link"><a href="https://jogsportswear.com/" style="text-decoration: underline;">www.jogsportswear.com</a></td>
 				</tr>
 				<tr>
-					<td style="text-align: left; border-width: 0px; " class="link"><u>www.jogsports.com</u></td>
+					<td style="text-align: left; border-width: 0px; " class="link"><a href="https://www.jogsports.com/" style="text-decoration: underline;">www.jogsports.com</a></td>
 				</tr>
 				<?php endif; ?>
 				<tr style="background-color: #CCF;">
