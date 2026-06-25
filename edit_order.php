@@ -425,7 +425,28 @@ $s_of_id_list = implode(",", $a_of_id);
          width: 45px !important ;
     }
 </style>
+<script>
+		$(document).ready(function () {
 
+		$("#form_manage_save")
+			.find("input:not([type='hidden']), textarea")
+			.prop("readonly", true);
+
+		$("#form_manage_save")
+			.find("select")
+			.prop("disabled", true);
+
+		$(".editForm").on("click", function(e){
+			e.preventDefault();
+
+			const section = $(this).closest(".boxes");
+
+			section.find("input, textarea").prop("readonly", false);
+			section.find("select").prop("disabled", false);
+		});
+
+	});
+</script>
 <div class="editORderPage">
 	<div class=" pageHeader">
 		<h2>Editing Order</h2>
@@ -470,7 +491,7 @@ $s_of_id_list = implode(",", $a_of_id);
 							<div class="boxes">
 								<div class="formTitle d-flex align-items-center flex-row">
 									<h6 class="subHeading m-0">Billing Information </h6>
-									<a href="#" class="sm-Btn">Edit</a>
+									<a href="#" class="sm-Btn editForm">Edit</a>
 								</div>
 								<fieldset class="grid2 singleFrom">
 									<div class="form-group column2">
