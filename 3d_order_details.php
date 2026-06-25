@@ -622,6 +622,10 @@ function getPantonNameAPI($zone, $designId, $type = 'pantonName') {
        class="ols3d-btn-primary">
       Continue to Add Roster →
     </a>
+    <a href="?vp=<?= base64_encode('order_info') ?>&order_id=<?= $order_id_enc ?>"
+       class="ols3d-btn-primary">
+      Skip Roster
+    </a>
     <a href="?vp=<?= base64_encode('3d_orders') ?>" class="ols3d-btn-secondary">
       Save Draft
     </a>
