@@ -365,7 +365,7 @@ include('check-session.php');
 
                                 <label for=""> Zipcode <span class="required-star">*</span></label>
 
-                                <input type="text" name="zipcode" id="edit_zipcode" class="form-control" maxlength="20" placeholder="Add Zip Code..">
+                                <input type="number" name="zipcode" id="edit_zipcode" class="form-control" maxlength="20" placeholder="Add Zip Code..">
                                 <div id="error_zipcode" class="validation-message"></div>
 
                             </div>
