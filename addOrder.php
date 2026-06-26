@@ -97,23 +97,23 @@ if ($num_row == 0) {
         text-align: center !important;
     }
 
-    
-    .w-45{
-         width: 45px !important ;
+
+    .w-45 {
+        width: 45px !important;
     }
 
-    .addOrderPage .open_add_new_modal{
-            background: white;
-            color: #333333;
-            display: flex;
-            border: none;
-            box-shadow: 0px 1px 4px 0px #0000001A;
-            border: 1px solid #DDDDDD;
-            height: 39px;
-            border-radius: 6px 6px 1px 1px;
-            align-items: center;
-            width: 124px;
-            justify-content:center ;
+    .addOrderPage .open_add_new_modal {
+        background: white;
+        color: #333333;
+        display: flex;
+        border: none;
+        box-shadow: 0px 1px 4px 0px #0000001A;
+        border: 1px solid #DDDDDD;
+        height: 39px;
+        border-radius: 6px 6px 1px 1px;
+        align-items: center;
+        width: 124px;
+        justify-content: center;
     }
 </style>
 
@@ -179,7 +179,7 @@ if ($num_row == 0) {
                                     </div>
                                     <div class="form-group column2">
                                         <label for="" class="w-100 text-start  c-label">Country <span class="required">*</span> </label>
-                                        <input type="text" name="country" id="bi_country" maxlength="30"  value="<?php echo $a_data[0]["country"]; ?>">
+                                        <input type="text" name="country" id="bi_country" maxlength="30" value="<?php echo $a_data[0]["country"]; ?>">
                                     </div>
                                     <div class="form-group">
                                         <label for="" class="w-100 text-start  c-label">City <span class="required">*</span> </label>
@@ -198,7 +198,7 @@ if ($num_row == 0) {
                                         <input type="number" name="tel" id="bi_tel" maxlength="30" value="<?php echo $a_data[0]["tel"]; ?>">
                                     </div>
                                     <div class="form-group column2">
-                                        <label for="" class="w-100 text-start  c-label">TAX ID  </label>
+                                        <label for="" class="w-100 text-start  c-label">TAX ID </label>
                                         <input type="text" name="tax_id" id="bi_tax_id" maxlength="30" value="<?php echo $a_data[0]["tax_id"]; ?>">
                                         <input type="hidden" name="bill_addr_id" id="bi_addr_id" value="<?php echo $a_data[0]["addr_id"]; ?>">
                                     </div>
@@ -426,15 +426,15 @@ if ($num_row == 0) {
                                         </div>
                                         <div class="d-flex gap-2">
 
-                                            <span class="themeBtn iconBTn teamAndRosterDetails" id="showTeamTabsSection">Save and Continue <figure class="m-0"><img src="images/vector/nextBtn.png" alt=""></figure></span>
+                                            <span class="primaryBtn btnsStyle teamAndRosterDetails" id="showTeamTabsSection">Save and Continue <figure class="m-0"><img src="images/vector/nextBtn.png" alt=""></figure></span>
 
-                                         
 
-                                            <span class="" style="height: 55px; width: 151px; overflow: hidden; position: relative ;top: 10px;">
-                                                <input type="file" class="form-control " accept=".xlsx" name="order_form_file" id="order_form_file">
+
+                                            <span class="" style="height: 40px; width: 215px; overflow: hidden; position: relative ; ">
+                                                <input type="file" class="form-control " accept=".xlsx" name="order_form_file" id="order_form_file" style="font-size: 13px;">
                                             </span>
 
-                                            <button class="orderFormUpload btn btn-sm btn themeBtn2 iconBTn" type="button">
+                                            <button class="orderFormUpload primaryBorderBtn btnsStyle" type="button">
                                                 <figure class="m-0">
                                                     <img src="images/vector/upload.png" alt="">
                                                 </figure>
@@ -462,7 +462,7 @@ if ($num_row == 0) {
                                         button.</li>
                                 </ol>
                                 <p class="XSmall grey">You can download a Blank Order Form here</p>
-                                <a href="src/download/OLS.xls" download="Blank-Order-Form.xls" class="themeBtn2 d-flex gap-3 iconBTn">
+                                <a href="./assets/Blank_Order_Form.xlsx" download="Blank_Order_Form.xls" class="themeBtn2 d-flex gap-3 iconBTn">
                                     <figure class="m-0">
                                         <img src="images/vector/OLSNew.png" alt="">
                                     </figure> Download <figure class="m-0">
@@ -477,9 +477,9 @@ if ($num_row == 0) {
                             <ul class="nav nav-tabs whiteBg" id="teamTab" role="tablist">
                                 <li class="nav-item" role="presentation">
                                     <button class="btn btn-sm btn-primary open_add_new_modal" id="addNewTeamButton" type="button">
-                                         <figure class="m-0"><img src="images/vector/add.png" alt="" style="width: 16px;">
-                                         </figure>
-                                          Add New
+                                        <figure class="m-0"><img src="images/vector/add.png" alt="" style="width: 16px;">
+                                        </figure>
+                                        Add New
                                     </button>
                                     <!-- <a class="nav-link d-flex  open_add_new_modal" >
                                        
@@ -662,22 +662,22 @@ addNewTeam Member Modal
 
                     <span class="themeBtn text-center" id="AddNewTeamModal">Save and Continue</span>
 
-                   <div class="d-flex gap-2">
+                    <div class="d-flex gap-2 align-items-center">
 
-                            <span class="" style="height: 55px; width: 151px; overflow: hidden; position: relative ;top: 10px;">
-                                <input type="file" class="form-control " accept=".xlsx" name="new_order_form_file" id="new_order_form_file">
-                            </span>
+                        <span class="" style="height: 55px; width: 151px; overflow: hidden; position: relative ;top: 10px;">
+                            <input type="file" class="form-control " accept=".xlsx" name="new_order_form_file" id="new_order_form_file">
+                        </span>
 
-                            <button class="UploadOrderFormNew btn btn-sm themeBtn2 iconBTn" type="button">
-                                <figure class="m-0">
-                                    <img src="images/vector/upload.png" alt="">
-                                </figure>
-                                &nbsp; <span>Upload Order Form </span>
-                            </button>
+                        <button class="UploadOrderFormNew btn btn-sm themeBtn2 iconBTn" type="button">
+                            <figure class="m-0">
+                                <img src="images/vector/upload.png" alt="">
+                            </figure>
+                            &nbsp; <span>Upload Order Form </span>
+                        </button>
 
-                   </div>
+                    </div>
 
-                    
+
 
                 </div>
 
@@ -832,8 +832,6 @@ addNewTeam Member Modal
 <!-- Toggles  -->
 
 <script>
-    
-
     $(document).ready(function() {
         $('#toggleGuide').click(function() {
             $('#detailsList').fadeToggle(300); // Adjust duration as needed
@@ -955,26 +953,26 @@ addNewTeam Member Modal
 
                 $('.teamTabsSection').show(300); // Adjust duration as needed
                 $('#table_showing').append(response.html);
-            
+
 
                 if (newOrderForm == true) {
                     $('#addNewTeam').modal('hide');
                 }
 
 
-                  form_id = parseInt(form_id);
+                form_id = parseInt(form_id);
 
-                  form_id++;
+                form_id++;
 
-                    $('#form_id_inc').val(form_id);
+                $('#form_id_inc').val(form_id);
 
-                    $('#form_id_inc_modal').val(form_id);
+                $('#form_id_inc_modal').val(form_id);
 
-                    tmp_num_form = parseInt($('#tmp_num_form').val());
+                tmp_num_form = parseInt($('#tmp_num_form').val());
 
-                    tmp_num_form++;
+                tmp_num_form++;
 
-                    $('#tmp_num_form').val(tmp_num_form);
+                $('#tmp_num_form').val(tmp_num_form);
 
                 spanText.text('Upload Order Form');
 
@@ -1065,7 +1063,7 @@ addNewTeam Member Modal
                     $('#input_on_team_name_new').val("");
 
                     $('#input_on_year_new').val("");
-                    $('#prod_id_new').val(""); 
+                    $('#prod_id_new').val("");
 
                     form_id = parseInt(form_id);
 
@@ -1189,10 +1187,10 @@ addNewTeam Member Modal
 
                     $('#table_showing').append(resp);
 
-                     $('#input_on_team_name').val("");
+                    $('#input_on_team_name').val("");
 
-                      $('#input_on_year').val("");
-                      $('#prod_id').val(''); 
+                    $('#input_on_year').val("");
+                    $('#prod_id').val('');
 
                     form_id = parseInt(form_id);
 
@@ -1292,8 +1290,8 @@ addNewTeam Member Modal
 
                     $('#input_on_team_name').val("");
 
-                     $('#input_on_year').val("");
-                      $('#prod_id_new').val(''); 
+                    $('#input_on_year').val("");
+                    $('#prod_id_new').val('');
 
                     form_id = parseInt(form_id);
 
@@ -1328,10 +1326,6 @@ addNewTeam Member Modal
 
 
 <script>
-
-
-
-
     document.addEventListener('DOMContentLoaded', function() {
 
         const tabLinks = document.querySelectorAll('.switch-tab');
@@ -1405,10 +1399,10 @@ addNewTeam Member Modal
         $('button[data-bs-target="#' + tabPaneId + '"], a[href="#' + tabPaneId + '"]').remove();
 
         // Activate first available tab
-        let first_tab = $('.add_order_nav_link:first'); 
-        let href  = first_tab.attr('href'); 
-        first_tab.addClass('active'); 
-        $(href).addClass('show active'); 
+        let first_tab = $('.add_order_nav_link:first');
+        let href = first_tab.attr('href');
+        first_tab.addClass('active');
+        $(href).addClass('show active');
     }
 
     function addItemRow(form_id, prod_id) {
@@ -1477,7 +1471,7 @@ addNewTeam Member Modal
 
 
     function calculateQTY(prod_id, class_name) {
-    
+
 
         var qty_total = 0;
         $('.' + class_name).each(function() {
@@ -1894,23 +1888,23 @@ addNewTeam Member Modal
             $('#form1').attr("action", "ajax/manage_order/submit_draft.php");
 
             // $('#form1').on('submit', function(e) {
-			// 	    e.preventDefault();
+            // 	    e.preventDefault();
 
-			// 	   console.log("form sunmit "); 
+            // 	   console.log("form sunmit "); 
 
-             
 
-			// 	$.ajax({
-			// 			url: "./ajax/manage_order/submit_draft.php",
-			// 			type: "POST",
-			// 			data: $(this).serialize(),
-			// 			success: function(res) {
-			// 			console.log(res);
-			// 	}
-			// 	});
-			// });
 
-				
+            // 	$.ajax({
+            // 			url: "./ajax/manage_order/submit_draft.php",
+            // 			type: "POST",
+            // 			data: $(this).serialize(),
+            // 			success: function(res) {
+            // 			console.log(res);
+            // 	}
+            // 	});
+            // });
+
+
             $('#form1').submit();
         }
 
@@ -1920,45 +1914,45 @@ addNewTeam Member Modal
 <script>
     // Function to delete a row
 
-   
-   function deleteRow(button) {
 
-    const row = button.closest('tr'); // works if button is DOM element
-
-    // Safely get data attributes (works without jQuery)
-    let prod_id = row.getAttribute('data-prod_id');
-    let form_id = row.getAttribute('data-form_id');
-
-    if (row) {
-        row.remove(); // modern cleaner way
-    }
-
-    // Convert to number if needed
-    prod_id = parseInt(prod_id);
-
-    // Make sure split_no exists
-    let split = (typeof split_no !== 'undefined') ? split_no : 1;
- 
-
-    if (prod_id === 1) {
-        calculateQTY(1, 'jersey_qty_' + form_id);
-        calculateQTY(1, 'jersey_qty2_' + form_id);
-        calculateQTY(1, 'sock_qty_' + form_id);
-        calculateQTY(1, 'sock_qty2_' + form_id);
-    } else {
-        if (split === 1) {
-            calculateQTY(prod_id, 'jersey_qty_' + form_id);
-        } else {
-            calculateQTY(prod_id, 'jersey_qty_' + form_id);
-            calculateQTY(prod_id, 'sock_qty_' + form_id);
+    function deleteRow(button) {
+        if (!confirm("Deleting row. Confirm?")) {
+            // return;
         }
+        const row = button.closest('tr'); // works if button is DOM element
+
+        // Safely get data attributes (works without jQuery)
+        let prod_id = row.getAttribute('data-prod_id');
+        let form_id = row.getAttribute('data-form_id');
+
+        if (row) {
+            row.remove(); // modern cleaner way
+        }
+
+        // Convert to number if needed
+        prod_id = parseInt(prod_id);
+
+        // Make sure split_no exists
+        let split = (typeof split_no !== 'undefined') ? split_no : 1;
+
+
+        if (prod_id === 1) {
+            calculateQTY(1, 'jersey_qty_' + form_id);
+            calculateQTY(1, 'jersey_qty2_' + form_id);
+            calculateQTY(1, 'sock_qty_' + form_id);
+            calculateQTY(1, 'sock_qty2_' + form_id);
+        } else {
+            if (split === 1) {
+                calculateQTY(prod_id, 'jersey_qty_' + form_id);
+            } else {
+                calculateQTY(prod_id, 'jersey_qty_' + form_id);
+                calculateQTY(prod_id, 'sock_qty_' + form_id);
+            }
+        }
+
+        // Remove row safely
+
     }
-
-    // Remove row safely
-    
-}
-
-
 </script>
 
 
@@ -2173,8 +2167,8 @@ addNewTeam Member Modal
         // isValid &= validateField('#bi_address', VALIDATION_PATTERNS.text, 'Only letters and spaces allowed');
         // isValid &= validateField('#de_address', VALIDATION_PATTERNS.text, 'Only letters and spaces allowed');
 
-        isValid &= ValidateOnlyEmpty('#bi_address',  'Address is required');
-        isValid &= ValidateOnlyEmpty('#de_address',  'Address is required');
+        isValid &= ValidateOnlyEmpty('#bi_address', 'Address is required');
+        isValid &= ValidateOnlyEmpty('#de_address', 'Address is required');
 
         isValid &= validateField('#bi_zip_code', VALIDATION_PATTERNS.zipcode, 'Invalid zipcode');
         isValid &= validateField('#de_zip_code', VALIDATION_PATTERNS.zipcode, 'Invalid zipcode');

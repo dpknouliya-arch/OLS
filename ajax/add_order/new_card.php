@@ -123,7 +123,7 @@
 
 
                                                 <figure class="m-0 d-inline iconBTn">
-                                                    <img  src="images/vector/delter.png" alt="" style="width: 30px; background: #FFF; padding: 6px;margin-left: 20px;">
+                                                    <img src="images/vector/delter.png" alt="" style="width: 30px; background: #FFF; padding: 6px;margin-left: 20px;">
 
                                                 </figure>
                                             </span>
@@ -264,7 +264,7 @@
 
                                         <input type="hidden" name="a_oi_id[<?php echo $form_id; ?>][]" value="new">
 
-                                        <button class="deleteRow border-none bg-none" onclick="deleteRow(this)">
+                                        <button class="deleteRow border-none bg-none 111" onclick="deleteRow(this)">
 
                                             <figure class="m-0"><img src="images/vector/deleteGrey.png" alt=""></figure>
 
@@ -380,9 +380,9 @@
                         </tbody>
                         <tr>
 
-                            <td colspan="2">
+                            <td colspan="1">
 
-                                <span id="addRowButton" class=" addRowButtoncls bg-none border-none d-flex justify-content-between w-100" onclick="return addItemRow(<?php echo $form_id; ?>,1);">
+                                <span id="addRowButton" class=" addRowButtoncls bg-none border-none w-100" onclick="return addItemRow(<?php echo $form_id; ?>,1);">
                                     <figure class="m-0"><img src="images/vector/add.png" alt=""> </figure>
                                 </span>
 
@@ -432,17 +432,17 @@
 
                         <tr>
 
-                                <!-- <th style="border-width: 0px; background-color: #FFA;"></th> -->
+                            <!-- <th style="border-width: 0px; background-color: #FFA;"></th> -->
 
-                                <th colspan="2" style="background: #F9F9F9 !important;   padding: 10px 0 10px 10px !important;">
-                                    <p class="mb-0" style="background: #222222;  text-align: center;  font-size: 13px;  font-weight: 500;  padding: 10px !important;  border-radius: 15px 0 0 15px;">
-                                        Special Comments (if any)
-                                    </p>
-                                </th>
+                            <th colspan="2" style="background: #F9F9F9 !important;   padding: 10px 0 10px 10px !important;">
+                                <p class="mb-0" style="background: #222222;  text-align: center;  font-size: 13px;  font-weight: 500;  padding: 10px !important;  border-radius: 15px 0 0 15px;">
+                                    Special Comments (if any)
+                                </p>
+                            </th>
 
-                                <th colspan="16" style="background-color: #F9F9F9 !important; padding: 10px  10px 10px 0 !important;">
-                                    <input type="text" name="special_comment[<?= $form_id ?>]" placeholder="Enter Special Comment here..." style=" width: 100%; background:#FFF !important; border: 1px solid #eee; padding: 8px; border-radius: 0 20px 20px 0;">
-                                </th>
+                            <th colspan="16" style="background-color: #F9F9F9 !important; padding: 10px  10px 10px 0 !important;">
+                                <input type="text" name="special_comment[<?= $form_id ?>]" placeholder="Enter Special Comment here..." style=" width: 100%; background:#FFF !important; border: 1px solid #eee; padding: 8px; border-radius: 0 20px 20px 0;">
+                            </th>
 
                         </tr>
 
@@ -500,14 +500,14 @@
 
                                 <div class="d-inline">
 
-                                  
+
                                     <h6 class="my-auto"><?php echo $form_name; ?>(<?php echo $row_product["prod_name"]; ?>) <span href="#" class="d-inline deleteTable" onclick="removeTable(this)">
                                             <figure class="m-0 d-inline">
                                                 <img src="images/vector/delter.png" alt="" style="width: 30px; background: #FFF; padding: 6px;margin-left: 20px;">
                                             </figure>
                                         </span></h6>
 
-                                  
+
 
 
                                 </div>
@@ -772,9 +772,9 @@
                         <tfoot>
                             <tr>
 
-                                <td colspan="2">
-                                    <span id="addRowButton" class="addRowButtoncls bg-none border-none d-flex justify-content-between w-100" onclick="return addItemRow(<?php echo $form_id; ?>,<?php echo $prod_id; ?>);">
-                                        <figure class="m-0"><img src="../../images/vector/add.png" alt=""></figure>
+                                <td colspan="1">
+                                    <span id="addRowButton" class="addRowButtoncls bg-none border-none w-100" onclick="return addItemRow(<?php echo $form_id; ?>,<?php echo $prod_id; ?>);">
+                                        <figure class="m-0"><img src="../images/vector/add.png" alt=""></figure>
                                     </span>
                                     <input type="hidden" id="num_item_<?php echo $form_id; ?>" value="<?php echo $tet; ?>">
 
@@ -1364,9 +1364,9 @@
                             ?>
                         </tbody>
                         <tr>
-                            <td colspan="2">
-                                <span id="addRowButton" class="addRowButtoncls bg-none border-none d-flex justify-content-between w-100" onclick="return addItemRow(<?php echo $form_id; ?>,<?php echo $prod_id; ?>);">
-                                    <figure class="m-0"><img src="../../images/vector/add.png" alt=""></figure>
+                            <td colspan="1">
+                                <span id="addRowButton" class="addRowButtoncls bg-none border-none w-100" onclick="return addItemRow(<?php echo $form_id; ?>,<?php echo $prod_id; ?>);">
+                                    <figure class="m-0"><img src="../images/vector/add.png" alt=""></figure>
                                 </span>
                                 <input type="hidden" id="num_item_<?php echo $form_id; ?>" value="<?php echo $tet; ?>">
 

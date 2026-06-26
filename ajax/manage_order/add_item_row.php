@@ -31,9 +31,9 @@
 
 if($prod_id=="1"){	
 ?>
-	<tr id="prod_item_<?php echo $form_id; ?>_<?php echo $row_id; ?>">
-		<td style="border-width: 0px; background-color: #FFA; font-size: 16px; color: #F00; cursor: pointer; text-align: right;" onclick="return deleteItemRow(<?php echo $form_id; ?>,'new',1,<?php echo $row_id; ?>);">
-			<i class="fa fa-minus-circle"></i>
+	<tr id="prod_item_<?php echo $form_id; ?>_<?php echo $row_id; ?>" class="add_item_row_manage">
+		<td style="border-width: 0px; background-color: #FFA; cursor: pointer;" onclick="return deleteItemRow(<?php echo $form_id; ?>,'new',1,<?php echo $row_id; ?>);">
+			<figure class="m-0"><img src="images/vector/deleteGrey.png" alt=""></figure>
 			<input type="hidden" name="a_oi_id[<?php echo $form_id; ?>][]" value="new">
 		</td>
 		<td><input class="white_in" name="player_name[<?php echo $form_id; ?>][]" type="text" maxlength="120"></td>
@@ -92,9 +92,9 @@ if($prod_id=="1"){
 	$split_name1 = $tmp_split[0];
 	$split_name2 = $tmp_split[1];*/
 ?>
-	<tr id="prod_item_<?php echo $form_id; ?>_<?php echo $row_id; ?>">
-		<td style="border-width: 0px; background-color: #FFA; font-size: 16px; color: #F00; cursor: pointer; text-align: right;" onclick="return deleteItemRow(<?php echo $form_id; ?>,'new',<?php echo $prod_id; ?>,<?php echo $row_id; ?>,2);">
-			<i class="fa fa-minus-circle"></i>
+	<tr id="prod_item_<?php echo $form_id; ?>_<?php echo $row_id; ?>" class="add_item_row_manage_222">
+		<td style="border-width: 0px; background-color: #FFA; cursor: pointer;" onclick="return deleteItemRow(<?php echo $form_id; ?>,'new',<?php echo $prod_id; ?>,<?php echo $row_id; ?>,2);">
+			<figure class="m-0"><img src="images/vector/deleteGrey.png" alt=""></figure>
 			<input type="hidden" name="a_oi_id[<?php echo $form_id; ?>][]" value="new">
 		</td>
 		<?php 
@@ -157,9 +157,9 @@ if($prod_id=="1"){
 }else{
 
 ?>
-	<tr id="prod_item_<?php echo $form_id; ?>_<?php echo $row_id; ?>">
-		<td style="border-width: 0px; background-color: #FFA; font-size: 16px; color: #F00; cursor: pointer; text-align: right;" onclick="return deleteItemRow(<?php echo $form_id; ?>,'new',<?php echo $prod_id; ?>,<?php echo $row_id; ?>,1);">
-			<i class="fa fa-minus-circle"></i>
+	<tr id="prod_item_<?php echo $form_id; ?>_<?php echo $row_id; ?>" class="add_item_row_manage_333">
+		<td style="border-width: 0px; background-color: #FFA; cursor: pointer;" onclick="return deleteItemRow(<?php echo $form_id; ?>,'new',<?php echo $prod_id; ?>,<?php echo $row_id; ?>,1);">
+			<figure class="m-0"><img src="images/vector/deleteGrey.png" alt=""></figure>
 			<input type="hidden" name="a_oi_id[<?php echo $form_id; ?>][]" value="new">
 		</td>
 		<?php 

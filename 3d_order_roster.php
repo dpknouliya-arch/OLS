@@ -356,14 +356,14 @@ $color_list_json = json_encode($color_list);
       '<td>' + sel(JERSEY_SIZES,  d.jersey_size,        'Size')   + '</td>' +
       '<td>' + inp(d.jersey_no,   '#', 'text', 'maxlength="10" required oninput="this.value=this.value.replace(/[^0-9]/g,\'\')"') + '</td>' +
       '<td>' + inp(d.jersey_color,  'Jersey color')  + '</td>' +
-      '<td>' + inp(d.jersey_qty,   '1', 'number')    + '</td>' +
+      '<td>' + inp(d.jersey_qty,   '1', 'number', 'min="0" max="9999"')    + '</td>' +
       '<td>' + inp(d.jersey_color2, 'Jersey color 2') + '</td>' +
-      '<td>' + inp(d.jersey_qty2,  '0', 'number')    + '</td>' +
+      '<td>' + inp(d.jersey_qty2,  '0', 'number', 'min="0" max="9999"')    + '</td>' +
       '<td>' + sel(SOCK_SIZES,    d.sock_size,          'Size')   + '</td>' +
       '<td>' + inp(d.sock_color,   'Sock color')    + '</td>' +
-      '<td>' + inp(d.sock_qty,    '0', 'number')    + '</td>' +
+      '<td>' + inp(d.sock_qty,    '0', 'number', 'min="0" max="9999"')    + '</td>' +
       '<td>' + inp(d.sock_color2,  'Sock color 2')  + '</td>' +
-      '<td>' + inp(d.sock_qty2,   '0', 'number')    + '</td>' +
+      '<td>' + inp(d.sock_qty2,   '0', 'number', 'min="0" max="9999"')    + '</td>' +
       '<td>' + sel(COR_A_OPTS,    d.cor_a,              '-Select-')      + '</td>' +
       '<td>' + inp(d.name_for_packing, 'Packing name') + '</td>' +
       '<td>' + inp(d.notes,        'Notes')          + '</td>';

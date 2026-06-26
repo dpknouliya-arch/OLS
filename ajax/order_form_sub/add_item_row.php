@@ -27,7 +27,7 @@
 
 if($prod_id=="1"){	
 ?>
-	<tr id="prod_item_<?php echo $form_id; ?>_<?php echo $row_id; ?>">
+	<tr id="prod_item_<?php echo $form_id; ?>_<?php echo $row_id; ?>" class="add_item_row_sub">
 		<td style="border-width: 0px; background-color: #FFA; font-size: 16px; color: #F00; cursor: pointer; text-align: right;" onclick="return deleteItemRow(<?php echo $form_id; ?>,'new',1,<?php echo $row_id; ?>);">
 			<i class="fa fa-minus-circle"></i>
 			<input type="hidden" name="a_oi_id[<?php echo $form_id; ?>][]" value="new">
@@ -80,7 +80,7 @@ if($prod_id=="1"){
 	$split_name1 = $tmp_split[0];
 	$split_name2 = $tmp_split[1];*/
 ?>
-	<tr id="prod_item_<?php echo $form_id; ?>_<?php echo $row_id; ?>">
+	<tr id="prod_item_<?php echo $form_id; ?>_<?php echo $row_id; ?>" class="add_item_row_sub_222">
 		<td style="border-width: 0px; background-color: #FFA; font-size: 16px; color: #F00; cursor: pointer; text-align: right;" onclick="return deleteItemRow(<?php echo $form_id; ?>,'new',<?php echo $prod_id; ?>,<?php echo $row_id; ?>,2);">
 			<i class="fa fa-minus-circle"></i>
 			<input type="hidden" name="a_oi_id[<?php echo $form_id; ?>][]" value="new">
@@ -141,7 +141,7 @@ if($prod_id=="1"){
 }else{
 
 ?>
-	<tr id="prod_item_<?php echo $form_id; ?>_<?php echo $row_id; ?>">
+	<tr id="prod_item_<?php echo $form_id; ?>_<?php echo $row_id; ?>" class="add_item_row_sub_333">
 		<td style="border-width: 0px; background-color: #FFA; font-size: 16px; color: #F00; cursor: pointer; text-align: right;" onclick="return deleteItemRow(<?php echo $form_id; ?>,'new',<?php echo $prod_id; ?>,<?php echo $row_id; ?>,1);">
 			<i class="fa fa-minus-circle"></i>
 			<input type="hidden" name="a_oi_id[<?php echo $form_id; ?>][]" value="new">

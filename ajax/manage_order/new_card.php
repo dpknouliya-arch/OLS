@@ -115,7 +115,7 @@ if($prod_id=="1"){
 		    <?php
 		    for($tet=1;$tet<17;$tet++){
 		    ?>
-			<tr id="prod_item_<?php echo $form_id; ?>_<?=$tet?>">
+			<tr id="prod_item_<?php echo $form_id; ?>_<?=$tet?>" class="new_card">
 				<td style="border-width: 0px; background-color: #FFA; font-size: 16px; color: #F00; cursor: pointer; text-align: right;" onclick="return deleteItemRow('new',<?php echo $form_id; ?>,<?=$tet?>);">
 					<i class="fa fa-minus-circle"></i>
 					<input type="hidden" name="a_oi_id[<?php echo $form_id; ?>][]" value="new">
@@ -272,7 +272,7 @@ if($prod_id=="1"){
 			<th>Notes</th>
 		</tr>
 		<tbody id="prod_item_<?php echo $form_id; ?>">
-			<tr id="prod_item_<?php echo $form_id; ?>_1">
+			<tr id="prod_item_<?php echo $form_id; ?>_1" class="new_card_222">
 				<td style="border-width: 0px; background-color: #FFA; font-size: 16px; color: #F00; cursor: pointer; text-align: right;" onclick="return deleteItemRow('new',<?php echo $form_id; ?>,1,2);">
 					<i class="fa fa-minus-circle"></i>
 					<input type="hidden" name="a_oi_id[<?php echo $form_id; ?>][]" value="new">
@@ -481,7 +481,7 @@ if($prod_id=="1"){
 			<th>Notes</th>
 		</tr>
 		<tbody id="prod_item_<?php echo $form_id; ?>">
-			<tr id="prod_item_<?php echo $form_id; ?>_1">
+			<tr id="prod_item_<?php echo $form_id; ?>_1" class="new_card_333">
 				<td style="border-width: 0px; background-color: #FFA; font-size: 16px; color: #F00; cursor: pointer; text-align: right;" onclick="return deleteItemRow('new',<?php echo $form_id; ?>,1,1);">
 					<i class="fa fa-minus-circle"></i>
 					<input type="hidden" name="a_oi_id[<?php echo $form_id; ?>][]" value="new">

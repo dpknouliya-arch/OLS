@@ -365,7 +365,16 @@ include('check-session.php');
 
                                 <label for=""> Zipcode <span class="required-star">*</span></label>
 
-                                <input type="number" name="zipcode" id="edit_zipcode" class="form-control" maxlength="20" placeholder="Add Zip Code..">
+                                <input
+                                    type="text"
+                                    name="zipcode"
+                                    id="edit_zipcode"
+                                    class="form-control"
+                                    maxlength="20"
+                                    inputmode="numeric"
+                                    pattern="[0-9]*"
+                                    oninput="this.value=this.value.replace(/[^0-9]/g,'')"
+                                    placeholder="Add Zip Code..">
                                 <div id="error_zipcode" class="validation-message"></div>
 
                             </div>
@@ -731,7 +740,7 @@ include('check-session.php');
         $('.fa-exclamation-triangle').hide();
 
     }
- 
+
 
 
     function saveNewAddressInfo() {

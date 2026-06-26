@@ -261,11 +261,11 @@
 @media (max-width: 900px) { .ols3d-panels { grid-template-columns: 1fr; } }
 
 .ols3d-panel {
-  background: var(--card); border-radius: 14px;
+  background:#F8F9FC; border-radius: 14px;
   overflow: hidden; border: 1.5px solid var(--border);
 }
 .ols3d-panel-header {
-  padding: 14px 20px; border-bottom: 1px solid #F0F2F7;
+  padding: 14px 20px; border-bottom: 1px solid #F0F2F7;    background: #FFF;
   display: flex; align-items: center; justify-content: space-between;
 }
 .ols3d-panel-title { font-weight: 700; font-size: 13px; color: var(--text-dark); }
@@ -292,7 +292,7 @@
 .ols3d-view-tab:hover { background: var(--brand); border-color: var(--brand); color: white; }
 
 /* Art approval dark panel */
-.ols3d-panel-body   { padding: 16px 20px; }
+.ols3d-panel-body   { padding: 16px 20px; background: #87878714; height: 100%;}
 .ols3d-art-dark {
   background: #0a0a0a; border-radius: 10px;
   padding: 20px; display: flex; gap: 16px;
@@ -407,8 +407,8 @@
 
 /* Socks */
 .ols3d-socks-panel {
-  background: var(--card); border-radius: var(--r);
-  border: 1.5px solid var(--border); padding: 16px 20px; margin-bottom: 18px;
+  background: #87878714; border-radius: var(--r);
+  border: 1.5px solid #cbcbcb; padding: 16px 20px; margin-bottom: 18px;
 }
 .ols3d-socks-panel h5 { font-size: 13px; font-weight: 700; color: var(--text-dark); margin-bottom: 12px; }
 .ols3d-socks-panel img { max-width: 200px; height: auto; }

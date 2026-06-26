@@ -4,66 +4,79 @@
     src: url("../Fonts/HaettenschweilerJog4.ttf") format("truetype");
     font-display: swap;
 }
+
 @font-face {
     font-family: "JerseyM54Jog3";
     src: url("../Fonts/JerseyM54Jog3.ttf") format("truetype");
     font-display: swap;
 }
+
 @font-face {
     font-family: "NHLEdgeNewYorkIslandersJOG";
     src: url("../Fonts/NHLEdgeNewYorkIslandersJOG.ttf") format("truetype");
     font-display: swap;
 }
+
 @font-face {
     font-family: "SuperstarM54JOG";
     src: url("../Fonts/SuperstarM54JOG.ttf") format("truetype");
     font-display: swap;
 }
+
 @font-face {
     font-family: "BebasNeueJog2";
     src: url("../Fonts/BebasNeueJog2.ttf") format("truetype");
     font-display: swap;
 }
+
 @font-face {
     font-family: "Brobane";
     src: url("../Fonts/Brobane.ttf") format("truetype");
     font-display: swap;
 }
+
 @font-face {
     font-family: "NHLChicago";
     src: url("../Fonts/NHLChicago.ttf") format("truetype");
     font-display: swap;
 }
+
 @font-face {
     font-family: "NHLENYR_";
     src: url("../Fonts/NHLENYR_.ttf") format("truetype");
     font-display: swap;
 }
+
 @font-face {
     font-family: "NHLMA__";
     src: url("../Fonts/NHLMA__.ttf") format("truetype");
     font-display: swap;
 }
+
 @font-face {
     font-family: "PROBLOCK";
     src: url("../Fonts/PROBLOCK.ttf") format("truetype");
     font-display: swap;
 }
+
 @font-face {
     font-family: "BrushScriptStd";
     src: url("../Fonts/BrushScriptStd.ttf") format("truetype");
     font-display: swap;
 }
+
 @font-face {
     font-family: "ThirstyScriptExtraBoldDemo";
     src: url("../Fonts/ThirstyScriptExtraBoldDemo.ttf") format("truetype");
     font-display: swap;
 }
+
 @font-face {
     font-family: "AngletonScript";
     src: url("../Fonts/AngletonScript.otf") format("opentype");
     font-display: swap;
 }
+
 /* ──────────────────────────────────────────────────────────────── */
 
 .main-content {
@@ -644,7 +657,9 @@ td {
 
 .addOrderPage td {
 
-    border: 1px solid #C8C8C8
+    border: 1px solid #C8C8C8;
+    padding: 4px !important;
+    font-size: 12px;
 }
 
 
@@ -684,27 +699,30 @@ td {
 .addOrderPage .table-responsive input,
 
 .addOrderPage .table-responsive select {
-
     width: 100%;
-
     font-size: 13px;
-
     background: none;
-
-    border: none;
-
-    color: var(--grey-color);
+    border: 1px solid #3333331f;
+    color: #535353;
+    padding: 2px 4px;
+    border-radius: 4px;
+    cursor: pointer;
 
 }
 
+input:focus-visible {
+    outline: 1px solid #93c3ff;
+    box-shadow: none !important;
+}
 
 
 .addOrderPage ::placeholder {
 
     color: var(--grey-color);
+}
 
-
-
+.addOrderPage .addRowButtoncls img {
+    cursor: pointer;
 }
 
 
@@ -3441,8 +3459,8 @@ newOrderPage   design_approvalPage.php
 }
 
 
-.w-fit{
-     width: fit-content !important;
+.w-fit {
+    width: fit-content !important;
 }
 
 
@@ -3451,3 +3469,46 @@ newOrderPage   design_approvalPage.php
 newOrderPage   design_approvalPage.php
 
 ===================================================== */
+
+.primaryBtn {
+    background: #2F50A3;
+    color: #FFF;
+    border: 1px solid #2F50A3;
+}
+
+.primaryBtn:hover {
+    border: 1px solid #2F50A3;
+    color: #2F50A3;
+    background: #2f50a317;
+}
+
+.successBtn {
+    background: #066b061c;
+    color: #188218;
+    border: 1px solid #00800063
+}
+
+.primaryBorderBtn {
+    border: 1px solid #2F50A3;
+    color: #2F50A3;
+}
+
+.primaryBorderBtn:hover {
+    background: #2F50A3;
+    color: #FFF;
+}
+
+.btnsStyle {
+    font-size: 13px;
+    padding: 6px 10px;
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.btnsStyle img {
+    width: 15px;
+}
