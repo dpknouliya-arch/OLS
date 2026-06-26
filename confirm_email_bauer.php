@@ -330,7 +330,7 @@ $row_user = $rs_user->fetch_assoc();
 									$('#loginBtn').attr('href', url_src);
 									$('#successModal').modal('show');
 								}else{
-								$('#loginBtn').attr('href', 'login.php');
+								$('#loginBtn').attr('href', 'bauer_login.php');
 								$('#successModal').modal('show');
 								}
 							

@@ -7,6 +7,7 @@ if (!isset($_SESSION["JOGOLS"])) {
 }
 
 include('../../db.php');
+include_once('../../includes/order_helpers.php');
 
 header('Content-Type: application/json');
 
@@ -48,8 +49,13 @@ while ($row = $res->fetch_assoc()) {
 $stmt->close();
 
 if (empty($forms)) {
-    echo json_encode(['result' => 'fail', 'msg' => 'No order form found for this design order.']);
-    exit();
+    // Roster was skipped — create a placeholder order form so checkout can proceed
+    $of_id = createNewTeamDraft($conn, $design_order_id, $user_id);
+    if ($of_id <= 0) {
+        echo json_encode(['result' => 'fail', 'msg' => 'Failed to create order form. Please try again.']);
+        exit();
+    }
+    $forms = [['of_id' => $of_id, 'is_submitted' => 0]];
 }
 
 // Fetch billing address
