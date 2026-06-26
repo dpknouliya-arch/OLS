@@ -62,7 +62,8 @@
 
     transition: width 0.3s;
 
-    overflow: hidden;
+    overflow-y: auto;
+    scrollbar-width: none;
 
     padding: 10px 0;
 
@@ -514,8 +515,8 @@ table td {
 
     }
 
-    .graphsStatus{
-             grid-template-columns: repeat(1, 1fr) !important;
+    .graphsStatus {
+        grid-template-columns: repeat(1, 1fr) !important;
     }
 
 }

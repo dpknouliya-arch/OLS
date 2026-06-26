@@ -21,13 +21,13 @@ $TTL_SHELL = 0;
 $ttl_top = 0;
 $ttl_bottom = 0;
 
- 
+
 
 
 
 $sql_draft = "SELECT * FROM tbl_draft_of WHERE draft_id = ?  AND user_id = ?  AND enable = 1 ORDER BY of_id ASC";
 $stmt = $conn->prepare($sql_draft);
-$stmt->bind_param("si", $draft_id ,$user_id); // use "s" if draft_id is string
+$stmt->bind_param("si", $draft_id, $user_id); // use "s" if draft_id is string
 $stmt->execute();
 $rs_draft = $stmt->get_result();
 $num_row = $rs_draft->num_rows;
@@ -61,7 +61,7 @@ if ($rs_sub_user->num_rows > 0) {
 	}
 }
 
- 
+
 
 $num_of = $num_row;
 
@@ -415,34 +415,67 @@ $s_of_id_list = implode(",", $a_of_id);
 		padding: 1vw;
 	}
 
-	.required{
-		 border: none !important;
-		 color: red !important;
-		 height: 0px;
+	.required {
+		border: none !important;
+		color: red !important;
+		height: 0px;
 	}
 
-	  .w-45{
-         width: 45px !important ;
-    }
+	.w-45 {
+		width: 45px !important;
+	}
+
+	.readonly-field {
+		background: #d0ddff2b !important;
+		cursor: not-allowed;
+	}
+
+	.edit-inactive {
+		color: #2F50A3;
+		text-decoration: none;
+		font-weight: 500;
+	}
+
+	.edit-active {
+		color: #16a34a;
+	}
 </style>
 <script>
-		$(document).ready(function () {
+	$(document).ready(function() {
 
+		// Make all fields readonly initially
 		$("#form_manage_save")
 			.find("input:not([type='hidden']), textarea")
-			.prop("readonly", true);
+			.prop("readonly", true)
+			.addClass("readonly-field");
 
 		$("#form_manage_save")
 			.find("select")
-			.prop("disabled", true);
+			.prop("disabled", true)
+			.addClass("readonly-field");
 
-		$(".editForm").on("click", function(e){
+		// Style Edit button initially
+		$(".editForm").addClass("edit-inactive");
+
+		$(".editForm").on("click", function(e) {
 			e.preventDefault();
 
 			const section = $(this).closest(".boxes");
 
-			section.find("input, textarea").prop("readonly", false);
-			section.find("select").prop("disabled", false);
+			// Enable fields
+			section.find("input, textarea")
+				.prop("readonly", false)
+				.removeClass("readonly-field");
+
+			section.find("select")
+				.prop("disabled", false)
+				.removeClass("readonly-field");
+
+			// Update Edit button style
+			$(this)
+				.removeClass("edit-inactive")
+				.addClass("edit-active")
+				.text("Editing");
 		});
 
 	});
@@ -482,7 +515,7 @@ $s_of_id_list = implode(",", $a_of_id);
 			<input type="hidden" name="of_id_delete" id="of_id_delete" value="">
 			<input type="hidden" name="oi_id_delete" id="oi_id_delete" value="">
 			<!-- <input type="hidden" name="edit_draft_id" id="edit_draft_id" value="<?php echo $_POST["draft_id"]; ?>"> -->
-			<input type="hidden" name="edit_draft_id" id="edit_draft_id" value="<?php echo $draft_id ; ?>">
+			<input type="hidden" name="edit_draft_id" id="edit_draft_id" value="<?php echo $draft_id; ?>">
 
 			<div class="tab-content" id="myTabContent">
 				<div class="tab-pane tab-pane-forboc fade show active" id="billing" role="tabpanel" aria-labelledby="billing-tab">
@@ -501,8 +534,8 @@ $s_of_id_list = implode(",", $a_of_id);
 									</div>
 									<div class="form-group column2">
 										<label for="">Contact <span class="required">*</span></label>
-										<input type="text"  name="contact" id="bi_contact"   maxlength="50" value="<?php echo $a_data[0]["bill_contact_name"]; ?>">
-										
+										<input type="text" name="contact" id="bi_contact" maxlength="50" value="<?php echo $a_data[0]["bill_contact_name"]; ?>">
+
 									</div>
 
 									<div class="form-group">
@@ -516,7 +549,7 @@ $s_of_id_list = implode(",", $a_of_id);
 									</div>
 									<div class="form-group column2">
 										<label for="">Country <span class="required">*</span> </label>
-										<input type="text"   name="country" id="bi_country"  maxlength="100" value="<?php echo $a_data[0]["bill_country"]; ?>">
+										<input type="text" name="country" id="bi_country" maxlength="100" value="<?php echo $a_data[0]["bill_country"]; ?>">
 									</div>
 									<div class="form-group column2">
 										<label for="">TAX-ID </label>
@@ -547,7 +580,7 @@ $s_of_id_list = implode(",", $a_of_id);
 									<div class="checkbox">
 
 										<div>
-											<input type="checkbox" id="check" name="check" value=""  checked value=""/>
+											<input type="checkbox" id="check" name="check" value="" checked value="" />
 											<label for="check" class="XSmall">
 												Same
 												as Billing Info
@@ -567,7 +600,7 @@ $s_of_id_list = implode(",", $a_of_id);
 									<div class="form-group column2">
 										<label for="">Contact <span class="required">*</span> </label>
 										<input type="text" name="d_contact" id="de_contact" maxlength="200" value="<?php echo $a_data[0]["deli_contact_name"]; ?>">
-									
+
 									</div>
 									<div class="form-group">
 										<label for="">City <span class="required">*</span> </label>
@@ -575,7 +608,7 @@ $s_of_id_list = implode(",", $a_of_id);
 									</div>
 
 									<div class="form-group">
-										<label for="">ZipCode <span class="required">*</span>  </label>
+										<label for="">ZipCode <span class="required">*</span> </label>
 										<input type="text" name="d_zip_code" id="de_zip_code" maxlength="20" value="<?php echo $a_data[0]["deli_zip_code"]; ?>">
 									</div>
 									<div class="form-group column2">
@@ -598,7 +631,7 @@ $s_of_id_list = implode(",", $a_of_id);
 									<div class="form-group column2">
 										<label for="">Address <span class="required">*</span> </label>
 										<textarea name="d_address_info" class="form-control" id="de_address" rows="3"> <?php echo $a_data[0]["deli_address"]; ?></textarea>
-										
+
 									</div>
 								</fieldset>
 							</div>
@@ -611,17 +644,18 @@ $s_of_id_list = implode(",", $a_of_id);
 
 
 
-						<div class="submitBUtton column2">
-				
-							<a class="themeBtn iconBTn movetoOrderItem">
+						<div class="submitBUtton column2 d-flex gap-2 align-items-center justify-content-end">
+							<a class="themeBtn iconBTn movetoOrderItem d-flex gap-2 align-items-center ">
 								Save and Continue
 								<figure class="m-0"><img src="images/vector/nextBtn.png" alt=""></figure>
 							</a>
-
-							<a class="nav-link movetoOrderItem" >
+							<a class="nav-link movetoOrderItem">
 								<ion-icon name="checkmark-circle-outline" class="iconImg md hydrated" role="img"></ion-icon>
 								Order Information
 							</a>
+
+
+
 						</div>
 					</div>
 				</div>
@@ -716,33 +750,33 @@ $s_of_id_list = implode(",", $a_of_id);
 
 
 
-							   <div class="styled-select">
-                                <label for="" class="w-100 text-start  c-label">Reorder? They the previous JOG order EX# here</label>
-                                <select id="reorder_num" name="reorder_num" onchange="getReorder()">
-                                    <option value="">Reorder? Type the EX# here</option>
-                                    <?php
-									$re_order_num = $a_data[0]["reorder_num"] ; 
+							<div class="styled-select">
+								<label for="" class="w-100 text-start  c-label">Reorder? They the previous JOG order EX# here</label>
+								<select id="reorder_num" name="reorder_num" onchange="getReorder()">
+									<option value="">Reorder? Type the EX# here</option>
+									<?php
+									$re_order_num = $a_data[0]["reorder_num"];
 
-                                    //$sql_new = "SELECT * FROM tbl_order_form WHERE user_id='$user_id'";
-                                    $sql_new = "SELECT tbl_order_form.*,COUNT(DISTINCT tbl_order_form.prod_id) AS prod_num,COUNT(tbl_order_item.oi_id) AS item_num,SUM(tbl_order_item.qty_top1+tbl_order_item.qty_top2+tbl_order_item.qty_bottom1+tbl_order_item.qty_bottom2) AS qty_sum,tbl_user.full_name,tbl_user.customer_id FROM tbl_order_form LEFT JOIN tbl_product ON tbl_order_form.prod_id=tbl_product.prod_id LEFT JOIN tbl_order_item ON tbl_order_form.of_id=tbl_order_item.of_id LEFT JOIN tbl_user ON tbl_order_form.user_id=tbl_user.user_id WHERE tbl_order_form.user_id='$user_id' AND tbl_order_form.enable=1 AND tbl_order_form.order_status<>'finished' AND tbl_order_form.lkr_order_main_id IS NOT NULL AND tbl_order_form.order_status NOT IN ('shipped','received','archived') GROUP BY tbl_order_form.draft_id ORDER BY tbl_order_form.order_date DESC;";
-                                    $emps = $conn->query($sql_new);
-                                    $num_rows = $emps->num_rows;
-                                    if ($num_rows > 0) {
-                                        while ($row_selection = $emps->fetch_assoc()) {
-                                            if (!empty($row_selection['code_match'])) {
-											  $selection =	$re_order_num == $row_selection['code_match'] ? 'selected' : '';
-                                    ?>
-                                                <option value="<?= $row_selection['code_match'] ?>" <?= $selection ?> ><?= $row_selection['code_match'] ?></option>
-                                    <?php
-                                            }
-                                        }
-                                    }
-                                    ?>
-                                </select>
-                                <a class="nav-link d-flex" id="PreviewPdfMdoal " target="_blank" style="cursor: pointer;">
-                                    <ion-icon name="eye-outline"></ion-icon>
-                                </a>
-                            </div>
+									//$sql_new = "SELECT * FROM tbl_order_form WHERE user_id='$user_id'";
+									$sql_new = "SELECT tbl_order_form.*,COUNT(DISTINCT tbl_order_form.prod_id) AS prod_num,COUNT(tbl_order_item.oi_id) AS item_num,SUM(tbl_order_item.qty_top1+tbl_order_item.qty_top2+tbl_order_item.qty_bottom1+tbl_order_item.qty_bottom2) AS qty_sum,tbl_user.full_name,tbl_user.customer_id FROM tbl_order_form LEFT JOIN tbl_product ON tbl_order_form.prod_id=tbl_product.prod_id LEFT JOIN tbl_order_item ON tbl_order_form.of_id=tbl_order_item.of_id LEFT JOIN tbl_user ON tbl_order_form.user_id=tbl_user.user_id WHERE tbl_order_form.user_id='$user_id' AND tbl_order_form.enable=1 AND tbl_order_form.order_status<>'finished' AND tbl_order_form.lkr_order_main_id IS NOT NULL AND tbl_order_form.order_status NOT IN ('shipped','received','archived') GROUP BY tbl_order_form.draft_id ORDER BY tbl_order_form.order_date DESC;";
+									$emps = $conn->query($sql_new);
+									$num_rows = $emps->num_rows;
+									if ($num_rows > 0) {
+										while ($row_selection = $emps->fetch_assoc()) {
+											if (!empty($row_selection['code_match'])) {
+												$selection =	$re_order_num == $row_selection['code_match'] ? 'selected' : '';
+									?>
+												<option value="<?= $row_selection['code_match'] ?>" <?= $selection ?>><?= $row_selection['code_match'] ?></option>
+									<?php
+											}
+										}
+									}
+									?>
+								</select>
+								<a class="nav-link d-flex" id="PreviewPdfMdoal " target="_blank" style="cursor: pointer;">
+									<ion-icon name="eye-outline"></ion-icon>
+								</a>
+							</div>
 
 
 						</fieldset>
@@ -756,7 +790,7 @@ $s_of_id_list = implode(",", $a_of_id);
 						</div>
 						<div class="submitBUtton">
 							<span class="themeBtn switch-tab iconBTn" id="movetoteam" onclick="movetoteam()">Save and
-								Continue  <figure class="m-0"><img src="images/vector/nextBtn.png" alt=""></figure></span>
+								Continue <figure class="m-0"><img src="images/vector/nextBtn.png" alt=""></figure></span>
 						</div>
 					</div>
 				</div>
@@ -776,15 +810,15 @@ $s_of_id_list = implode(",", $a_of_id);
 									<div class="form-group">
 										<label for="" class=" ">Year</label>
 										<select class="form-select" name="input_on_year" id="input_on_year">
-										<option value="">-- Select Year --</option>
-                                             <?php
-                                            $currentYear = date("Y");
-                                            for ($year = $currentYear - 5; $year <= $currentYear + 5; $year++) {
-                                                echo '<option value="' . $year . '">' . $year . '</option>';
-                                            }
-                                            ?>
+											<option value="">-- Select Year --</option>
+											<?php
+											$currentYear = date("Y");
+											for ($year = $currentYear - 5; $year <= $currentYear + 5; $year++) {
+												echo '<option value="' . $year . '">' . $year . '</option>';
+											}
+											?>
 										</select>
-										
+
 									</div>
 
 									<div class="form-group column2">
@@ -796,13 +830,13 @@ $s_of_id_list = implode(",", $a_of_id);
 												$stmt = $conn->prepare("SELECT * FROM tbl_product ORDER BY prod_id ASC");
 
 												if (!$stmt) {
-												die("Prepare failed: " . $conn->error);
+													die("Prepare failed: " . $conn->error);
 												}
 
 												$stmt->execute();
 
 												$rs_product = $stmt->get_result();
-								
+
 
 												while ($row_product = $rs_product->fetch_assoc()) {
 													echo "<option value=\"" . $row_product["prod_id"] . '">' . $row_product["prod_name"] . "</option>'; ";
@@ -825,7 +859,7 @@ $s_of_id_list = implode(",", $a_of_id);
 											</span>
 
 											<!-- <div class="upload-btn-wrapper"> -->
-												<!-- <button class="btn themeBtn2 d-flex gap-3">
+											<!-- <button class="btn themeBtn2 d-flex gap-3">
 													<figure class="m-0"><img src="images/vector/upload.png"
 															alt=""></figure> Upload Order Form
 												</button>
@@ -833,17 +867,17 @@ $s_of_id_list = implode(",", $a_of_id);
 												</figure> -->
 
 
-												
-												<span class="" style="height: 55px; width: 151px; overflow: hidden; position: relative ;top: 10px;">
-													<input type="file" class="form-control " accept=".xlsx" name="order_form_file" id="order_form_file">
-												</span>
 
-												<button class="orderFormUpload btn btn-sm btn themeBtn2 iconBTn" type="button">
-													<figure class="m-0">
-														<img src="images/vector/upload.png" alt="">
-													</figure>
-													<span>Upload Order Form </span>
-												</button>
+											<span class="" style="height: 55px; width: 151px; overflow: hidden; position: relative ;top: 10px;">
+												<input type="file" class="form-control " accept=".xlsx" name="order_form_file" id="order_form_file">
+											</span>
+
+											<button class="orderFormUpload btn btn-sm btn themeBtn2 iconBTn" type="button">
+												<figure class="m-0">
+													<img src="images/vector/upload.png" alt="">
+												</figure>
+												<span>Upload Order Form </span>
+											</button>
 
 
 											<!-- </div> -->
@@ -881,25 +915,25 @@ $s_of_id_list = implode(",", $a_of_id);
 
 								$stmt = $conn->prepare($sql_draft);
 
-								$stmt->bind_param("si", $draft_id ,$user_id); 
+								$stmt->bind_param("si", $draft_id, $user_id);
 
 								$stmt->execute();
 
 								$rs_draft = $stmt->get_result();
 								$a_item = array();
 								$i = 0;
-								$teamCount = 1; 
+								$teamCount = 1;
 								while ($row_item = $rs_draft->fetch_assoc()) {
 								?>
 									<li class="nav-item" role="presentation">
 										<a class="nav-link   teamDetailsNavitems  <?php if ($i == 0) {
-																echo "active";
-																$fisrtid = $row_item["of_id"];
-															} ?> " id="fill-tab-<?php echo $row_item["of_id"]; ?>" data-bs-toggle="tab" href="#fill-tabpanel-<?php echo $row_item["of_id"]; ?>" role="tab"  data-i = "<?= $i ?>"   aria-controls="fill-tabpanel-<?php echo $row_item["of_id"]; ?>" aria-selected="true"> Team <?php echo $teamCount ?> </a>
+																						echo "active";
+																						$fisrtid = $row_item["of_id"];
+																					} ?> " id="fill-tab-<?php echo $row_item["of_id"]; ?>" data-bs-toggle="tab" href="#fill-tabpanel-<?php echo $row_item["of_id"]; ?>" role="tab" data-i="<?= $i ?>" aria-controls="fill-tabpanel-<?php echo $row_item["of_id"]; ?>" aria-selected="true"> Team <?php echo $teamCount ?> </a>
 									</li>
 								<?php
 									$i++;
-									$teamCount++; 
+									$teamCount++;
 								}
 								?>
 							</ul>
@@ -907,7 +941,7 @@ $s_of_id_list = implode(",", $a_of_id);
 							<div class="bg-white tableLower">
 								<div id="table_showing" class="table-responsive">
 									<?php
-									
+
 
 									$sql_item = "SELECT * FROM tbl_draft_oi WHERE of_id IN (" . $s_of_id_list . ") ORDER BY of_id ASC,oi_id ASC;";
 									$rs_item = $conn->query($sql_item);
@@ -942,10 +976,10 @@ $s_of_id_list = implode(",", $a_of_id);
 										if ($a_data[$k]["xls_name"] != "") {
 									?>
 											<center id="sameteam<?php echo $of_id; ?>">
-												   <div class="tab-content  xls-name-blank" id="tab-content">
+												<div class="tab-content  xls-name-blank" id="tab-content">
 													<div class="tab-pane <?php if ($fisrtid == $of_id) {
 																				echo "active";
-																			} ?>" id="fill-tabpanel-<?php echo $of_id; ?>" role="tabpanel" aria-labelledby="fill-tab-<?php echo $of_id; ?>"  data-first_id = "<?= $fisrtid ?>">
+																			} ?>" id="fill-tabpanel-<?php echo $of_id; ?>" role="tabpanel" aria-labelledby="fill-tab-<?php echo $of_id; ?>" data-first_id="<?= $fisrtid ?>">
 														<div class="prod_card" id="prod_card<?php echo $form_id; ?>" card-id="<?php echo $form_id; ?>">
 															<input type="hidden" id="obj_size<?php echo $form_id; ?>" value="<?php echo base64_encode(json_encode($a_size)); ?>">
 															<input type="hidden" name="prod_id_list[<?php echo $form_id; ?>]" value="1">
@@ -1001,7 +1035,7 @@ $s_of_id_list = implode(",", $a_of_id);
 											$stmt = $conn->prepare($sql_size);
 
 											if (!$stmt) {
-											die("Prepare failed: " . $conn->error);
+												die("Prepare failed: " . $conn->error);
 											}
 
 											$stmt->bind_param("i", $prod_id); // use "s" if prod_id is string
@@ -1009,7 +1043,7 @@ $s_of_id_list = implode(",", $a_of_id);
 											$stmt->execute();
 
 											$rs_size = $stmt->get_result();
-										
+
 											$a_size = array();
 											while ($row_size = $rs_size->fetch_assoc()) {
 												$a_size[($row_size["split_order"])][] = $row_size;
@@ -1024,7 +1058,7 @@ $s_of_id_list = implode(",", $a_of_id);
 											$ttl_top = 0;
 											$ttl_bottom = 0;
 
-											$num_item = isset($a_item[$of_id]) ?  sizeof($a_item[$of_id]) : 0 ;
+											$num_item = isset($a_item[$of_id]) ?  sizeof($a_item[$of_id]) : 0;
 
 											if ($prod_id == "1") {
 											?>
@@ -1032,7 +1066,7 @@ $s_of_id_list = implode(",", $a_of_id);
 													<div class="tab-content   production_id-1" id="tab-content">
 														<div class="tab-pane <?php if ($fisrtid == $of_id) {
 																					echo "active";
-																				} ?>" id="fill-tabpanel-<?php echo $of_id; ?>" role="tabpanel" aria-labelledby="fill-tab-<?php echo $of_id; ?>"   data-first_id = "<?= $fisrtid ?>">
+																				} ?>" id="fill-tabpanel-<?php echo $of_id; ?>" role="tabpanel" aria-labelledby="fill-tab-<?php echo $of_id; ?>" data-first_id="<?= $fisrtid ?>">
 															<div class="prod_card" id="prod_card<?php echo $form_id; ?>" card-id="<?php echo $form_id; ?>">
 																<input type="hidden" id="obj_size<?php echo $form_id; ?>" value="<?php echo base64_encode(json_encode($a_size)); ?>">
 																<input type="hidden" name="prod_id_list[<?php echo $form_id; ?>]" value="1">
@@ -1056,18 +1090,19 @@ $s_of_id_list = implode(",", $a_of_id);
 																						<i class="fa fa-check" style="cursor: pointer; color: #0F0;" onclick="return editFormNameDone(<?php echo $form_id; ?>);"></i>
 																						<i class="fa fa-times" style="cursor: pointer; color: #F00; margin-left: 5px;" onclick="return editFormNameCancel(<?php echo $form_id; ?>);"></i>
 																					</span>
-																				  </span>
+																				</span>
 
 
 																				<?php echo " (" . $row_product["prod_name"] . ")"; ?>
 																				<?php if ($a_data[$k]["re_order_id"] == "") { ?>
 																					<figure class="m-0 d-inline iconBTn  delete_form_btn">
-																						<img src="images/vector/delter.png" alt="" style="width: 30px; background: #FFF; padding: 6px;margin-left: 20px;"></figure>
+																						<img src="images/vector/delter.png" alt="" style="width: 30px; background: #FFF; padding: 6px;margin-left: 20px;">
+																					</figure>
 																				<?php } else { ?>
 																					(RE-ORDER) <i class="fa fa-minus-circle" style="font-size: 16px; color: #999; " title="Re-Order form can not be deleted."></i>
 																				<?php } ?>
 																			</h6>
-																			
+
 																		</th>
 																		<th colspan="2">
 																			<?php
@@ -1221,7 +1256,7 @@ $s_of_id_list = implode(",", $a_of_id);
 																					<input class="white_in sock_qty2_<?php echo $form_id; ?>" name="sock_qty2[<?php echo $form_id; ?>][]" type="number" min="0" max="9999" onchange="calculateQTY(1,'sock_qty2_<?php echo $form_id; ?>');" onkeyup="calculateQTY(1,'sock_qty2_<?php echo $form_id; ?>');" value="<?php echo $edit_item["qty_bottom2"]; ?>">
 																				</td>
 																				<td>
-																					<select class="white_in w-fit"  name="select_ca[<?php echo $form_id; ?>][]">
+																					<select class="white_in w-fit" name="select_ca[<?php echo $form_id; ?>][]">
 																						<option value=""></option>
 																						<option value="captain" <?php if ($edit_item["c_or_a"] == "captain") {
 																													echo "selected";
@@ -1327,34 +1362,34 @@ $s_of_id_list = implode(",", $a_of_id);
 																		<th colspan="15">
 																			<div class="d-inline">
 																				<h6 class="my-auto">
-																					
-																				<span class="sp_outter_panel" id="sp_outter_panel<?php echo $form_id; ?>">
-																					<span style="text-transform: capitalize;" id="show_edit_form_name<?php echo $form_id; ?>"><?php echo $form_name; ?></span>
-																					<span id="sp_edit_fn_panel<?php echo $form_id; ?>">
-																						<figure class="m-0 d-inline" onclick="return editFormName(<?php echo $form_id; ?>);"><img
-																								src="images/vector/edit.png" alt="" style="width: 25px; margin:0 10px;">
+
+																					<span class="sp_outter_panel" id="sp_outter_panel<?php echo $form_id; ?>">
+																						<span style="text-transform: capitalize;" id="show_edit_form_name<?php echo $form_id; ?>"><?php echo $form_name; ?></span>
+																						<span id="sp_edit_fn_panel<?php echo $form_id; ?>">
+																							<figure class="m-0 d-inline" onclick="return editFormName(<?php echo $form_id; ?>);"><img
+																									src="images/vector/edit.png" alt="" style="width: 25px; margin:0 10px;">
+																							</figure>
+																						</span>
+																						<span id="sp_save_edit_fn_panel<?php echo $form_id; ?>" style="display:none;">
+																							<i class="fa fa-check" style="cursor: pointer; color: #0F0;" onclick="return editFormNameDone(<?php echo $form_id; ?>);"></i>
+																							<i class="fa fa-times" style="cursor: pointer; color: #F00; margin-left: 5px;" onclick="return editFormNameCancel(<?php echo $form_id; ?>);"></i>
+																						</span>
+																					</span>
+
+
+
+																					(<?php echo $row_product["prod_name"]; ?>)
+
+																					<button type="button" class="bg-white d-inline deleteTable border-none  delete_form_btn">
+
+																						<figure class="m-0 d-inline"><img
+																								src="images/vector/delter.png" alt="">
 																						</figure>
-																					</span>
-																					<span id="sp_save_edit_fn_panel<?php echo $form_id; ?>" style="display:none;">
-																						<i class="fa fa-check" style="cursor: pointer; color: #0F0;" onclick="return editFormNameDone(<?php echo $form_id; ?>);"></i>
-																						<i class="fa fa-times" style="cursor: pointer; color: #F00; margin-left: 5px;" onclick="return editFormNameCancel(<?php echo $form_id; ?>);"></i>
-																					</span>
-																				  </span>
 
-																				
-																				
-																				(<?php echo $row_product["prod_name"]; ?>) 
-																			
-																				<button type="button" class="bg-white d-inline deleteTable border-none  delete_form_btn">
+																					</button>
 
-																					<figure class="m-0 d-inline"><img
-																							src="images/vector/delter.png" alt="">
-																					</figure>
 
-																				</button>
-																			
-																			
-																			   </h6>
+																				</h6>
 																			</div>
 																		</th>
 																		<th colspan="2">
@@ -1596,8 +1631,8 @@ $s_of_id_list = implode(",", $a_of_id);
 											<?php
 											} else {
 
-												$split_name =  !empty($row_product["split_name"]) ? $row_product["split_name"] : NULL ;
-												
+												$split_name =  !empty($row_product["split_name"]) ? $row_product["split_name"] : NULL;
+
 											?>
 												<center id="sameteam<?php echo $of_id; ?>">
 													<div class="tab-content  split-name " id="tab-content">
@@ -1609,36 +1644,36 @@ $s_of_id_list = implode(",", $a_of_id);
 																<input type="hidden" name="prod_id_list[<?php echo $form_id; ?>]" value="<?php echo $prod_id ?>">
 																<input type="hidden" id="form_name_list<?php echo $form_id; ?>" name="form_name_list[<?php echo $form_id; ?>]" value="<?php echo $form_name; ?>">
 																<input type="hidden" id="edit_of_id<?php echo $form_id; ?>" name="edit_of_id[<?php echo $form_id; ?>]" value="<?php echo $of_id; ?>">
-																<table class="tbl_item_form Bag-Hat-Accessories"  data-delete_id = "<?= customEncode($of_id) ?>"   style="width: 100%;">
+																<table class="tbl_item_form Bag-Hat-Accessories" data-delete_id="<?= customEncode($of_id) ?>" style="width: 100%;">
 																	<tr class="theader">
 																		<th class="tablecount text-center"></th>
 																		<th colspan="7">
 																			<div class="d-inline">
-																				
-																
+
+
 																				<h6 class="my-auto text-center">
 
 																					<span class="sp_outter_panel" id="sp_outter_panel<?php echo $form_id; ?>">
-																					<span style="text-transform: capitalize;" id="show_edit_form_name<?php echo $form_id; ?>"><?php echo $form_name; ?></span>
-																					<span id="sp_edit_fn_panel<?php echo $form_id; ?>">
-																						<figure class="m-0 d-inline" onclick="return editFormName(<?php echo $form_id; ?>);"><img
-																								src="images/vector/edit.png" alt="" style="width: 25px; margin:0 10px;">
+																						<span style="text-transform: capitalize;" id="show_edit_form_name<?php echo $form_id; ?>"><?php echo $form_name; ?></span>
+																						<span id="sp_edit_fn_panel<?php echo $form_id; ?>">
+																							<figure class="m-0 d-inline" onclick="return editFormName(<?php echo $form_id; ?>);"><img
+																									src="images/vector/edit.png" alt="" style="width: 25px; margin:0 10px;">
+																							</figure>
+																						</span>
+																						<span id="sp_save_edit_fn_panel<?php echo $form_id; ?>" style="display:none;">
+																							<i class="fa fa-check" style="cursor: pointer; color: #0F0;" onclick="return editFormNameDone(<?php echo $form_id; ?>);"></i>
+																							<i class="fa fa-times" style="cursor: pointer; color: #F00; margin-left: 5px;" onclick="return editFormNameCancel(<?php echo $form_id; ?>);"></i>
+																						</span>
+																					</span>
+
+																					(<?php echo $row_product["prod_name"] ?? "" ?>)
+
+																					<button class="delete_form_btn bg-transparent border-none p-0 m-0" type="button">
+																						<figure class="m-0 d-inline iconBTn">
+																							<img src="images/vector/delter.png" alt="" style="width: 30px; background: #FFF; padding: 6px;margin-left: 20px;">
 																						</figure>
-																					</span>
-																					<span id="sp_save_edit_fn_panel<?php echo $form_id; ?>" style="display:none;">
-																						<i class="fa fa-check" style="cursor: pointer; color: #0F0;" onclick="return editFormNameDone(<?php echo $form_id; ?>);"></i>
-																						<i class="fa fa-times" style="cursor: pointer; color: #F00; margin-left: 5px;" onclick="return editFormNameCancel(<?php echo $form_id; ?>);"></i>
-																					</span>
-																				  </span>
-																				
-																				(<?php echo $row_product["prod_name"] ?? "" ?>)
-																		
-																				<button class="delete_form_btn bg-transparent border-none p-0 m-0" type="button">
-																					<figure class="m-0 d-inline iconBTn" >
-																						<img src="images/vector/delter.png" alt="" style="width: 30px; background: #FFF; padding: 6px;margin-left: 20px;">
-																					</figure>
-																				</button>
-																			</h6>
+																					</button>
+																				</h6>
 
 																			</div>
 																		</th>
@@ -2020,53 +2055,53 @@ $s_of_id_list = implode(",", $a_of_id);
 																	<tr>
 																		<th colspan="2" style="text-align: center; font-size: 14px; font-weight: 500;">TOTAL ORDER</th>
 																		<?php
-																	if(!empty($row_product)){
-																		if ($row_product["have_name"] == "1") {
+																		if (!empty($row_product)) {
+																			if ($row_product["have_name"] == "1") {
 																		?>
-																			<th></th>
-																		<?php
-																		}
-
-																		if ($row_product["choose_pg"] == "1") {
-																		?>
-																			<th></th>
-																		<?php
-																		}
-
-																		if ($row_product["choose_mf"] == "1") {
-																		?>
-																			<th></th>
-																		<?php
-																		}
-
-																		if ($row_product["have_size"] == "1") {
-																		?>
-																			<th></th>
-																		<?php
-																		}
-
-																		if ($row_product["have_number"] == "1") {
-																		?>
-																			<th></th>
-																		<?php
-																		}
-
-																		if ($row_product["prod_id"] == "2") {
-																		?>
-																			<th>
+																				<th></th>
 																			<?php
-																		}
-																		if ($row_product["prod_id"] == "4") {
+																			}
+
+																			if ($row_product["choose_pg"] == "1") {
 																			?>
-																			<th>
+																				<th></th>
 																			<?php
-																		}
-																	}
+																			}
+
+																			if ($row_product["choose_mf"] == "1") {
 																			?>
-																			<th id="total_jersey_qty_<?php echo $form_id; ?>"><?= $TTL_SHELL ?></th>
-																			<th></th>
-																			<th></th>
-																			<th></th>
+																				<th></th>
+																			<?php
+																			}
+
+																			if ($row_product["have_size"] == "1") {
+																			?>
+																				<th></th>
+																			<?php
+																			}
+
+																			if ($row_product["have_number"] == "1") {
+																			?>
+																				<th></th>
+																			<?php
+																			}
+
+																			if ($row_product["prod_id"] == "2") {
+																			?>
+																				<th>
+																				<?php
+																			}
+																			if ($row_product["prod_id"] == "4") {
+																				?>
+																				<th>
+																			<?php
+																			}
+																		}
+																			?>
+																				<th id="total_jersey_qty_<?php echo $form_id; ?>"><?= $TTL_SHELL ?></th>
+																				<th></th>
+																				<th></th>
+																				<th></th>
 																	</tr>
 																	<tr>
 
@@ -2103,8 +2138,6 @@ $s_of_id_list = implode(",", $a_of_id);
 											$a_item_show = array();
 											while ($row_oi = $rs_oi->fetch_assoc()) {
 												$a_item_show[] = $row_oi;
-
-												
 											}
 
 											$num_item = sizeof($a_item_show);
@@ -2122,11 +2155,11 @@ $s_of_id_list = implode(",", $a_of_id);
 
 											if ($prod_id == "1") {
 											?>
-											<input type="hidden" name="assigned_edit_of_id"  value="<?=$of_id?>">
+												<input type="hidden" name="assigned_edit_of_id" value="<?= $of_id ?>">
 
 												<center id="sameteam<?php echo $of_id; ?>">
 													<div class="tab-content  prod-id-1" id="tab-content">
-                                                       
+
 														<div class="tab-pane <?php if ($fisrtid == $of_id) {
 																					echo "active";
 																				} ?>" id="fill-tabpanel-<?php echo $of_id; ?>" role="tabpanel" aria-labelledby="fill-tab-<?php echo $of_id; ?>">
@@ -2237,7 +2270,7 @@ $s_of_id_list = implode(",", $a_of_id);
 												$split_name2 = $tmp_split[1];
 											?>
 
-											<input type="hidden" name="assigned_edit_of_id"  value="<?=$of_id?>">
+												<input type="hidden" name="assigned_edit_of_id" value="<?= $of_id ?>">
 
 												<center id="sameteam<?php echo $of_id; ?>">
 													<div class="tab-content  split-type2" id="tab-content">
@@ -2391,7 +2424,7 @@ $s_of_id_list = implode(",", $a_of_id);
 
 												$split_name = $row_product["split_name"];
 											?>
-											<input type="hidden" name="assigned_edit_of_id"  value="<?=$of_id?>">
+												<input type="hidden" name="assigned_edit_of_id" value="<?= $of_id ?>">
 
 												<center id="sameteam<?php echo $of_id; ?>">
 													<div class="tab-content split-name" id="tab-content">
@@ -2593,32 +2626,30 @@ $s_of_id_list = implode(",", $a_of_id);
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
+	function getReorder() {
+		const selectedValue = document.getElementById('reorder_num').value;
+		const previewLink = document.getElementById('PreviewPdfMdoal ');
+		if (selectedValue) {
 
+			$.ajax({
+				type: "POST",
+				dataType: "html",
+				url: "getOrder_code.php",
+				data: {
+					"order_main_code": selectedValue
+				},
+				success: function(resp) {
+					previewLink.href = `https://locker.jog-joinourgame.com/view/?id=${encodeURIComponent(resp)}`;
+				}
+			});
 
- function getReorder() {
-        const selectedValue = document.getElementById('reorder_num').value;
-        const previewLink = document.getElementById('PreviewPdfMdoal ');
-        if (selectedValue) {
+			// Replace with your actual PDF preview URL pattern
 
-            $.ajax({
-                type: "POST",
-                dataType: "html",
-                url: "getOrder_code.php",
-                data: {
-                    "order_main_code": selectedValue
-                },
-                success: function(resp) {
-                    previewLink.href = `https://locker.jog-joinourgame.com/view/?id=${encodeURIComponent(resp)}`;
-                }
-            });
-
-            // Replace with your actual PDF preview URL pattern
-
-        } else {
-            previewLink.href = "";
-        }
-    }
-getReorder(); 
+		} else {
+			previewLink.href = "";
+		}
+	}
+	getReorder();
 
 
 	function editFormName(form_id) {
@@ -2936,23 +2967,23 @@ getReorder();
 
 
 
-    function base64EncodeUnicode(str) {
-        return btoa(
-            new TextEncoder().encode(str)
-            .reduce((data, byte) => data + String.fromCharCode(byte), '')
-        );
-    }
+	function base64EncodeUnicode(str) {
+		return btoa(
+			new TextEncoder().encode(str)
+			.reduce((data, byte) => data + String.fromCharCode(byte), '')
+		);
+	}
 
 
 
 	$(document).ready(function() {
 		$('#showTeamTabsSection').click(function() {
-			let  isValid = CheckOrderFormValidation();
+			let isValid = CheckOrderFormValidation();
 
-            if (!isValid) {
-                console.log("Validation issue");
-                return false;
-            }
+			if (!isValid) {
+				console.log("Validation issue");
+				return false;
+			}
 
 
 			$('.teamTabsSection').show(300); // Adjust duration as needed
@@ -3041,11 +3072,11 @@ getReorder();
 		}
 
 	}
- 
+
 	function movetoteam() {
-        let isValid = CheckBillingFormValidation(); 
-		if(!isValid){
-			 return false ; 
+		let isValid = CheckBillingFormValidation();
+		if (!isValid) {
+			return false;
 		}
 
 
@@ -3060,11 +3091,11 @@ getReorder();
 
 	$(document).on('click', '.movetoOrderItem', function() {
 
-	  let isValid = CheckBillingFormValidation(); 
-	
-	 
-	  if(!isValid){
-			 return false ; 
+		let isValid = CheckBillingFormValidation();
+
+
+		if (!isValid) {
+			return false;
 		}
 
 
@@ -3080,7 +3111,7 @@ getReorder();
 	function saveDraft(eve) {
 		eve.preventDefault();
 
-	
+
 
 
 		if ($('#req_due_date').val() == "") {
@@ -3165,21 +3196,21 @@ getReorder();
 		$('#form_manage_save').submit();
 
 
-				// $('#form_manage_save').on('submit', function(e) {
-				//     e.preventDefault();
+		// $('#form_manage_save').on('submit', function(e) {
+		//     e.preventDefault();
 
-				//    console.log("form sunmit "); 
-				// $.ajax({
-				// 		url: "./ajax/manage_order/submit_draft.php",
-				// 		type: "POST",
-				// 		data: $(this).serialize(),
-				// 		success: function(res) {
-				// 		console.log(res);
-				// }
-				// });
-				// });
+		//    console.log("form sunmit "); 
+		// $.ajax({
+		// 		url: "./ajax/manage_order/submit_draft.php",
+		// 		type: "POST",
+		// 		data: $(this).serialize(),
+		// 		success: function(res) {
+		// 		console.log(res);
+		// }
+		// });
+		// });
 
-				// $('#form_manage_save').submit();
+		// $('#form_manage_save').submit();
 
 	}
 
@@ -3236,7 +3267,7 @@ getReorder();
 			$('#btn_submit_order').attr("disabled", true).html('<i class="fa fa-spinner fa-pulse fa-1x fa-fw"></i> Submiting...');
 
 			$('#is_submit_order').val("yes");
-			
+
 			$('#form_manage_save').attr("action", "ajax/manage_order/submit_draft.php");
 			$('#form_manage_save').submit();
 		}
@@ -3400,183 +3431,183 @@ getReorder();
 	}
 </script>
 <script>
+	document.addEventListener('DOMContentLoaded', () => {
+		const tabs = document.querySelectorAll('.nav-link');
+		const tabContent = document.querySelectorAll('.tab-pane-forboc');
 
-	
-		document.addEventListener('DOMContentLoaded', () => {
-			const tabs = document.querySelectorAll('.nav-link');
-			const tabContent = document.querySelectorAll('.tab-pane-forboc');
+		// Function to activate a tab
+		function activateTab(tabId) {
 
-			// Function to activate a tab
-			function activateTab(tabId) {
-
-				tabs.forEach(tab => {
-					if (tab.classList.contains('teamDetailsNavitems')) {
-					return;
-					}
-					tab.classList.remove('active');
-					if (tab.getAttribute('href') === `#${tabId}`) {
-						tab.classList.add('active');
-					}
-				});
-
-				tabContent.forEach(content => {
-					content.classList.remove('show', 'active');
-					if (content.id === tabId) {
-						content.classList.add('show', 'active');
-					}
-				});
-			}
-
-			// // Handle tab click
-	
 			tabs.forEach(tab => {
-			tab.addEventListener('show.bs.tab', function (event) {
-
-			let currentTab = event.relatedTarget; // ✅ tab you're leaving
-			let nextTab = event.target;           // ✅ tab you're going to
-
-			let currentId = nextTab ? nextTab.id : null;
-			let isValid = true;
-
-			
-
-			// 👉 VALIDATE CURRENT TAB (not next tab)
-			if (currentId === 'order-tab') {
-				isValid = CheckBillingFormValidation();
-			} else if (currentId === 'team-tab') {
-				isValid = CheckOrderInformationValidation();
-			}
-
-			 
-			
-
-			if (!isValid) {
-				event.preventDefault(); // ✅ THIS WILL NOW WORK
-			}
-			});
+				if (tab.classList.contains('teamDetailsNavitems')) {
+					return;
+				}
+				tab.classList.remove('active');
+				if (tab.getAttribute('href') === `#${tabId}`) {
+					tab.classList.add('active');
+				}
 			});
 
-			// Handle back/forward
-			window.addEventListener('popstate', (event) => {
-				const tabId = event.state?.tabId || 'billing';
-               
-
-				activateTab(tabId);
+			tabContent.forEach(content => {
+				content.classList.remove('show', 'active');
+				if (content.id === tabId) {
+					content.classList.add('show', 'active');
+				}
 			});
+		}
 
-			// Initial load
-			const initialTabId = window.location.hash
-				? window.location.hash.substring(1)
-				: 'billing';
+		// // Handle tab click
 
-			activateTab(initialTabId);
+		tabs.forEach(tab => {
+			tab.addEventListener('show.bs.tab', function(event) {
 
-			if (!window.location.hash) {
-				history.replaceState({ tabId: 'billing' }, '', '#billing');
-			}
+				let currentTab = event.relatedTarget; // ✅ tab you're leaving
+				let nextTab = event.target; // ✅ tab you're going to
+
+				let currentId = nextTab ? nextTab.id : null;
+				let isValid = true;
+
+
+
+				// 👉 VALIDATE CURRENT TAB (not next tab)
+				if (currentId === 'order-tab') {
+					isValid = CheckBillingFormValidation();
+				} else if (currentId === 'team-tab') {
+					isValid = CheckOrderInformationValidation();
+				}
+
+
+
+
+				if (!isValid) {
+					event.preventDefault(); // ✅ THIS WILL NOW WORK
+				}
+			});
 		});
 
+		// Handle back/forward
+		window.addEventListener('popstate', (event) => {
+			const tabId = event.state?.tabId || 'billing';
 
 
-    // same as billing info 
+			activateTab(tabId);
+		});
 
+		// Initial load
+		const initialTabId = window.location.hash ?
+			window.location.hash.substring(1) :
+			'billing';
 
-	$(document).on('change' , '#check' ,function(){
-         const a_data_json = <?php echo json_encode($a_data); ?>;
-	     const a_data = a_data_json[0];
-        if ($(this).is(':checked')) {
-             $('#bi_company_name').val(a_data['bill_comp_name']);
-             $('#bi_contact').val(a_data['bill_contact_name']);
-             $('#bi_country').val(a_data["bill_country"]); 
-             $('#bi_city').val(a_data["bill_city"]); 
-             $('#bi_zip_code').val(a_data["bill_zip_code"]); 
-             $('#bi_email').val(a_data["bill_email"]); 
-             $('#bi_tel').val(a_data["bill_tel"]);
-            //  $('#bi_addr_id').val(a_data[0]["addr_id"]);
-             $('#bi_address').val(a_data["bill_address"]);
-             $('#bi_tax_id').val(a_data["bill_tax_id"]);
+		activateTab(initialTabId);
 
-             $('#de_company_name').val(a_data["deli_comp_name"]); 
-             $('#de_contact').val(a_data["deli_contact_name"]);
-             $('#de_country').val(a_data["deli_country"]); 
-             $('#de_city').val(a_data["deli_city"]); 
-             $('#de_zip_code').val(a_data["deli_zip_code"]); 
-             $('#de_email').val(a_data["deli_email"]); 
-             $('#de_tel').val(a_data["deli_tel"]); 
-             $('#de_tax_id').val(a_data["deli_tax_id"]); 
-            //  $('#de_addr_id').val(a_data[1]["addr_id"]); 
-             $('#de_address').val(a_data["deli_address"]); 
-
-         }else{
-               $('#bi_company_name ,#bi_contact ,#bi_country ,#bi_city ,#bi_zip_code ,#de_company_name ,#de_contact ,#de_country ,#de_city ,#de_zip_code ,#de_email ,#de_tel ,#de_tax_id  ,#de_address ,#bi_email ,#bi_tel  ,#bi_address ,#bi_tax_id' ).val('');
-         }
-    })
+		if (!window.location.hash) {
+			history.replaceState({
+				tabId: 'billing'
+			}, '', '#billing');
+		}
+	});
 
 
 
+	// same as billing info 
 
 
-	
-    // Validation patterns
-    const VALIDATION_PATTERNS = {
-        textNumber: /^(?=.*[a-zA-Z]).{3,50}$/,
-		OrderName: /^(?=.*[a-zA-Z])[a-zA-Z0-9\s&'.,\-()]{3,100}$/ , 
-        city: /^[a-zA-Z\s]{2,300}$/, // Letters and spaces only
-        text: /^[a-zA-Z\s]{2,200}$/, // Letters and spaces only
-        zipcode: /^[a-zA-Z0-9\-\s]{2,20}$/, // Letters, numbers, hyphens
-        tel: /^[0-9+\-\s\(\)]{3,30}$/, // Numbers, +, -, spaces, parentheses
-        email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/ // Standard email 
-    };
+	$(document).on('change', '#check', function() {
+		const a_data_json = <?php echo json_encode($a_data); ?>;
+		const a_data = a_data_json[0];
+		if ($(this).is(':checked')) {
+			$('#bi_company_name').val(a_data['bill_comp_name']);
+			$('#bi_contact').val(a_data['bill_contact_name']);
+			$('#bi_country').val(a_data["bill_country"]);
+			$('#bi_city').val(a_data["bill_city"]);
+			$('#bi_zip_code').val(a_data["bill_zip_code"]);
+			$('#bi_email').val(a_data["bill_email"]);
+			$('#bi_tel').val(a_data["bill_tel"]);
+			//  $('#bi_addr_id').val(a_data[0]["addr_id"]);
+			$('#bi_address').val(a_data["bill_address"]);
+			$('#bi_tax_id').val(a_data["bill_tax_id"]);
 
-    // Check the first step 
+			$('#de_company_name').val(a_data["deli_comp_name"]);
+			$('#de_contact').val(a_data["deli_contact_name"]);
+			$('#de_country').val(a_data["deli_country"]);
+			$('#de_city').val(a_data["deli_city"]);
+			$('#de_zip_code').val(a_data["deli_zip_code"]);
+			$('#de_email').val(a_data["deli_email"]);
+			$('#de_tel').val(a_data["deli_tel"]);
+			$('#de_tax_id').val(a_data["deli_tax_id"]);
+			//  $('#de_addr_id').val(a_data[1]["addr_id"]); 
+			$('#de_address').val(a_data["deli_address"]);
 
-
-
-	
-
-
-
-
-    function showFieldError(fieldId, message) {
-        let mainDiv = $('#' + fieldId).closest('.form-group');
-        // Remove existing error first
-        mainDiv.find('.errorMessage').remove();
-
-        let errorMessage = '<p class="errorMessage" style="color:red;">' + message + '</p>';
-        mainDiv.append(errorMessage);
-    }
-
-    function clearFieldError(fieldId) {
-        let mainDiv = $('#' + fieldId).closest('.form-group');
-        mainDiv.find('.errorMessage').remove();
-    }
+		} else {
+			$('#bi_company_name ,#bi_contact ,#bi_country ,#bi_city ,#bi_zip_code ,#de_company_name ,#de_contact ,#de_country ,#de_city ,#de_zip_code ,#de_email ,#de_tel ,#de_tax_id  ,#de_address ,#bi_email ,#bi_tel  ,#bi_address ,#bi_tax_id').val('');
+		}
+	})
 
 
-    function validateField(selector, pattern, message, canEmpty = false) {
-        let val = $(selector).val().trim();
-        let id = $(selector).attr('id');
 
-        // 👉 Case 1: Field is empty
-        if (!val) {
-            if (canEmpty) {
-                clearFieldError(id);
-                return true; // empty is allowed
-            } else {
-                showFieldError(id, message);
-                return false; // empty NOT allowed
-            }
-        }
 
-        // 👉 Case 2: Field has value → must match pattern
-        if (!pattern.test(val)) {
-            showFieldError(id, message);
-            return false;
-        }
 
-        // 👉 Valid case
-        clearFieldError(id);
-        return true;
-    }
+
+	// Validation patterns
+	const VALIDATION_PATTERNS = {
+		textNumber: /^(?=.*[a-zA-Z]).{3,50}$/,
+		OrderName: /^(?=.*[a-zA-Z])[a-zA-Z0-9\s&'.,\-()]{3,100}$/,
+		city: /^[a-zA-Z\s]{2,300}$/, // Letters and spaces only
+		text: /^[a-zA-Z\s]{2,200}$/, // Letters and spaces only
+		zipcode: /^[a-zA-Z0-9\-\s]{2,20}$/, // Letters, numbers, hyphens
+		tel: /^[0-9+\-\s\(\)]{3,30}$/, // Numbers, +, -, spaces, parentheses
+		email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/ // Standard email 
+	};
+
+	// Check the first step 
+
+
+
+
+
+
+
+
+	function showFieldError(fieldId, message) {
+		let mainDiv = $('#' + fieldId).closest('.form-group');
+		// Remove existing error first
+		mainDiv.find('.errorMessage').remove();
+
+		let errorMessage = '<p class="errorMessage" style="color:red;">' + message + '</p>';
+		mainDiv.append(errorMessage);
+	}
+
+	function clearFieldError(fieldId) {
+		let mainDiv = $('#' + fieldId).closest('.form-group');
+		mainDiv.find('.errorMessage').remove();
+	}
+
+
+	function validateField(selector, pattern, message, canEmpty = false) {
+		let val = $(selector).val().trim();
+		let id = $(selector).attr('id');
+
+		// 👉 Case 1: Field is empty
+		if (!val) {
+			if (canEmpty) {
+				clearFieldError(id);
+				return true; // empty is allowed
+			} else {
+				showFieldError(id, message);
+				return false; // empty NOT allowed
+			}
+		}
+
+		// 👉 Case 2: Field has value → must match pattern
+		if (!pattern.test(val)) {
+			showFieldError(id, message);
+			return false;
+		}
+
+		// 👉 Valid case
+		clearFieldError(id);
+		return true;
+	}
 
 
 	function validateDateField(selector, message) {
@@ -3614,108 +3645,108 @@ getReorder();
 		return true;
 	}
 
-	
-    function CheckBillingFormValidation() {
-        let isValid = true;
 
-        $('.errorMessage').remove();
+	function CheckBillingFormValidation() {
+		let isValid = true;
 
-        // TEXT FIELDS
-        isValid &= validateField('#bi_contact', VALIDATION_PATTERNS.text, 'Invalid contact name');
-        isValid &= validateField('#de_contact', VALIDATION_PATTERNS.text, 'Invalid contact name');
+		$('.errorMessage').remove();
 
-        isValid &= validateField('#bi_country', VALIDATION_PATTERNS.text, 'Only letters and spaces allowed');
-        isValid &= validateField('#de_country', VALIDATION_PATTERNS.text, 'Only letters and spaces allowed');
+		// TEXT FIELDS
+		isValid &= validateField('#bi_contact', VALIDATION_PATTERNS.text, 'Invalid contact name');
+		isValid &= validateField('#de_contact', VALIDATION_PATTERNS.text, 'Invalid contact name');
 
-        isValid &= validateField('#bi_city', VALIDATION_PATTERNS.city, 'Only letters and spaces allowed');
-        isValid &= validateField('#de_city', VALIDATION_PATTERNS.city, 'Only letters and spaces allowed');
+		isValid &= validateField('#bi_country', VALIDATION_PATTERNS.text, 'Only letters and spaces allowed');
+		isValid &= validateField('#de_country', VALIDATION_PATTERNS.text, 'Only letters and spaces allowed');
 
-        isValid &= ValidateOnlyEmpty('#bi_address',  'Please fill the address');
-        isValid &= ValidateOnlyEmpty('#de_address','Please fill the address');
+		isValid &= validateField('#bi_city', VALIDATION_PATTERNS.city, 'Only letters and spaces allowed');
+		isValid &= validateField('#de_city', VALIDATION_PATTERNS.city, 'Only letters and spaces allowed');
 
-        isValid &= validateField('#bi_zip_code', VALIDATION_PATTERNS.zipcode, 'Invalid zipcode');
-        isValid &= validateField('#de_zip_code', VALIDATION_PATTERNS.zipcode, 'Invalid zipcode');
+		isValid &= ValidateOnlyEmpty('#bi_address', 'Please fill the address');
+		isValid &= ValidateOnlyEmpty('#de_address', 'Please fill the address');
 
-        isValid &= validateField('#bi_tel', VALIDATION_PATTERNS.tel, 'Invalid telephone number');
-        isValid &= validateField('#de_tel', VALIDATION_PATTERNS.tel, 'Invalid telephone number');
+		isValid &= validateField('#bi_zip_code', VALIDATION_PATTERNS.zipcode, 'Invalid zipcode');
+		isValid &= validateField('#de_zip_code', VALIDATION_PATTERNS.zipcode, 'Invalid zipcode');
 
-        isValid &= validateField('#bi_email', VALIDATION_PATTERNS.email, 'Invalid email address');
-        isValid &= validateField('#de_email', VALIDATION_PATTERNS.email, 'Invalid email address');
+		isValid &= validateField('#bi_tel', VALIDATION_PATTERNS.tel, 'Invalid telephone number');
+		isValid &= validateField('#de_tel', VALIDATION_PATTERNS.tel, 'Invalid telephone number');
 
-        isValid &= validateField('#bi_company_name', VALIDATION_PATTERNS.textNumber, 'Invalid company name', true);
-        isValid &= validateField('#de_company_name', VALIDATION_PATTERNS.textNumber, 'Invalid company name', true);
+		isValid &= validateField('#bi_email', VALIDATION_PATTERNS.email, 'Invalid email address');
+		isValid &= validateField('#de_email', VALIDATION_PATTERNS.email, 'Invalid email address');
 
-
-        return Boolean(isValid);
-    }
+		isValid &= validateField('#bi_company_name', VALIDATION_PATTERNS.textNumber, 'Invalid company name', true);
+		isValid &= validateField('#de_company_name', VALIDATION_PATTERNS.textNumber, 'Invalid company name', true);
 
 
-    function CheckOrderInformationValidation() {
-        let isValid = true;
-
-        $('.errorMessage').remove();
-
-        let eventDateValid = validateDateField('#game_event_date', 'Please select event date');
-        let dueDateValid = validateDateField('#req_due_date', 'Please select due date');
-
-        if (!eventDateValid || !dueDateValid) {
-            isValid = false;
-        }
-
-        // 🔥 Optional: logical validation (important)
-        let eventDate = $('#game_event_date').val();
-        let dueDate = $('#req_due_date').val();
-
-        if (eventDate && dueDate) {
-            if (new Date(dueDate) < new Date(eventDate)) {
-                showFieldError('req_due_date', 'Due date cannot be before event date');
-                isValid = false;
-            }
-        }
-
-        isValid &= validateField('#project_name', VALIDATION_PATTERNS.OrderName, 'Invalid order name', true);
-        isValid &= validateField('#customer_po', VALIDATION_PATTERNS.textNumber, 'Invalid customer PO', true);
+		return Boolean(isValid);
+	}
 
 
+	function CheckOrderInformationValidation() {
+		let isValid = true;
 
-        return isValid;
-    }
+		$('.errorMessage').remove();
 
-    function CheckOrderFormValidation(is_new = false) {
-        let isValid = true;
-        $('.errorMessage').remove();
+		let eventDateValid = validateDateField('#game_event_date', 'Please select event date');
+		let dueDateValid = validateDateField('#req_due_date', 'Please select due date');
 
+		if (!eventDateValid || !dueDateValid) {
+			isValid = false;
+		}
 
-        if (is_new) {
-            isValid &= ValidateOnlyEmpty('#input_on_team_name_new', 'Invalid team name');
-            isValid &= ValidateOnlyEmpty('#input_on_year_new', 'Select Year');
-            isValid &= ValidateOnlyEmpty('#prod_id_new', 'Select Order Form');
-        } else {
-            isValid &= ValidateOnlyEmpty('#input_on_team_name', 'Invalid team name');
-            isValid &= ValidateOnlyEmpty('#input_on_year', 'Select Year');
-            isValid &= ValidateOnlyEmpty('#prod_id', 'Select Order Form');
-        }
+		// 🔥 Optional: logical validation (important)
+		let eventDate = $('#game_event_date').val();
+		let dueDate = $('#req_due_date').val();
 
-        return isValid;
-    }
+		if (eventDate && dueDate) {
+			if (new Date(dueDate) < new Date(eventDate)) {
+				showFieldError('req_due_date', 'Due date cannot be before event date');
+				isValid = false;
+			}
+		}
+
+		isValid &= validateField('#project_name', VALIDATION_PATTERNS.OrderName, 'Invalid order name', true);
+		isValid &= validateField('#customer_po', VALIDATION_PATTERNS.textNumber, 'Invalid customer PO', true);
 
 
 
-		//  delete draft function 
+		return isValid;
+	}
 
-   $(document).on('click' , '.delete_form_btn'  , function(){
-	   let closestTable = $(this).closest('.tbl_item_form') ; 
-	   let draft_id = closestTable.data('delete_id'); 
-
-	   let tab_pane = closestTable.closest('.tab-pane') ;
-	 
-	 
-	   deleteDraft(draft_id ,tab_pane) ;  
-   }) ; 
+	function CheckOrderFormValidation(is_new = false) {
+		let isValid = true;
+		$('.errorMessage').remove();
 
 
+		if (is_new) {
+			isValid &= ValidateOnlyEmpty('#input_on_team_name_new', 'Invalid team name');
+			isValid &= ValidateOnlyEmpty('#input_on_year_new', 'Select Year');
+			isValid &= ValidateOnlyEmpty('#prod_id_new', 'Select Order Form');
+		} else {
+			isValid &= ValidateOnlyEmpty('#input_on_team_name', 'Invalid team name');
+			isValid &= ValidateOnlyEmpty('#input_on_year', 'Select Year');
+			isValid &= ValidateOnlyEmpty('#prod_id', 'Select Order Form');
+		}
 
-	function deleteDraft(draft_id ,tab_pane) {
+		return isValid;
+	}
+
+
+
+	//  delete draft function 
+
+	$(document).on('click', '.delete_form_btn', function() {
+		let closestTable = $(this).closest('.tbl_item_form');
+		let draft_id = closestTable.data('delete_id');
+
+		let tab_pane = closestTable.closest('.tab-pane');
+
+
+		deleteDraft(draft_id, tab_pane);
+	});
+
+
+
+	function deleteDraft(draft_id, tab_pane) {
 
 		if (confirm("Confirm to delete draft")) {
 			$.ajax({
@@ -3728,18 +3759,18 @@ getReorder();
 				success: function(resp) {
 
 					if (resp.result == "success") {
-						    let centerElement = tab_pane.closest('center') ; 
-	                       let active_nav_link = tab_pane.attr('aria-labelledby'); 
+						let centerElement = tab_pane.closest('center');
+						let active_nav_link = tab_pane.attr('aria-labelledby');
 
-						   centerElement.remove(); 
-						   $('#'+active_nav_link).remove(); 
+						centerElement.remove();
+						$('#' + active_nav_link).remove();
 
-											// Activate first available tab
+						// Activate first available tab
 						var firstTab = $('.teamDetailsNavitems:first');
 						firstTab.addClass('active')
-						var href = firstTab.attr('href'); 
-						$(href).addClass('show active'); 
-		 
+						var href = firstTab.attr('href');
+						$(href).addClass('show active');
+
 					}
 
 				}
@@ -3750,40 +3781,38 @@ getReorder();
 
 
 
-    $(document).on('click', '.orderFormUpload', function() {
-        let isValid = CheckOrderFormValidation();
-        let spanText = $(this).find('span');
-        let button = $(this);
+	$(document).on('click', '.orderFormUpload', function() {
+		let isValid = CheckOrderFormValidation();
+		let spanText = $(this).find('span');
+		let button = $(this);
 
-        if (!isValid) {
-            console.log("validation failed");
-            return false;
-        }
-
-
-
-        var prod_id = $('#prod_id').val();
-
-        var form_id = $('#form_id_inc').val();
-
-        var on_team_name = base64EncodeUnicode($('#input_on_team_name').val());
-
-        var on_year = window.btoa($('#input_on_year').val());
-        const teamId = $('#teamTab li').length;
-        let fileInput = $('#order_form_file')[0];
-        let file = fileInput.files[0];
-
-        if (!file) return;
-
-        let formData = new FormData();
-        formData.append('file', file);
-        formData.append('form_id', form_id);
-        formData.append('prod_id', prod_id);
-        formData.append('on_team_name', on_team_name);
-        formData.append('teamno', teamId);
-        formData.append('on_year', on_year);
+		if (!isValid) {
+			console.log("validation failed");
+			return false;
+		}
 
 
+
+		var prod_id = $('#prod_id').val();
+
+		var form_id = $('#form_id_inc').val();
+
+		var on_team_name = base64EncodeUnicode($('#input_on_team_name').val());
+
+		var on_year = window.btoa($('#input_on_year').val());
+		const teamId = $('#teamTab li').length;
+		let fileInput = $('#order_form_file')[0];
+		let file = fileInput.files[0];
+
+		if (!file) return;
+
+		let formData = new FormData();
+		formData.append('file', file);
+		formData.append('form_id', form_id);
+		formData.append('prod_id', prod_id);
+		formData.append('on_team_name', on_team_name);
+		formData.append('teamno', teamId);
+		formData.append('on_year', on_year);
 
 
 
@@ -3792,24 +3821,26 @@ getReorder();
 
 
 
-        // 👉 Optional: add extra data
-        // formData.append('order_id', $('#order_id').val());
-        spanText.text('Uploading.....');
-        button.attr('disabled', true);
-        $.ajax({
-            url: 'ajax/add_order/upload_order_form.php', // 🔁 change to your PHP file
-            type: 'POST',
-            data: formData,
-            contentType: false,
-            processData: false,
-            dataType: 'json',
-            success: function(response) {
-                button.removeAttr('disabled');
-                if (response.upload == false) {
-                    spanText.text('Upload Order Form');
-                    alert("Blank or wrong order form . Please add correct order form");
-                    return false;
-                }
+
+
+		// 👉 Optional: add extra data
+		// formData.append('order_id', $('#order_id').val());
+		spanText.text('Uploading.....');
+		button.attr('disabled', true);
+		$.ajax({
+			url: 'ajax/add_order/upload_order_form.php', // 🔁 change to your PHP file
+			type: 'POST',
+			data: formData,
+			contentType: false,
+			processData: false,
+			dataType: 'json',
+			success: function(response) {
+				button.removeAttr('disabled');
+				if (response.upload == false) {
+					spanText.text('Upload Order Form');
+					alert("Blank or wrong order form . Please add correct order form");
+					return false;
+				}
 
 
 				$('#teamTab .nav-link').removeClass('active');
@@ -3829,19 +3860,19 @@ getReorder();
 
 				$('#teamTab').append(teamTab);
 
-                $('.teamTabsSection').show(300); // Adjust duration as needed
-                $('#table_showing').append(response.html);
+				$('.teamTabsSection').show(300); // Adjust duration as needed
+				$('#table_showing').append(response.html);
 
-                spanText.text('Upload Order Form');
+				spanText.text('Upload Order Form');
 
-            },
-            error: function(xhr, status, error) {
-                console.error("Upload failed:", error);
-                alert('Upload failed');
-            }
-        });
+			},
+			error: function(xhr, status, error) {
+				console.error("Upload failed:", error);
+				alert('Upload failed');
+			}
+		});
 
-    });
+	});
 
 
 	function deleteRow(button) {
@@ -3861,7 +3892,7 @@ getReorder();
 
 		// Make sure split_no exists
 		let split = (typeof split_no !== 'undefined') ? split_no : 1;
-	
+
 
 		if (prod_id === 1) {
 			calculateQTY(1, 'jersey_qty_' + form_id);
@@ -3878,29 +3909,29 @@ getReorder();
 		}
 
 		// Remove row safely
-		
+
 	}
 
-	   function removeTable(el) {
+	function removeTable(el) {
 
-        // Get current tab-pane
-        var $tabPane = $(el).closest('.tab-pane');
+		// Get current tab-pane
+		var $tabPane = $(el).closest('.tab-pane');
 
-        var tabPaneId = $tabPane.attr('id'); // e.g. fill-tabpanel-1
+		var tabPaneId = $tabPane.attr('id'); // e.g. fill-tabpanel-1
 
-        // Remove the tab-pane
-        $tabPane.remove();
+		// Remove the tab-pane
+		$tabPane.remove();
 
-        // Remove corresponding tab button
-        $('button[data-bs-target="#' + tabPaneId + '"], a[href="#' + tabPaneId + '"]').remove();
+		// Remove corresponding tab button
+		$('button[data-bs-target="#' + tabPaneId + '"], a[href="#' + tabPaneId + '"]').remove();
 
-        // Activate first available tab
-		 var firstTab = $('.teamDetailsNavitems:first');
-		 firstTab.addClass('active')
-		 var href = firstTab.attr('href'); 
-         $(href).addClass('show active'); 
-		 
-    }
+		// Activate first available tab
+		var firstTab = $('.teamDetailsNavitems:first');
+		firstTab.addClass('active')
+		var href = firstTab.attr('href');
+		$(href).addClass('show active');
+
+	}
 </script>
 
 

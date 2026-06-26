@@ -87,7 +87,7 @@ $s_of_id_list = implode(",", $a_of_id);
 						}
 
 
-						$num_item =  isset($a_item[$of_id]) ? sizeof($a_item[$of_id]) : 0 ;
+						$num_item =  isset($a_item[$of_id]) ? sizeof($a_item[$of_id]) : 0;
 
 						if ($prod_id == "1") {
 					?>
@@ -299,7 +299,7 @@ $s_of_id_list = implode(",", $a_of_id);
 										}
 										?>
 										<th style="width:70px;"><?php echo $split_name1; ?> Size</th>
-										<th><?php echo $split_name1; ?> #  </th>
+										<th><?php echo $split_name1; ?> # </th>
 										<th><?php echo $split_name1; ?> Color</th>
 										<th style="width:60px;">QTY</th>
 										<th style="width:70px;"><?php echo $split_name2; ?> Size</th>
@@ -319,9 +319,9 @@ $s_of_id_list = implode(",", $a_of_id);
 											$sum_qty_top1 += $edit_item["qty_top1"];
 											$sum_qty_bottom1 += $edit_item["qty_bottom1"];
 										?>
-											<tr id="prod_item_<?php echo $form_id; ?>_<?php echo $row_count; ?>">
-												<td style="border-width: 0px; background-color: #FFA; font-size: 16px; color: #F00; cursor: pointer; text-align: right;" onclick="return deleteItemRow(<?php echo $form_id; ?>,<?php echo $edit_item["oi_id"]; ?>,<?php echo $prod_id; ?>,<?php echo $row_count; ?>,2);">
-													<i class="fa fa-minus-circle"></i>
+											<tr id="prod_item_<?php echo $form_id; ?>_<?php echo $row_count; ?>" class="edit_order_sub_222">
+												<td style="border-width: 0px; background-color: #FFA; cursor: pointer;" onclick="return deleteItemRow(<?php echo $form_id; ?>,<?php echo $edit_item["oi_id"]; ?>,<?php echo $prod_id; ?>,<?php echo $row_count; ?>,2);">
+													<figure class="m-0"><img src="images/vector/deleteGrey.png" alt=""></figure>
 													<input type="hidden" name="a_oi_id[<?php echo $form_id; ?>][]" value="<?php echo $edit_item["oi_id"]; ?>">
 												</td>
 												<?php
@@ -517,9 +517,9 @@ $s_of_id_list = implode(",", $a_of_id);
 											$edit_item = $a_item[$of_id][$m];
 											$sum_qty_top1 += $edit_item["qty_top1"];
 										?>
-											<tr id="prod_item_<?php echo $form_id; ?>_<?php echo $row_count; ?>">
-												<td style="border-width: 0px; background-color: #FFA; font-size: 16px; color: #F00; cursor: pointer; text-align: right;" onclick="return deleteItemRow(<?php echo $form_id; ?>,<?php echo $edit_item["oi_id"]; ?>,<?php echo $prod_id; ?>,<?php echo $row_count; ?>,1);">
-													<i class="fa fa-minus-circle"></i>
+											<tr id="prod_item_<?php echo $form_id; ?>_<?php echo $row_count; ?>" class="edit_order_sub">
+												<td style="border-width: 0px; background-color: #FFA; cursor: pointer;" onclick="return deleteItemRow(<?php echo $form_id; ?>,<?php echo $edit_item["oi_id"]; ?>,<?php echo $prod_id; ?>,<?php echo $row_count; ?>,1);">
+													<figure class="m-0"><img src="images/vector/deleteGrey.png" alt=""></figure>
 													<input type="hidden" name="a_oi_id[<?php echo $form_id; ?>][]" value="<?php echo $edit_item["oi_id"]; ?>">
 												</td>
 												<?php

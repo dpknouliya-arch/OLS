@@ -188,7 +188,7 @@ if ($prod_id == "1") {
 
                         <td>
 
-                            <button class="deleteRow border-none bg-none" onclick="deleteRow(this)">
+                            <button class="deleteRow border-none bg-none 222" onclick="deleteRow(this)">
 
                                 <figure class="m-0"><img src="../images/vector/deleteGrey.png" alt=""></figure>
 
@@ -548,7 +548,7 @@ if ($prod_id == "1") {
 
                         <td>
 
-                            <button class="deleteRow border-none bg-none" onclick="deleteRow(this)">
+                            <button class="deleteRow border-none bg-none 333" onclick="deleteRow(this)">
 
                                 <figure class="m-0"><img src="../images/vector/deleteGrey.png" alt=""></figure>
 
@@ -1022,7 +1022,7 @@ if ($prod_id == "1") {
 
                         <td>
 
-                            <button class="deleteRow border-none bg-none" onclick="deleteRow(this)">
+                            <button class="deleteRow border-none bg-none 444" onclick="deleteRow(this)">
 
                                 <figure class="m-0"><img src="../images/vector/deleteGrey.png" alt=""></figure>
 
