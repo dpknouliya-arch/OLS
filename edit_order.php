@@ -898,8 +898,14 @@ $s_of_id_list = implode(",", $a_of_id);
 										Form button.</li>
 								</ol>
 								<p class="XSmall grey">You can download a Blank Order Form here</p>
-								<a href="#" class="themeBtn2 d-flex gap-3">Download <figure class="m-0"><img
-											src="images/vector/excel.png" alt=""></figure></a>
+								 
+								<a href="images/Blank_Order_Form.xls" download="Blank_Order_Form.xls" class="themeBtn2 d-flex gap-3 iconBTn">
+									<figure class="m-0">
+										<img src="images/vector/OLSNew.png" alt="">
+									</figure> Download <figure class="m-0">
+										<img src="images/vector/excel.png" alt="">
+									</figure>
+								</a>
 							</div>
 						</div>
 					</div>

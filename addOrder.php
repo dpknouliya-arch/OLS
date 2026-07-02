@@ -462,13 +462,13 @@ if ($num_row == 0) {
                                         button.</li>
                                 </ol>
                                 <p class="XSmall grey">You can download a Blank Order Form here</p>
-                                <a href="./assets/Blank_Order_Form.xlsx" download="Blank_Order_Form.xls" class="themeBtn2 d-flex gap-3 iconBTn">
-                                    <figure class="m-0">
-                                        <img src="images/vector/OLSNew.png" alt="">
-                                    </figure> Download <figure class="m-0">
-                                        <img src="images/vector/excel.png" alt="">
-                                    </figure>
-                                </a>
+                               <a href="images/Blank_Order_Form.xls" download="Blank_Order_Form.xls" class="themeBtn2 d-flex gap-3 iconBTn">
+									<figure class="m-0">
+										<img src="images/vector/OLSNew.png" alt="">
+									</figure> Download <figure class="m-0">
+										<img src="images/vector/excel.png" alt="">
+									</figure>
+								</a>
                             </div>
                         </div>
                     </div>
@@ -1917,24 +1917,21 @@ addNewTeam Member Modal
 
     function deleteRow(button) {
         if (!confirm("Deleting row. Confirm?")) {
-            // return;
+            return; // Stop execution if user clicks Cancel
         }
-        const row = button.closest('tr'); // works if button is DOM element
 
-        // Safely get data attributes (works without jQuery)
+        const row = button.closest('tr');
+
         let prod_id = row.getAttribute('data-prod_id');
         let form_id = row.getAttribute('data-form_id');
 
         if (row) {
-            row.remove(); // modern cleaner way
+            row.remove();
         }
 
-        // Convert to number if needed
         prod_id = parseInt(prod_id);
 
-        // Make sure split_no exists
         let split = (typeof split_no !== 'undefined') ? split_no : 1;
-
 
         if (prod_id === 1) {
             calculateQTY(1, 'jersey_qty_' + form_id);
@@ -1949,9 +1946,6 @@ addNewTeam Member Modal
                 calculateQTY(prod_id, 'sock_qty_' + form_id);
             }
         }
-
-        // Remove row safely
-
     }
 </script>
 

@@ -7,20 +7,18 @@ $obj_user = json_decode(base64_decode($_SESSION["JOGOLS"]));
 $user_id = $obj_user->user_id;
 
 ?>
+ 
 
 <style>
     .updated_dateTxt {
-        color: #FFF;
-        background: green;
-        padding: 2px;
-        border-radius: 26px;
-        padding: 2px 5px;
-        font-size: 13px !important;
-        text-align: center;
+      color: #FFF;
+      background: green;
+      padding: 2px;
+      border-radius: 26px;
+      padding: 2px 5px;
+      font-size: 13px !important;
+      text-align: center;
     }
-</style>
-
-<style>
     /* ── ROOT TOKENS ──────────────────────────────────────────────── */
     :root {
       --jog-dark:       #0a0e1a;
@@ -824,6 +822,53 @@ $user_id = $obj_user->user_id;
     ::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
     .deleteDraftsItems img{     width: 13px;   height: 13px;  object-fit: contain; }
      .deleteDraftsItems .dropdown-item-custom{ padding: 3px 6px; border: 1px solid #f3b1b175;  border-radius: 4px;}
+     .draftNum{   color : #6a6d76;   font-size: 15px; font-weight: 600;
+     }
+     #StoryBoardMain  .card-thumb .jersey-img{
+        height: 180px;
+        object-fit: contain;
+     }
+     #StoryBoardMain .card-thumb { 
+        height: 220px;
+        background: linear-gradient(335deg, #989ca53b 0%, #cdaa7e45 100%);
+    }
+    .story-board-row {
+        padding: 30px;
+        border: 1px solid #c3c3c3bd;
+        border-radius: 6px;
+    }
+    .story-board-row .brandLogo img{ 
+      background: #161212;
+      padding: 14px;
+      width: 125px;
+      border-radius: 4px;
+    }
+    .StoryBoardHeader .title{
+        font-size:18px;
+        font-weight: 600;
+        color: #262222;
+        text-transform: uppercase; 
+    }
+    .StoryBoardHeader .printBtn{
+        padding: 5px 20px;
+        background: #059669;
+        color: #fff;
+        border: none;
+        border-radius: 18px;
+        font-family: var(--font-body);
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: background .15s;
+        white-space: nowrap;
+        text-transform: uppercase;
+    }
+    #StoryBoardMain .draft-card{
+      margin-bottom: 20px;
+  }
   </style>
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -853,13 +898,164 @@ $user_id = $obj_user->user_id;
                 <option value="name">Team Name A–Z</option>
             </select>
             <span class="toolbar-count" id="draft-count">6 drafts</span>
+            <a href="" class="btn-new" ><i class="bi bi-plus-lg"></i><i class="fa fa-tachometer" aria-hidden="true"></i> Create Story Board</a>
             <!-- <a href="#" class="btn-new"><i class="bi bi-plus-lg"></i>New Design</a> -->
         </div>
 
         <!-- Card Grid -->
         <div class="row g-3" id="draft-grid">
             <!-- Cards injected by JS -->
-        </div>        
+        </div> 
+        
+        <div class="row my-3 d-none" id="StoryBoardMain">
+          
+          <div class="col-md-8 m-auto">
+            <div class="row story-board-row">
+                <div class="col-md-12 StoryBoardHeader">
+                  <figure class="brandLogo my-auto"><img src="images/logo/jogLOGO.png" alt=""></figure> 
+                   <div class="d-flex justify-content-between align-items-center my-3">
+                      <div class="title">Story Board</div>
+                      <button class="btn printBtn"><i class="fa fa-print" aria-hidden="true"></i> Print</button>
+                    </div> 
+                </div>
+                <div class="col-12 col-md-6 col-xl-4 draft-card-col" data-status="draft" data-name="tbl003">
+                    <div class="draft-card">
+                      <div class="card-thumb">
+                        <img class="jersey-img" src="https://3d-design-storage.s3.ap-south-1.amazonaws.com/3dassets/brand_1/admin/uploads/69fc7b6e7f27b-TBL003Front.webp">   
+                      </div>
+                        <div class="card-body-inner"> 
+                            <div class="meta-row">
+                              <div class="meta-item title"><i class="bi bi-person"></i>Order Name</div>
+                              <div class="meta-item">TBL003</div>
+                            </div> 
+                            <div class="meta-row">
+                              <div class="meta-item title"><i class="bi bi-person"></i>Draft Number</div>
+                              <div class="meta-item">07</div>
+                            </div> 
+                            <div class="meta-row">
+                              <div class="meta-item title"><i class="bi bi-person"></i> Category</div>
+                              <div class="meta-item">Big Hit Pro</div>
+                          </div>  
+                      </div>
+                      
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 col-xl-4 draft-card-col" data-status="draft" data-name="tbl003">
+                  <div class="draft-card">
+                    <div class="card-thumb">
+                      <img class="jersey-img" src="https://3d-design-storage.s3.ap-south-1.amazonaws.com/3dassets/brand_1/admin/uploads/6a33a1e323b22-Front.webp">   
+                    </div>
+                      <div class="card-body-inner"> 
+                          <div class="meta-row">
+                            <div class="meta-item title"><i class="bi bi-person"></i>Order Name</div>
+                            <div class="meta-item">TBL003</div>
+                          </div> 
+                          <div class="meta-row">
+                            <div class="meta-item title"><i class="bi bi-person"></i>Draft Number</div>
+                            <div class="meta-item">07</div>
+                          </div> 
+                          <div class="meta-row">
+                            <div class="meta-item title"><i class="bi bi-person"></i> Category</div>
+                            <div class="meta-item">Big Hit Pro</div>
+                        </div>  
+                    </div>
+                    
+                  </div>
+                </div>
+                <div class="col-12 col-md-6 col-xl-4 draft-card-col" data-status="draft" data-name="tbl003">
+                  <div class="draft-card">
+                    <div class="card-thumb">
+                      <img class="jersey-img" src="https://3d-design-storage.s3.ap-south-1.amazonaws.com/3dassets/brand_1/admin/uploads/6a0410695dcb5-UM002Front.webp">   
+                    </div>
+                      <div class="card-body-inner"> 
+                          <div class="meta-row">
+                            <div class="meta-item title"><i class="bi bi-person"></i>Order Name</div>
+                            <div class="meta-item">TBL003</div>
+                          </div> 
+                          <div class="meta-row">
+                            <div class="meta-item title"><i class="bi bi-person"></i>Draft Number</div>
+                            <div class="meta-item">07</div>
+                          </div> 
+                          <div class="meta-row">
+                            <div class="meta-item title"><i class="bi bi-person"></i> Category</div>
+                            <div class="meta-item">Big Hit Pro</div>
+                        </div>  
+                    </div>
+                    
+                  </div>
+                </div>
+                <div class="col-12 col-md-6 col-xl-4 draft-card-col" data-status="draft" data-name="tbl003">
+                  <div class="draft-card">
+                    <div class="card-thumb">
+                      <img class="jersey-img" src="https://3d-design-storage.s3.ap-south-1.amazonaws.com/3dassets/brand_1/admin/uploads/6a0410695dcb5-UM002Front.webp">   
+                    </div>
+                      <div class="card-body-inner"> 
+                          <div class="meta-row">
+                            <div class="meta-item title"><i class="bi bi-person"></i>Order Name</div>
+                            <div class="meta-item">TBL003</div>
+                          </div> 
+                          <div class="meta-row">
+                            <div class="meta-item title"><i class="bi bi-person"></i>Draft Number</div>
+                            <div class="meta-item">07</div>
+                          </div> 
+                          <div class="meta-row">
+                            <div class="meta-item title"><i class="bi bi-person"></i> Category</div>
+                            <div class="meta-item">Big Hit Pro</div>
+                        </div>  
+                    </div>
+                    
+                  </div>
+                </div>
+                <div class="col-12 col-md-6 col-xl-4 draft-card-col" data-status="draft" data-name="tbl003">
+                  <div class="draft-card">
+                    <div class="card-thumb">
+                      <img class="jersey-img" src="https://3d-design-storage.s3.ap-south-1.amazonaws.com/3dassets/brand_1/admin/uploads/6a33a1e323b22-Front.webp">   
+                    </div>
+                      <div class="card-body-inner"> 
+                          <div class="meta-row">
+                            <div class="meta-item title"><i class="bi bi-person"></i>Order Name</div>
+                            <div class="meta-item">TBL003</div>
+                          </div> 
+                          <div class="meta-row">
+                            <div class="meta-item title"><i class="bi bi-person"></i>Draft Number</div>
+                            <div class="meta-item">07</div>
+                          </div> 
+                          <div class="meta-row">
+                            <div class="meta-item title"><i class="bi bi-person"></i> Category</div>
+                            <div class="meta-item">Big Hit Pro</div>
+                        </div>  
+                    </div>
+                    
+                  </div>
+                </div>
+                <div class="col-12 col-md-6 col-xl-4 draft-card-col" data-status="draft" data-name="tbl003">
+                    <div class="draft-card">
+                      <div class="card-thumb">
+                        <img class="jersey-img" src="https://3d-design-storage.s3.ap-south-1.amazonaws.com/3dassets/brand_1/admin/uploads/69fc7b6e7f27b-TBL003Front.webp">   
+                      </div>
+                        <div class="card-body-inner"> 
+                            <div class="meta-row">
+                              <div class="meta-item title"><i class="bi bi-person"></i>Order Name</div>
+                              <div class="meta-item">TBL003</div>
+                            </div> 
+                            <div class="meta-row">
+                              <div class="meta-item title"><i class="bi bi-person"></i>Draft Number</div>
+                              <div class="meta-item">07</div>
+                            </div> 
+                            <div class="meta-row">
+                              <div class="meta-item title"><i class="bi bi-person"></i> Category</div>
+                              <div class="meta-item">Big Hit Pro</div>
+                          </div>  
+                      </div>
+                      
+                    </div>
+                </div>
+                
+              
+                 
+            </div>
+          </div>
+        </div>
     </section>
 
 
@@ -1074,12 +1270,12 @@ function renderDraftCards(data) {
         </div>
         <div class="card-body-inner">
           <div class="card-title-row">
-            <div class="card-team-name">${d.name}</div>
+            <div class="card-team-name ">${d.name}</div>
             <div class="rep-avatar">${d.insert_date.slice(0, 10)}</div>
           </div>
-          <div>
+          <div class="d-flex gap-2 my-auto">
             <span class="status-badge ${s.cls}">${s.label}</span>
-
+            <h6 class="draftNum my-auto">07</h6>
           </div>
           <div class="meta-row">
             <div class="meta-item"><i class="bi bi-calendar3"></i><b>Created:</b> ${d.insert_date.slice(0, 10)}</div>
